@@ -1,0 +1,194 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.embuckets.controlcartera.entidades;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+/**
+ *
+ * @author emilio
+ */
+@Entity
+@Table(name = "ASEGURADO")
+@XmlRootElement
+@NamedQueries({
+    @NamedQuery(name = "Asegurado.findAll", query = "SELECT a FROM Asegurado a"),
+    @NamedQuery(name = "Asegurado.findByIdcliente", query = "SELECT a FROM Asegurado a WHERE a.idcliente = :idcliente"),
+    @NamedQuery(name = "Asegurado.findByRfc", query = "SELECT a FROM Asegurado a WHERE a.rfc = :rfc"),
+    @NamedQuery(name = "Asegurado.findByNota", query = "SELECT a FROM Asegurado a WHERE a.nota = :nota")})
+public class Asegurado implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "IDCLIENTE")
+    private Integer idcliente;
+    @Column(name = "RFC")
+    private String rfc;
+    @Column(name = "NOTA")
+    private String nota;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
+    private List<Email> emailList;
+    @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = false, updatable = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    private Cliente cliente;
+    @JoinColumn(name = "IDDOMICILIO", referencedColumnName = "IDDOMICILIO")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Domicilio iddomicilio;
+    @JoinColumn(name = "TIPOPERSONA", referencedColumnName = "TIPOPERSONA")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private TipoPersona tipopersona;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "titular", fetch = FetchType.LAZY)
+    private List<Poliza> polizaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "contratante", fetch = FetchType.LAZY)
+    private List<Poliza> polizaList1;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
+    private List<DocumentoAsegurado_1> documentoAseguradoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
+    private List<Telefono> telefonoList;
+
+    public Asegurado() {
+    }
+
+    public Asegurado(Integer idcliente) {
+        this.idcliente = idcliente;
+    }
+
+    public Integer getIdcliente() {
+        return idcliente;
+    }
+
+    public void setIdcliente(Integer idcliente) {
+        this.idcliente = idcliente;
+    }
+
+    public String getRfc() {
+        return rfc;
+    }
+
+    public void setRfc(String rfc) {
+        this.rfc = rfc;
+    }
+
+    public String getNota() {
+        return nota;
+    }
+
+    public void setNota(String nota) {
+        this.nota = nota;
+    }
+
+    @XmlTransient
+    public List<Email> getEmailList() {
+        return emailList;
+    }
+
+    public void setEmailList(List<Email> emailList) {
+        this.emailList = emailList;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Domicilio getIddomicilio() {
+        return iddomicilio;
+    }
+
+    public void setIddomicilio(Domicilio iddomicilio) {
+        this.iddomicilio = iddomicilio;
+    }
+
+    public TipoPersona getTipopersona() {
+        return tipopersona;
+    }
+
+    public void setTipopersona(TipoPersona tipopersona) {
+        this.tipopersona = tipopersona;
+    }
+
+    @XmlTransient
+    public List<Poliza> getPolizaList() {
+        return polizaList;
+    }
+
+    public void setPolizaList(List<Poliza> polizaList) {
+        this.polizaList = polizaList;
+    }
+
+    @XmlTransient
+    public List<Poliza> getPolizaList1() {
+        return polizaList1;
+    }
+
+    public void setPolizaList1(List<Poliza> polizaList1) {
+        this.polizaList1 = polizaList1;
+    }
+
+    @XmlTransient
+    public List<DocumentoAsegurado_1> getDocumentoAseguradoList() {
+        return documentoAseguradoList;
+    }
+
+    public void setDocumentoAseguradoList(List<DocumentoAsegurado_1> documentoAseguradoList) {
+        this.documentoAseguradoList = documentoAseguradoList;
+    }
+
+    @XmlTransient
+    public List<Telefono> getTelefonoList() {
+        return telefonoList;
+    }
+
+    public void setTelefonoList(List<Telefono> telefonoList) {
+        this.telefonoList = telefonoList;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (idcliente != null ? idcliente.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Asegurado)) {
+            return false;
+        }
+        Asegurado other = (Asegurado) object;
+        if ((this.idcliente == null && other.idcliente != null) || (this.idcliente != null && !this.idcliente.equals(other.idcliente))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.embuckets.controlcartera.entidades.Asegurado[ idcliente=" + idcliente + " ]";
+    }
+    
+}

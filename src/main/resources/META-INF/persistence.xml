@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="cartera" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <class>com.embuckets.controlcartera.entidades.Poliza</class>
+    <class>com.embuckets.controlcartera.entidades.Telefono</class>
+    <class>com.embuckets.controlcartera.entidades.Caratula</class>
+    <class>com.embuckets.controlcartera.entidades.Recibo</class>
+    <class>com.embuckets.controlcartera.entidades.PolizaVida</class>
+    <class>com.embuckets.controlcartera.entidades.Email</class>
+    <class>com.embuckets.controlcartera.entidades.Ramo</class>
+    <class>com.embuckets.controlcartera.entidades.TipoEmail</class>
+    <class>com.embuckets.controlcartera.entidades.Auto</class>
+    <class>com.embuckets.controlcartera.entidades.FormaPago</class>
+    <class>com.embuckets.controlcartera.entidades.Delegacion</class>
+    <class>com.embuckets.controlcartera.entidades.TipoPersona</class>
+    <class>com.embuckets.controlcartera.entidades.Moneda</class>
+    <class>com.embuckets.controlcartera.entidades.TipoDocumentoAsegurado</class>
+    <class>com.embuckets.controlcartera.entidades.PolizaAuto</class>
+    <class>com.embuckets.controlcartera.entidades.TipoTelefono</class>
+    <class>com.embuckets.controlcartera.entidades.PolizaGmm</class>
+    <class>com.embuckets.controlcartera.entidades.Aseguradora</class>
+    <class>com.embuckets.controlcartera.entidades.Estado</class>
+    <class>com.embuckets.controlcartera.entidades.Cliente</class>
+    <class>com.embuckets.controlcartera.entidades.Cobranza</class>
+    <class>com.embuckets.controlcartera.entidades.ConductoCobro</class>
+    <class>com.embuckets.controlcartera.entidades.SumaAseguradaAuto</class>
+    <class>com.embuckets.controlcartera.entidades.DocumentoAsegurado</class>
+    <class>com.embuckets.controlcartera.entidades.Domicilio</class>
+    <class>com.embuckets.controlcartera.entidades.DocumentoRecibo</class>
+    <class>com.embuckets.controlcartera.entidades.EstadoPoliza</class>
+    <class>com.embuckets.controlcartera.entidades.Asegurado</class>
+    <class>com.embuckets.controlcartera.entidades.EstadoNotificacion</class>
+    <class>com.embuckets.controlcartera.entidades.NotificacionRecibo</class>
+    <class>com.embuckets.controlcartera.entidades.NotificacionCumple</class>
+    <class>com.embuckets.controlcartera.entidades.DocumentoAsegurado_1</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:derby:cartera"/>
+      <!--<property name="javax.persistence.jdbc.url" value="jdbc:derby:C:\Users\emilio\Documents\NetBeansProjects\ControlCartera\cartera"/>-->
+      <property name="javax.persistence.jdbc.user" value="emilio"/>
+      <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+      <property name="javax.persistence.jdbc.password" value="emilio"/>
+      <property name="hibernate.default_schema" value="APP"/>
+      <property name="hibernate.show_sql" value="true"/>
+    </properties>
+  </persistence-unit>
+</persistence>
