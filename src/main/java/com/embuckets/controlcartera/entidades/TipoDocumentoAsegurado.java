@@ -38,7 +38,7 @@ public class TipoDocumentoAsegurado implements Serializable {
     @Column(name = "TIPODOCUMENTO")
     private String tipodocumento;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tipoDocumentoAsegurado", fetch = FetchType.LAZY)
-    private List<DocumentoAsegurado_1> documentoAseguradoList;
+    private List<DocumentoAsegurado> documentoAseguradoList;
 
     public TipoDocumentoAsegurado() {
     }
@@ -56,11 +56,11 @@ public class TipoDocumentoAsegurado implements Serializable {
     }
 
     @XmlTransient
-    public List<DocumentoAsegurado_1> getDocumentoAseguradoList() {
+    public List<DocumentoAsegurado> getDocumentoAseguradoList() {
         return documentoAseguradoList;
     }
 
-    public void setDocumentoAseguradoList(List<DocumentoAsegurado_1> documentoAseguradoList) {
+    public void setDocumentoAseguradoList(List<DocumentoAsegurado> documentoAseguradoList) {
         this.documentoAseguradoList = documentoAseguradoList;
     }
 

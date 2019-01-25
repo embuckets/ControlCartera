@@ -79,15 +79,15 @@ public class Poliza implements Serializable {
     private Caratula caratula;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaAuto polizaAuto;
-    @JoinColumn(name = "TITULAR", referencedColumnName = "IDCLIENTE")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Asegurado titular;
     @JoinColumn(name = "CONTRATANTE", referencedColumnName = "IDCLIENTE")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado contratante;
     @JoinColumn(name = "ASEGURADORA", referencedColumnName = "ASEGURADORA")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Aseguradora aseguradora;
+    @JoinColumn(name = "TITULAR", referencedColumnName = "IDCLIENTE")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Cliente titular;
     @JoinColumn(name = "CONDUCTOCOBRO", referencedColumnName = "CONDUCTOCOBRO")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private ConductoCobro conductocobro;
@@ -205,14 +205,6 @@ public class Poliza implements Serializable {
         this.polizaAuto = polizaAuto;
     }
 
-    public Asegurado getTitular() {
-        return titular;
-    }
-
-    public void setTitular(Asegurado titular) {
-        this.titular = titular;
-    }
-
     public Asegurado getContratante() {
         return contratante;
     }
@@ -227,6 +219,14 @@ public class Poliza implements Serializable {
 
     public void setAseguradora(Aseguradora aseguradora) {
         this.aseguradora = aseguradora;
+    }
+
+    public Cliente getTitular() {
+        return titular;
+    }
+
+    public void setTitular(Cliente titular) {
+        this.titular = titular;
     }
 
     public ConductoCobro getConductocobro() {

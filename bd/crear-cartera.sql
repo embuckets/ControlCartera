@@ -264,7 +264,7 @@ CREATE TABLE POLIZA (
     REFERENCES ASEGURADO (idCliente),
   CONSTRAINT fk_poliza_titular
     FOREIGN KEY (Titular)
-    REFERENCES ASEGURADO (idCliente),
+    REFERENCES CLIENTE (idCliente),
   CONSTRAINT fk_poliza_estadoPoliza
     FOREIGN KEY (Estado)
     REFERENCES ESTADO_POLIZA (Estado))
@@ -335,7 +335,7 @@ CREATE TABLE COBRANZA (
 -- Table RECIBO
 -- -----------------------------------------------------
 CREATE TABLE RECIBO (
-  idRecibo INT NOT NULL,
+  idRecibo INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
   idPoliza INT NOT NULL,
   cubreDesde DATE NOT NULL,
   cubreHasta DATE NOT NULL,
@@ -441,7 +441,7 @@ CREATE TABLE POLIZA_GMM (
   idPoliza INT NOT NULL,
   Deducible DECIMAL(9,2) NOT NULL,
   DeducibleMoneda VARCHAR(7) NOT NULL,
-  SumaAsegurada DECIMAL(9,2) NOT NULL,
+  SumaAsegurada VARCHAR(14) NOT NULL,
   SumaAseguradaMondeda VARCHAR(7) NOT NULL,
   Coaseguro SMALLINT NOT NULL,
   PRIMARY KEY (idPoliza),
@@ -708,6 +708,7 @@ INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Mapfre');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('MetLife');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Old Mutual Life');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Pan-American');
+INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Plan Seguro');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Inbursa');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Quálitas');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Afirme');
@@ -772,7 +773,8 @@ INSERT INTO FORMA_PAGO (FormaPago) VALUES ('Mensual');
 
 INSERT INTO MONEDA (Moneda) VALUES ('Pesos');
 INSERT INTO MONEDA (Moneda) VALUES ('Dólares');
-INSERT INTO MONEDA (Moneda) VALUES ('Umam');
+INSERT INTO MONEDA (Moneda) VALUES ('UMAM');
+INSERT INTO MONEDA (Moneda) VALUES ('UDIS');
 
 
 

@@ -11,8 +11,8 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import com.embuckets.controlcartera.entidades.Asegurado;
+import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.DocumentoAseguradoPK;
-import com.embuckets.controlcartera.entidades.DocumentoAsegurado_1;
 import com.embuckets.controlcartera.entidades.TipoDocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
@@ -24,9 +24,9 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class DocumentoAsegurado_1JpaController implements Serializable {
+public class DocumentoAseguradoJpaController implements Serializable {
 
-    public DocumentoAsegurado_1JpaController(EntityManagerFactory emf) {
+    public DocumentoAseguradoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
@@ -35,39 +35,39 @@ public class DocumentoAsegurado_1JpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(DocumentoAsegurado_1 documentoAsegurado_1) throws PreexistingEntityException, Exception {
-        if (documentoAsegurado_1.getDocumentoAseguradoPK() == null) {
-            documentoAsegurado_1.setDocumentoAseguradoPK(new DocumentoAseguradoPK());
+    public void create(DocumentoAsegurado documentoAsegurado) throws PreexistingEntityException, Exception {
+        if (documentoAsegurado.getDocumentoAseguradoPK() == null) {
+            documentoAsegurado.setDocumentoAseguradoPK(new DocumentoAseguradoPK());
         }
-        documentoAsegurado_1.getDocumentoAseguradoPK().setIdcliente(documentoAsegurado_1.getAsegurado().getIdcliente());
-        documentoAsegurado_1.getDocumentoAseguradoPK().setTipodocumento(documentoAsegurado_1.getTipoDocumentoAsegurado().getTipodocumento());
+        documentoAsegurado.getDocumentoAseguradoPK().setIdcliente(documentoAsegurado.getAsegurado().getIdcliente());
+        documentoAsegurado.getDocumentoAseguradoPK().setTipodocumento(documentoAsegurado.getTipoDocumentoAsegurado().getTipodocumento());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Asegurado asegurado = documentoAsegurado_1.getAsegurado();
+            Asegurado asegurado = documentoAsegurado.getAsegurado();
             if (asegurado != null) {
                 asegurado = em.getReference(asegurado.getClass(), asegurado.getIdcliente());
-                documentoAsegurado_1.setAsegurado(asegurado);
+                documentoAsegurado.setAsegurado(asegurado);
             }
-            TipoDocumentoAsegurado tipoDocumentoAsegurado = documentoAsegurado_1.getTipoDocumentoAsegurado();
+            TipoDocumentoAsegurado tipoDocumentoAsegurado = documentoAsegurado.getTipoDocumentoAsegurado();
             if (tipoDocumentoAsegurado != null) {
                 tipoDocumentoAsegurado = em.getReference(tipoDocumentoAsegurado.getClass(), tipoDocumentoAsegurado.getTipodocumento());
-                documentoAsegurado_1.setTipoDocumentoAsegurado(tipoDocumentoAsegurado);
+                documentoAsegurado.setTipoDocumentoAsegurado(tipoDocumentoAsegurado);
             }
-            em.persist(documentoAsegurado_1);
+            em.persist(documentoAsegurado);
             if (asegurado != null) {
-                asegurado.getDocumentoAseguradoList().add(documentoAsegurado_1);
+                asegurado.getDocumentoAseguradoList().add(documentoAsegurado);
                 asegurado = em.merge(asegurado);
             }
             if (tipoDocumentoAsegurado != null) {
-                tipoDocumentoAsegurado.getDocumentoAseguradoList().add(documentoAsegurado_1);
+                tipoDocumentoAsegurado.getDocumentoAseguradoList().add(documentoAsegurado);
                 tipoDocumentoAsegurado = em.merge(tipoDocumentoAsegurado);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findDocumentoAsegurado_1(documentoAsegurado_1.getDocumentoAseguradoPK()) != null) {
-                throw new PreexistingEntityException("DocumentoAsegurado_1 " + documentoAsegurado_1 + " already exists.", ex);
+            if (findDocumentoAsegurado(documentoAsegurado.getDocumentoAseguradoPK()) != null) {
+                throw new PreexistingEntityException("DocumentoAsegurado " + documentoAsegurado + " already exists.", ex);
             }
             throw ex;
         } finally {
@@ -77,50 +77,50 @@ public class DocumentoAsegurado_1JpaController implements Serializable {
         }
     }
 
-    public void edit(DocumentoAsegurado_1 documentoAsegurado_1) throws NonexistentEntityException, Exception {
-        documentoAsegurado_1.getDocumentoAseguradoPK().setIdcliente(documentoAsegurado_1.getAsegurado().getIdcliente());
-        documentoAsegurado_1.getDocumentoAseguradoPK().setTipodocumento(documentoAsegurado_1.getTipoDocumentoAsegurado().getTipodocumento());
+    public void edit(DocumentoAsegurado documentoAsegurado) throws NonexistentEntityException, Exception {
+        documentoAsegurado.getDocumentoAseguradoPK().setIdcliente(documentoAsegurado.getAsegurado().getIdcliente());
+        documentoAsegurado.getDocumentoAseguradoPK().setTipodocumento(documentoAsegurado.getTipoDocumentoAsegurado().getTipodocumento());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            DocumentoAsegurado_1 persistentDocumentoAsegurado_1 = em.find(DocumentoAsegurado_1.class, documentoAsegurado_1.getDocumentoAseguradoPK());
-            Asegurado aseguradoOld = persistentDocumentoAsegurado_1.getAsegurado();
-            Asegurado aseguradoNew = documentoAsegurado_1.getAsegurado();
-            TipoDocumentoAsegurado tipoDocumentoAseguradoOld = persistentDocumentoAsegurado_1.getTipoDocumentoAsegurado();
-            TipoDocumentoAsegurado tipoDocumentoAseguradoNew = documentoAsegurado_1.getTipoDocumentoAsegurado();
+            DocumentoAsegurado persistentDocumentoAsegurado = em.find(DocumentoAsegurado.class, documentoAsegurado.getDocumentoAseguradoPK());
+            Asegurado aseguradoOld = persistentDocumentoAsegurado.getAsegurado();
+            Asegurado aseguradoNew = documentoAsegurado.getAsegurado();
+            TipoDocumentoAsegurado tipoDocumentoAseguradoOld = persistentDocumentoAsegurado.getTipoDocumentoAsegurado();
+            TipoDocumentoAsegurado tipoDocumentoAseguradoNew = documentoAsegurado.getTipoDocumentoAsegurado();
             if (aseguradoNew != null) {
                 aseguradoNew = em.getReference(aseguradoNew.getClass(), aseguradoNew.getIdcliente());
-                documentoAsegurado_1.setAsegurado(aseguradoNew);
+                documentoAsegurado.setAsegurado(aseguradoNew);
             }
             if (tipoDocumentoAseguradoNew != null) {
                 tipoDocumentoAseguradoNew = em.getReference(tipoDocumentoAseguradoNew.getClass(), tipoDocumentoAseguradoNew.getTipodocumento());
-                documentoAsegurado_1.setTipoDocumentoAsegurado(tipoDocumentoAseguradoNew);
+                documentoAsegurado.setTipoDocumentoAsegurado(tipoDocumentoAseguradoNew);
             }
-            documentoAsegurado_1 = em.merge(documentoAsegurado_1);
+            documentoAsegurado = em.merge(documentoAsegurado);
             if (aseguradoOld != null && !aseguradoOld.equals(aseguradoNew)) {
-                aseguradoOld.getDocumentoAseguradoList().remove(documentoAsegurado_1);
+                aseguradoOld.getDocumentoAseguradoList().remove(documentoAsegurado);
                 aseguradoOld = em.merge(aseguradoOld);
             }
             if (aseguradoNew != null && !aseguradoNew.equals(aseguradoOld)) {
-                aseguradoNew.getDocumentoAseguradoList().add(documentoAsegurado_1);
+                aseguradoNew.getDocumentoAseguradoList().add(documentoAsegurado);
                 aseguradoNew = em.merge(aseguradoNew);
             }
             if (tipoDocumentoAseguradoOld != null && !tipoDocumentoAseguradoOld.equals(tipoDocumentoAseguradoNew)) {
-                tipoDocumentoAseguradoOld.getDocumentoAseguradoList().remove(documentoAsegurado_1);
+                tipoDocumentoAseguradoOld.getDocumentoAseguradoList().remove(documentoAsegurado);
                 tipoDocumentoAseguradoOld = em.merge(tipoDocumentoAseguradoOld);
             }
             if (tipoDocumentoAseguradoNew != null && !tipoDocumentoAseguradoNew.equals(tipoDocumentoAseguradoOld)) {
-                tipoDocumentoAseguradoNew.getDocumentoAseguradoList().add(documentoAsegurado_1);
+                tipoDocumentoAseguradoNew.getDocumentoAseguradoList().add(documentoAsegurado);
                 tipoDocumentoAseguradoNew = em.merge(tipoDocumentoAseguradoNew);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                DocumentoAseguradoPK id = documentoAsegurado_1.getDocumentoAseguradoPK();
-                if (findDocumentoAsegurado_1(id) == null) {
-                    throw new NonexistentEntityException("The documentoAsegurado_1 with id " + id + " no longer exists.");
+                DocumentoAseguradoPK id = documentoAsegurado.getDocumentoAseguradoPK();
+                if (findDocumentoAsegurado(id) == null) {
+                    throw new NonexistentEntityException("The documentoAsegurado with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -136,24 +136,24 @@ public class DocumentoAsegurado_1JpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            DocumentoAsegurado_1 documentoAsegurado_1;
+            DocumentoAsegurado documentoAsegurado;
             try {
-                documentoAsegurado_1 = em.getReference(DocumentoAsegurado_1.class, id);
-                documentoAsegurado_1.getDocumentoAseguradoPK();
+                documentoAsegurado = em.getReference(DocumentoAsegurado.class, id);
+                documentoAsegurado.getDocumentoAseguradoPK();
             } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The documentoAsegurado_1 with id " + id + " no longer exists.", enfe);
+                throw new NonexistentEntityException("The documentoAsegurado with id " + id + " no longer exists.", enfe);
             }
-            Asegurado asegurado = documentoAsegurado_1.getAsegurado();
+            Asegurado asegurado = documentoAsegurado.getAsegurado();
             if (asegurado != null) {
-                asegurado.getDocumentoAseguradoList().remove(documentoAsegurado_1);
+                asegurado.getDocumentoAseguradoList().remove(documentoAsegurado);
                 asegurado = em.merge(asegurado);
             }
-            TipoDocumentoAsegurado tipoDocumentoAsegurado = documentoAsegurado_1.getTipoDocumentoAsegurado();
+            TipoDocumentoAsegurado tipoDocumentoAsegurado = documentoAsegurado.getTipoDocumentoAsegurado();
             if (tipoDocumentoAsegurado != null) {
-                tipoDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAsegurado_1);
+                tipoDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAsegurado);
                 tipoDocumentoAsegurado = em.merge(tipoDocumentoAsegurado);
             }
-            em.remove(documentoAsegurado_1);
+            em.remove(documentoAsegurado);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -162,19 +162,19 @@ public class DocumentoAsegurado_1JpaController implements Serializable {
         }
     }
 
-    public List<DocumentoAsegurado_1> findDocumentoAsegurado_1Entities() {
-        return findDocumentoAsegurado_1Entities(true, -1, -1);
+    public List<DocumentoAsegurado> findDocumentoAseguradoEntities() {
+        return findDocumentoAseguradoEntities(true, -1, -1);
     }
 
-    public List<DocumentoAsegurado_1> findDocumentoAsegurado_1Entities(int maxResults, int firstResult) {
-        return findDocumentoAsegurado_1Entities(false, maxResults, firstResult);
+    public List<DocumentoAsegurado> findDocumentoAseguradoEntities(int maxResults, int firstResult) {
+        return findDocumentoAseguradoEntities(false, maxResults, firstResult);
     }
 
-    private List<DocumentoAsegurado_1> findDocumentoAsegurado_1Entities(boolean all, int maxResults, int firstResult) {
+    private List<DocumentoAsegurado> findDocumentoAseguradoEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(DocumentoAsegurado_1.class));
+            cq.select(cq.from(DocumentoAsegurado.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -186,20 +186,20 @@ public class DocumentoAsegurado_1JpaController implements Serializable {
         }
     }
 
-    public DocumentoAsegurado_1 findDocumentoAsegurado_1(DocumentoAseguradoPK id) {
+    public DocumentoAsegurado findDocumentoAsegurado(DocumentoAseguradoPK id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(DocumentoAsegurado_1.class, id);
+            return em.find(DocumentoAsegurado.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getDocumentoAsegurado_1Count() {
+    public int getDocumentoAseguradoCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<DocumentoAsegurado_1> rt = cq.from(DocumentoAsegurado_1.class);
+            Root<DocumentoAsegurado> rt = cq.from(DocumentoAsegurado.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

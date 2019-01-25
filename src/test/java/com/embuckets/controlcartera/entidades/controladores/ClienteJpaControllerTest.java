@@ -14,7 +14,9 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -27,25 +29,26 @@ import static org.junit.Assert.*;
  * @author emilio
  */
 public class ClienteJpaControllerTest {
+
     private EntityManagerFactory entityManagerFactory;
-    
+
     public ClienteJpaControllerTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
         entityManagerFactory = Persistence.createEntityManagerFactory("cartera");
-        
+
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -71,12 +74,13 @@ public class ClienteJpaControllerTest {
     public void testCreate() {
         System.out.println("create");
         Cliente cliente = new Cliente();
-        cliente.setNombre("Emilio");
+        cliente.setNombre("Daniel");
         cliente.setApellidopaterno("Hernandez");
         cliente.setApellidomaterno("Segovia");
         cliente.setNacimiento(Date.from(Instant.now()));
         ClienteJpaController instance = new ClienteJpaController(entityManagerFactory);
         instance.create(cliente);
+        System.out.println("ID: " + cliente.getIdcliente());
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
@@ -153,6 +157,29 @@ public class ClienteJpaControllerTest {
     }
 
     /**
+     * Test of findCliente method, of class ClienteJpaController.
+     */
+    @Test
+    public void testFindClienteByNombreYApellidos() {
+        System.out.println("findClienteByNombreYApellidos");
+        String nombre = "emilio";
+        String apellidopaterno = "her";
+        String apellidomaterno = "sego";
+
+//        ClienteJpaController instance = new ClienteJpaController(entityManagerFactory);
+//        try {
+//            Cliente cliente = instance.findClienteByNombreCompleto(nombre, apellidopaterno, apellidomaterno);
+//            assertTrue("Cliente " + nombre + " " + apellidopaterno + " " + apellidomaterno + " tiene ID = " + cliente.getIdcliente(), true);
+//
+//        } catch (NoResultException ex) {
+//            fail("Cliente " + nombre + " " + apellidopaterno + " " + apellidomaterno + " no existe");
+//        }
+
+        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+    }
+
+    /**
      * Test of getClienteCount method, of class ClienteJpaController.
      */
     @Test
@@ -165,5 +192,5 @@ public class ClienteJpaControllerTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-    
+
 }

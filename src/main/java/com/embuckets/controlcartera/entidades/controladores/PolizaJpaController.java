@@ -14,6 +14,7 @@ import com.embuckets.controlcartera.entidades.Caratula;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Aseguradora;
+import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.ConductoCobro;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.FormaPago;
@@ -63,11 +64,6 @@ public class PolizaJpaController implements Serializable {
                 polizaAuto = em.getReference(polizaAuto.getClass(), polizaAuto.getIdpoliza());
                 poliza.setPolizaAuto(polizaAuto);
             }
-            Asegurado titular = poliza.getTitular();
-            if (titular != null) {
-                titular = em.getReference(titular.getClass(), titular.getIdcliente());
-                poliza.setTitular(titular);
-            }
             Asegurado contratante = poliza.getContratante();
             if (contratante != null) {
                 contratante = em.getReference(contratante.getClass(), contratante.getIdcliente());
@@ -77,6 +73,11 @@ public class PolizaJpaController implements Serializable {
             if (aseguradora != null) {
                 aseguradora = em.getReference(aseguradora.getClass(), aseguradora.getAseguradora());
                 poliza.setAseguradora(aseguradora);
+            }
+            Cliente titular = poliza.getTitular();
+            if (titular != null) {
+                titular = em.getReference(titular.getClass(), titular.getIdcliente());
+                poliza.setTitular(titular);
             }
             ConductoCobro conductocobro = poliza.getConductocobro();
             if (conductocobro != null) {
@@ -138,10 +139,6 @@ public class PolizaJpaController implements Serializable {
                 polizaAuto.setPoliza(poliza);
                 polizaAuto = em.merge(polizaAuto);
             }
-            if (titular != null) {
-                titular.getPolizaList().add(poliza);
-                titular = em.merge(titular);
-            }
             if (contratante != null) {
                 contratante.getPolizaList().add(poliza);
                 contratante = em.merge(contratante);
@@ -149,6 +146,10 @@ public class PolizaJpaController implements Serializable {
             if (aseguradora != null) {
                 aseguradora.getPolizaList().add(poliza);
                 aseguradora = em.merge(aseguradora);
+            }
+            if (titular != null) {
+                titular.getPolizaList().add(poliza);
+                titular = em.merge(titular);
             }
             if (conductocobro != null) {
                 conductocobro.getPolizaList().add(poliza);
@@ -215,12 +216,12 @@ public class PolizaJpaController implements Serializable {
             Caratula caratulaNew = poliza.getCaratula();
             PolizaAuto polizaAutoOld = persistentPoliza.getPolizaAuto();
             PolizaAuto polizaAutoNew = poliza.getPolizaAuto();
-            Asegurado titularOld = persistentPoliza.getTitular();
-            Asegurado titularNew = poliza.getTitular();
             Asegurado contratanteOld = persistentPoliza.getContratante();
             Asegurado contratanteNew = poliza.getContratante();
             Aseguradora aseguradoraOld = persistentPoliza.getAseguradora();
             Aseguradora aseguradoraNew = poliza.getAseguradora();
+            Cliente titularOld = persistentPoliza.getTitular();
+            Cliente titularNew = poliza.getTitular();
             ConductoCobro conductocobroOld = persistentPoliza.getConductocobro();
             ConductoCobro conductocobroNew = poliza.getConductocobro();
             EstadoPoliza estadoOld = persistentPoliza.getEstado();
@@ -281,10 +282,6 @@ public class PolizaJpaController implements Serializable {
                 polizaAutoNew = em.getReference(polizaAutoNew.getClass(), polizaAutoNew.getIdpoliza());
                 poliza.setPolizaAuto(polizaAutoNew);
             }
-            if (titularNew != null) {
-                titularNew = em.getReference(titularNew.getClass(), titularNew.getIdcliente());
-                poliza.setTitular(titularNew);
-            }
             if (contratanteNew != null) {
                 contratanteNew = em.getReference(contratanteNew.getClass(), contratanteNew.getIdcliente());
                 poliza.setContratante(contratanteNew);
@@ -292,6 +289,10 @@ public class PolizaJpaController implements Serializable {
             if (aseguradoraNew != null) {
                 aseguradoraNew = em.getReference(aseguradoraNew.getClass(), aseguradoraNew.getAseguradora());
                 poliza.setAseguradora(aseguradoraNew);
+            }
+            if (titularNew != null) {
+                titularNew = em.getReference(titularNew.getClass(), titularNew.getIdcliente());
+                poliza.setTitular(titularNew);
             }
             if (conductocobroNew != null) {
                 conductocobroNew = em.getReference(conductocobroNew.getClass(), conductocobroNew.getConductocobro());
@@ -347,14 +348,6 @@ public class PolizaJpaController implements Serializable {
                 polizaAutoNew.setPoliza(poliza);
                 polizaAutoNew = em.merge(polizaAutoNew);
             }
-            if (titularOld != null && !titularOld.equals(titularNew)) {
-                titularOld.getPolizaList().remove(poliza);
-                titularOld = em.merge(titularOld);
-            }
-            if (titularNew != null && !titularNew.equals(titularOld)) {
-                titularNew.getPolizaList().add(poliza);
-                titularNew = em.merge(titularNew);
-            }
             if (contratanteOld != null && !contratanteOld.equals(contratanteNew)) {
                 contratanteOld.getPolizaList().remove(poliza);
                 contratanteOld = em.merge(contratanteOld);
@@ -370,6 +363,14 @@ public class PolizaJpaController implements Serializable {
             if (aseguradoraNew != null && !aseguradoraNew.equals(aseguradoraOld)) {
                 aseguradoraNew.getPolizaList().add(poliza);
                 aseguradoraNew = em.merge(aseguradoraNew);
+            }
+            if (titularOld != null && !titularOld.equals(titularNew)) {
+                titularOld.getPolizaList().remove(poliza);
+                titularOld = em.merge(titularOld);
+            }
+            if (titularNew != null && !titularNew.equals(titularOld)) {
+                titularNew.getPolizaList().add(poliza);
+                titularNew = em.merge(titularNew);
             }
             if (conductocobroOld != null && !conductocobroOld.equals(conductocobroNew)) {
                 conductocobroOld.getPolizaList().remove(poliza);
@@ -508,11 +509,6 @@ public class PolizaJpaController implements Serializable {
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
             }
-            Asegurado titular = poliza.getTitular();
-            if (titular != null) {
-                titular.getPolizaList().remove(poliza);
-                titular = em.merge(titular);
-            }
             Asegurado contratante = poliza.getContratante();
             if (contratante != null) {
                 contratante.getPolizaList().remove(poliza);
@@ -522,6 +518,11 @@ public class PolizaJpaController implements Serializable {
             if (aseguradora != null) {
                 aseguradora.getPolizaList().remove(poliza);
                 aseguradora = em.merge(aseguradora);
+            }
+            Cliente titular = poliza.getTitular();
+            if (titular != null) {
+                titular.getPolizaList().remove(poliza);
+                titular = em.merge(titular);
             }
             ConductoCobro conductocobro = poliza.getConductocobro();
             if (conductocobro != null) {

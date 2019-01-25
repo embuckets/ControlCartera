@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Wed Jan 23 13:11:16 CST 2019:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0168-7c1f-a9b7-000004a53240 
+Thu Jan 24 21:38:58 CST 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0168-8316-d1bd-000004a6df80 
 on database directory C:\Users\emilio\Documents\NetBeansProjects\ControlCartera\cartera with class loader sun.misc.Launcher$AppClassLoader@42a57993 
 Loaded from file:/C:/Users/emilio/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
 java.vendor=Oracle Corporation

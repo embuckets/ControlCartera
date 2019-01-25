@@ -17,7 +17,6 @@ import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -38,7 +37,7 @@ public class ReciboJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Recibo recibo) throws PreexistingEntityException, Exception {
+    public void create(Recibo recibo) {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -91,11 +90,6 @@ public class ReciboJpaController implements Serializable {
                 idpoliza = em.merge(idpoliza);
             }
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findRecibo(recibo.getIdrecibo()) != null) {
-                throw new PreexistingEntityException("Recibo " + recibo + " already exists.", ex);
-            }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();

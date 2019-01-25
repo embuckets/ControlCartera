@@ -18,7 +18,7 @@ import com.embuckets.controlcartera.entidades.Email;
 import java.util.ArrayList;
 import java.util.List;
 import com.embuckets.controlcartera.entidades.Poliza;
-import com.embuckets.controlcartera.entidades.DocumentoAsegurado_1;
+import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
@@ -48,11 +48,8 @@ public class AseguradoJpaController implements Serializable {
         if (asegurado.getPolizaList() == null) {
             asegurado.setPolizaList(new ArrayList<Poliza>());
         }
-        if (asegurado.getPolizaList1() == null) {
-            asegurado.setPolizaList1(new ArrayList<Poliza>());
-        }
         if (asegurado.getDocumentoAseguradoList() == null) {
-            asegurado.setDocumentoAseguradoList(new ArrayList<DocumentoAsegurado_1>());
+            asegurado.setDocumentoAseguradoList(new ArrayList<DocumentoAsegurado>());
         }
         if (asegurado.getTelefonoList() == null) {
             asegurado.setTelefonoList(new ArrayList<Telefono>());
@@ -102,16 +99,10 @@ public class AseguradoJpaController implements Serializable {
                 attachedPolizaList.add(polizaListPolizaToAttach);
             }
             asegurado.setPolizaList(attachedPolizaList);
-            List<Poliza> attachedPolizaList1 = new ArrayList<Poliza>();
-            for (Poliza polizaList1PolizaToAttach : asegurado.getPolizaList1()) {
-                polizaList1PolizaToAttach = em.getReference(polizaList1PolizaToAttach.getClass(), polizaList1PolizaToAttach.getIdpoliza());
-                attachedPolizaList1.add(polizaList1PolizaToAttach);
-            }
-            asegurado.setPolizaList1(attachedPolizaList1);
-            List<DocumentoAsegurado_1> attachedDocumentoAseguradoList = new ArrayList<DocumentoAsegurado_1>();
-            for (DocumentoAsegurado_1 documentoAseguradoListDocumentoAsegurado_1ToAttach : asegurado.getDocumentoAseguradoList()) {
-                documentoAseguradoListDocumentoAsegurado_1ToAttach = em.getReference(documentoAseguradoListDocumentoAsegurado_1ToAttach.getClass(), documentoAseguradoListDocumentoAsegurado_1ToAttach.getDocumentoAseguradoPK());
-                attachedDocumentoAseguradoList.add(documentoAseguradoListDocumentoAsegurado_1ToAttach);
+            List<DocumentoAsegurado> attachedDocumentoAseguradoList = new ArrayList<DocumentoAsegurado>();
+            for (DocumentoAsegurado documentoAseguradoListDocumentoAseguradoToAttach : asegurado.getDocumentoAseguradoList()) {
+                documentoAseguradoListDocumentoAseguradoToAttach = em.getReference(documentoAseguradoListDocumentoAseguradoToAttach.getClass(), documentoAseguradoListDocumentoAseguradoToAttach.getDocumentoAseguradoPK());
+                attachedDocumentoAseguradoList.add(documentoAseguradoListDocumentoAseguradoToAttach);
             }
             asegurado.setDocumentoAseguradoList(attachedDocumentoAseguradoList);
             List<Telefono> attachedTelefonoList = new ArrayList<Telefono>();
@@ -143,30 +134,21 @@ public class AseguradoJpaController implements Serializable {
                 }
             }
             for (Poliza polizaListPoliza : asegurado.getPolizaList()) {
-                Asegurado oldTitularOfPolizaListPoliza = polizaListPoliza.getTitular();
-                polizaListPoliza.setTitular(asegurado);
+                Asegurado oldContratanteOfPolizaListPoliza = polizaListPoliza.getContratante();
+                polizaListPoliza.setContratante(asegurado);
                 polizaListPoliza = em.merge(polizaListPoliza);
-                if (oldTitularOfPolizaListPoliza != null) {
-                    oldTitularOfPolizaListPoliza.getPolizaList().remove(polizaListPoliza);
-                    oldTitularOfPolizaListPoliza = em.merge(oldTitularOfPolizaListPoliza);
+                if (oldContratanteOfPolizaListPoliza != null) {
+                    oldContratanteOfPolizaListPoliza.getPolizaList().remove(polizaListPoliza);
+                    oldContratanteOfPolizaListPoliza = em.merge(oldContratanteOfPolizaListPoliza);
                 }
             }
-            for (Poliza polizaList1Poliza : asegurado.getPolizaList1()) {
-                Asegurado oldContratanteOfPolizaList1Poliza = polizaList1Poliza.getContratante();
-                polizaList1Poliza.setContratante(asegurado);
-                polizaList1Poliza = em.merge(polizaList1Poliza);
-                if (oldContratanteOfPolizaList1Poliza != null) {
-                    oldContratanteOfPolizaList1Poliza.getPolizaList1().remove(polizaList1Poliza);
-                    oldContratanteOfPolizaList1Poliza = em.merge(oldContratanteOfPolizaList1Poliza);
-                }
-            }
-            for (DocumentoAsegurado_1 documentoAseguradoListDocumentoAsegurado_1 : asegurado.getDocumentoAseguradoList()) {
-                Asegurado oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado_1 = documentoAseguradoListDocumentoAsegurado_1.getAsegurado();
-                documentoAseguradoListDocumentoAsegurado_1.setAsegurado(asegurado);
-                documentoAseguradoListDocumentoAsegurado_1 = em.merge(documentoAseguradoListDocumentoAsegurado_1);
-                if (oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado_1 != null) {
-                    oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado_1.getDocumentoAseguradoList().remove(documentoAseguradoListDocumentoAsegurado_1);
-                    oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado_1 = em.merge(oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado_1);
+            for (DocumentoAsegurado documentoAseguradoListDocumentoAsegurado : asegurado.getDocumentoAseguradoList()) {
+                Asegurado oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado = documentoAseguradoListDocumentoAsegurado.getAsegurado();
+                documentoAseguradoListDocumentoAsegurado.setAsegurado(asegurado);
+                documentoAseguradoListDocumentoAsegurado = em.merge(documentoAseguradoListDocumentoAsegurado);
+                if (oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado != null) {
+                    oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAseguradoListDocumentoAsegurado);
+                    oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado = em.merge(oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado);
                 }
             }
             for (Telefono telefonoListTelefono : asegurado.getTelefonoList()) {
@@ -207,10 +189,8 @@ public class AseguradoJpaController implements Serializable {
             List<Email> emailListNew = asegurado.getEmailList();
             List<Poliza> polizaListOld = persistentAsegurado.getPolizaList();
             List<Poliza> polizaListNew = asegurado.getPolizaList();
-            List<Poliza> polizaList1Old = persistentAsegurado.getPolizaList1();
-            List<Poliza> polizaList1New = asegurado.getPolizaList1();
-            List<DocumentoAsegurado_1> documentoAseguradoListOld = persistentAsegurado.getDocumentoAseguradoList();
-            List<DocumentoAsegurado_1> documentoAseguradoListNew = asegurado.getDocumentoAseguradoList();
+            List<DocumentoAsegurado> documentoAseguradoListOld = persistentAsegurado.getDocumentoAseguradoList();
+            List<DocumentoAsegurado> documentoAseguradoListNew = asegurado.getDocumentoAseguradoList();
             List<Telefono> telefonoListOld = persistentAsegurado.getTelefonoList();
             List<Telefono> telefonoListNew = asegurado.getTelefonoList();
             List<String> illegalOrphanMessages = null;
@@ -236,23 +216,15 @@ public class AseguradoJpaController implements Serializable {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Poliza " + polizaListOldPoliza + " since its titular field is not nullable.");
+                    illegalOrphanMessages.add("You must retain Poliza " + polizaListOldPoliza + " since its contratante field is not nullable.");
                 }
             }
-            for (Poliza polizaList1OldPoliza : polizaList1Old) {
-                if (!polizaList1New.contains(polizaList1OldPoliza)) {
+            for (DocumentoAsegurado documentoAseguradoListOldDocumentoAsegurado : documentoAseguradoListOld) {
+                if (!documentoAseguradoListNew.contains(documentoAseguradoListOldDocumentoAsegurado)) {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Poliza " + polizaList1OldPoliza + " since its contratante field is not nullable.");
-                }
-            }
-            for (DocumentoAsegurado_1 documentoAseguradoListOldDocumentoAsegurado_1 : documentoAseguradoListOld) {
-                if (!documentoAseguradoListNew.contains(documentoAseguradoListOldDocumentoAsegurado_1)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain DocumentoAsegurado_1 " + documentoAseguradoListOldDocumentoAsegurado_1 + " since its asegurado field is not nullable.");
+                    illegalOrphanMessages.add("You must retain DocumentoAsegurado " + documentoAseguradoListOldDocumentoAsegurado + " since its asegurado field is not nullable.");
                 }
             }
             for (Telefono telefonoListOldTelefono : telefonoListOld) {
@@ -292,17 +264,10 @@ public class AseguradoJpaController implements Serializable {
             }
             polizaListNew = attachedPolizaListNew;
             asegurado.setPolizaList(polizaListNew);
-            List<Poliza> attachedPolizaList1New = new ArrayList<Poliza>();
-            for (Poliza polizaList1NewPolizaToAttach : polizaList1New) {
-                polizaList1NewPolizaToAttach = em.getReference(polizaList1NewPolizaToAttach.getClass(), polizaList1NewPolizaToAttach.getIdpoliza());
-                attachedPolizaList1New.add(polizaList1NewPolizaToAttach);
-            }
-            polizaList1New = attachedPolizaList1New;
-            asegurado.setPolizaList1(polizaList1New);
-            List<DocumentoAsegurado_1> attachedDocumentoAseguradoListNew = new ArrayList<DocumentoAsegurado_1>();
-            for (DocumentoAsegurado_1 documentoAseguradoListNewDocumentoAsegurado_1ToAttach : documentoAseguradoListNew) {
-                documentoAseguradoListNewDocumentoAsegurado_1ToAttach = em.getReference(documentoAseguradoListNewDocumentoAsegurado_1ToAttach.getClass(), documentoAseguradoListNewDocumentoAsegurado_1ToAttach.getDocumentoAseguradoPK());
-                attachedDocumentoAseguradoListNew.add(documentoAseguradoListNewDocumentoAsegurado_1ToAttach);
+            List<DocumentoAsegurado> attachedDocumentoAseguradoListNew = new ArrayList<DocumentoAsegurado>();
+            for (DocumentoAsegurado documentoAseguradoListNewDocumentoAseguradoToAttach : documentoAseguradoListNew) {
+                documentoAseguradoListNewDocumentoAseguradoToAttach = em.getReference(documentoAseguradoListNewDocumentoAseguradoToAttach.getClass(), documentoAseguradoListNewDocumentoAseguradoToAttach.getDocumentoAseguradoPK());
+                attachedDocumentoAseguradoListNew.add(documentoAseguradoListNewDocumentoAseguradoToAttach);
             }
             documentoAseguradoListNew = attachedDocumentoAseguradoListNew;
             asegurado.setDocumentoAseguradoList(documentoAseguradoListNew);
@@ -351,34 +316,23 @@ public class AseguradoJpaController implements Serializable {
             }
             for (Poliza polizaListNewPoliza : polizaListNew) {
                 if (!polizaListOld.contains(polizaListNewPoliza)) {
-                    Asegurado oldTitularOfPolizaListNewPoliza = polizaListNewPoliza.getTitular();
-                    polizaListNewPoliza.setTitular(asegurado);
+                    Asegurado oldContratanteOfPolizaListNewPoliza = polizaListNewPoliza.getContratante();
+                    polizaListNewPoliza.setContratante(asegurado);
                     polizaListNewPoliza = em.merge(polizaListNewPoliza);
-                    if (oldTitularOfPolizaListNewPoliza != null && !oldTitularOfPolizaListNewPoliza.equals(asegurado)) {
-                        oldTitularOfPolizaListNewPoliza.getPolizaList().remove(polizaListNewPoliza);
-                        oldTitularOfPolizaListNewPoliza = em.merge(oldTitularOfPolizaListNewPoliza);
+                    if (oldContratanteOfPolizaListNewPoliza != null && !oldContratanteOfPolizaListNewPoliza.equals(asegurado)) {
+                        oldContratanteOfPolizaListNewPoliza.getPolizaList().remove(polizaListNewPoliza);
+                        oldContratanteOfPolizaListNewPoliza = em.merge(oldContratanteOfPolizaListNewPoliza);
                     }
                 }
             }
-            for (Poliza polizaList1NewPoliza : polizaList1New) {
-                if (!polizaList1Old.contains(polizaList1NewPoliza)) {
-                    Asegurado oldContratanteOfPolizaList1NewPoliza = polizaList1NewPoliza.getContratante();
-                    polizaList1NewPoliza.setContratante(asegurado);
-                    polizaList1NewPoliza = em.merge(polizaList1NewPoliza);
-                    if (oldContratanteOfPolizaList1NewPoliza != null && !oldContratanteOfPolizaList1NewPoliza.equals(asegurado)) {
-                        oldContratanteOfPolizaList1NewPoliza.getPolizaList1().remove(polizaList1NewPoliza);
-                        oldContratanteOfPolizaList1NewPoliza = em.merge(oldContratanteOfPolizaList1NewPoliza);
-                    }
-                }
-            }
-            for (DocumentoAsegurado_1 documentoAseguradoListNewDocumentoAsegurado_1 : documentoAseguradoListNew) {
-                if (!documentoAseguradoListOld.contains(documentoAseguradoListNewDocumentoAsegurado_1)) {
-                    Asegurado oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado_1 = documentoAseguradoListNewDocumentoAsegurado_1.getAsegurado();
-                    documentoAseguradoListNewDocumentoAsegurado_1.setAsegurado(asegurado);
-                    documentoAseguradoListNewDocumentoAsegurado_1 = em.merge(documentoAseguradoListNewDocumentoAsegurado_1);
-                    if (oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado_1 != null && !oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado_1.equals(asegurado)) {
-                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado_1.getDocumentoAseguradoList().remove(documentoAseguradoListNewDocumentoAsegurado_1);
-                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado_1 = em.merge(oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado_1);
+            for (DocumentoAsegurado documentoAseguradoListNewDocumentoAsegurado : documentoAseguradoListNew) {
+                if (!documentoAseguradoListOld.contains(documentoAseguradoListNewDocumentoAsegurado)) {
+                    Asegurado oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado = documentoAseguradoListNewDocumentoAsegurado.getAsegurado();
+                    documentoAseguradoListNewDocumentoAsegurado.setAsegurado(asegurado);
+                    documentoAseguradoListNewDocumentoAsegurado = em.merge(documentoAseguradoListNewDocumentoAsegurado);
+                    if (oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado != null && !oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado.equals(asegurado)) {
+                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAseguradoListNewDocumentoAsegurado);
+                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado = em.merge(oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado);
                     }
                 }
             }
@@ -435,21 +389,14 @@ public class AseguradoJpaController implements Serializable {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Asegurado (" + asegurado + ") cannot be destroyed since the Poliza " + polizaListOrphanCheckPoliza + " in its polizaList field has a non-nullable titular field.");
+                illegalOrphanMessages.add("This Asegurado (" + asegurado + ") cannot be destroyed since the Poliza " + polizaListOrphanCheckPoliza + " in its polizaList field has a non-nullable contratante field.");
             }
-            List<Poliza> polizaList1OrphanCheck = asegurado.getPolizaList1();
-            for (Poliza polizaList1OrphanCheckPoliza : polizaList1OrphanCheck) {
+            List<DocumentoAsegurado> documentoAseguradoListOrphanCheck = asegurado.getDocumentoAseguradoList();
+            for (DocumentoAsegurado documentoAseguradoListOrphanCheckDocumentoAsegurado : documentoAseguradoListOrphanCheck) {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Asegurado (" + asegurado + ") cannot be destroyed since the Poliza " + polizaList1OrphanCheckPoliza + " in its polizaList1 field has a non-nullable contratante field.");
-            }
-            List<DocumentoAsegurado_1> documentoAseguradoListOrphanCheck = asegurado.getDocumentoAseguradoList();
-            for (DocumentoAsegurado_1 documentoAseguradoListOrphanCheckDocumentoAsegurado_1 : documentoAseguradoListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This Asegurado (" + asegurado + ") cannot be destroyed since the DocumentoAsegurado_1 " + documentoAseguradoListOrphanCheckDocumentoAsegurado_1 + " in its documentoAseguradoList field has a non-nullable asegurado field.");
+                illegalOrphanMessages.add("This Asegurado (" + asegurado + ") cannot be destroyed since the DocumentoAsegurado " + documentoAseguradoListOrphanCheckDocumentoAsegurado + " in its documentoAseguradoList field has a non-nullable asegurado field.");
             }
             List<Telefono> telefonoListOrphanCheck = asegurado.getTelefonoList();
             for (Telefono telefonoListOrphanCheckTelefono : telefonoListOrphanCheck) {

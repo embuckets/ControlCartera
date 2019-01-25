@@ -90,7 +90,7 @@ public class DocumentoAseguradoPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.mycompany.controlcartera.DocumentoAseguradoPK[ idcliente=" + idcliente + ", nombre=" + nombre + ", tipodocumento=" + tipodocumento + " ]";
+        return "com.embuckets.controlcartera.entidades.DocumentoAseguradoPK[ idcliente=" + idcliente + ", nombre=" + nombre + ", tipodocumento=" + tipodocumento + " ]";
     }
     
 }

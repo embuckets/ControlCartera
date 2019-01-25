@@ -57,12 +57,10 @@ public class Asegurado implements Serializable {
     @JoinColumn(name = "TIPOPERSONA", referencedColumnName = "TIPOPERSONA")
     @ManyToOne(fetch = FetchType.LAZY)
     private TipoPersona tipopersona;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "titular", fetch = FetchType.LAZY)
-    private List<Poliza> polizaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "contratante", fetch = FetchType.LAZY)
-    private List<Poliza> polizaList1;
+    private List<Poliza> polizaList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
-    private List<DocumentoAsegurado_1> documentoAseguradoList;
+    private List<DocumentoAsegurado> documentoAseguradoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
     private List<Telefono> telefonoList;
 
@@ -140,20 +138,11 @@ public class Asegurado implements Serializable {
     }
 
     @XmlTransient
-    public List<Poliza> getPolizaList1() {
-        return polizaList1;
-    }
-
-    public void setPolizaList1(List<Poliza> polizaList1) {
-        this.polizaList1 = polizaList1;
-    }
-
-    @XmlTransient
-    public List<DocumentoAsegurado_1> getDocumentoAseguradoList() {
+    public List<DocumentoAsegurado> getDocumentoAseguradoList() {
         return documentoAseguradoList;
     }
 
-    public void setDocumentoAseguradoList(List<DocumentoAsegurado_1> documentoAseguradoList) {
+    public void setDocumentoAseguradoList(List<DocumentoAsegurado> documentoAseguradoList) {
         this.documentoAseguradoList = documentoAseguradoList;
     }
 

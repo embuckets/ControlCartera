@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.embuckets.controlcartera.entidades;
 
 import java.io.Serializable;
@@ -22,6 +21,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -75,6 +75,8 @@ public class Cliente implements Serializable {
     private Asegurado asegurado;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente", fetch = FetchType.LAZY)
     private NotificacionCumple notificacionCumple;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "titular", fetch = FetchType.LAZY)
+    private List<Poliza> polizaList;
 
     public Cliente() {
     }
@@ -162,6 +164,15 @@ public class Cliente implements Serializable {
         this.notificacionCumple = notificacionCumple;
     }
 
+    @XmlTransient
+    public List<Poliza> getPolizaList() {
+        return polizaList;
+    }
+
+    public void setPolizaList(List<Poliza> polizaList) {
+        this.polizaList = polizaList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -186,5 +197,5 @@ public class Cliente implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Cliente[ idcliente=" + idcliente + " ]";
     }
-
+    
 }

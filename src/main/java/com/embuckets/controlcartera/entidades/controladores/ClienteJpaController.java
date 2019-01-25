@@ -17,6 +17,7 @@ import com.embuckets.controlcartera.entidades.PolizaGmm;
 import java.util.ArrayList;
 import java.util.List;
 import com.embuckets.controlcartera.entidades.PolizaVida;
+import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import javax.persistence.EntityManager;
@@ -44,6 +45,9 @@ public class ClienteJpaController implements Serializable {
         if (cliente.getPolizaVidaList() == null) {
             cliente.setPolizaVidaList(new ArrayList<PolizaVida>());
         }
+        if (cliente.getPolizaList() == null) {
+            cliente.setPolizaList(new ArrayList<Poliza>());
+        }
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -70,6 +74,12 @@ public class ClienteJpaController implements Serializable {
                 attachedPolizaVidaList.add(polizaVidaListPolizaVidaToAttach);
             }
             cliente.setPolizaVidaList(attachedPolizaVidaList);
+            List<Poliza> attachedPolizaList = new ArrayList<Poliza>();
+            for (Poliza polizaListPolizaToAttach : cliente.getPolizaList()) {
+                polizaListPolizaToAttach = em.getReference(polizaListPolizaToAttach.getClass(), polizaListPolizaToAttach.getIdpoliza());
+                attachedPolizaList.add(polizaListPolizaToAttach);
+            }
+            cliente.setPolizaList(attachedPolizaList);
             em.persist(cliente);
             if (asegurado != null) {
                 Cliente oldClienteOfAsegurado = asegurado.getCliente();
@@ -97,6 +107,15 @@ public class ClienteJpaController implements Serializable {
                 polizaVidaListPolizaVida.getClienteList().add(cliente);
                 polizaVidaListPolizaVida = em.merge(polizaVidaListPolizaVida);
             }
+            for (Poliza polizaListPoliza : cliente.getPolizaList()) {
+                Cliente oldTitularOfPolizaListPoliza = polizaListPoliza.getTitular();
+                polizaListPoliza.setTitular(cliente);
+                polizaListPoliza = em.merge(polizaListPoliza);
+                if (oldTitularOfPolizaListPoliza != null) {
+                    oldTitularOfPolizaListPoliza.getPolizaList().remove(polizaListPoliza);
+                    oldTitularOfPolizaListPoliza = em.merge(oldTitularOfPolizaListPoliza);
+                }
+            }
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -119,6 +138,8 @@ public class ClienteJpaController implements Serializable {
             List<PolizaGmm> polizaGmmListNew = cliente.getPolizaGmmList();
             List<PolizaVida> polizaVidaListOld = persistentCliente.getPolizaVidaList();
             List<PolizaVida> polizaVidaListNew = cliente.getPolizaVidaList();
+            List<Poliza> polizaListOld = persistentCliente.getPolizaList();
+            List<Poliza> polizaListNew = cliente.getPolizaList();
             List<String> illegalOrphanMessages = null;
             if (aseguradoOld != null && !aseguradoOld.equals(aseguradoNew)) {
                 if (illegalOrphanMessages == null) {
@@ -131,6 +152,14 @@ public class ClienteJpaController implements Serializable {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
                 illegalOrphanMessages.add("You must retain NotificacionCumple " + notificacionCumpleOld + " since its cliente field is not nullable.");
+            }
+            for (Poliza polizaListOldPoliza : polizaListOld) {
+                if (!polizaListNew.contains(polizaListOldPoliza)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain Poliza " + polizaListOldPoliza + " since its titular field is not nullable.");
+                }
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
@@ -157,6 +186,13 @@ public class ClienteJpaController implements Serializable {
             }
             polizaVidaListNew = attachedPolizaVidaListNew;
             cliente.setPolizaVidaList(polizaVidaListNew);
+            List<Poliza> attachedPolizaListNew = new ArrayList<Poliza>();
+            for (Poliza polizaListNewPolizaToAttach : polizaListNew) {
+                polizaListNewPolizaToAttach = em.getReference(polizaListNewPolizaToAttach.getClass(), polizaListNewPolizaToAttach.getIdpoliza());
+                attachedPolizaListNew.add(polizaListNewPolizaToAttach);
+            }
+            polizaListNew = attachedPolizaListNew;
+            cliente.setPolizaList(polizaListNew);
             cliente = em.merge(cliente);
             if (aseguradoNew != null && !aseguradoNew.equals(aseguradoOld)) {
                 Cliente oldClienteOfAsegurado = aseguradoNew.getCliente();
@@ -198,6 +234,17 @@ public class ClienteJpaController implements Serializable {
                 if (!polizaVidaListOld.contains(polizaVidaListNewPolizaVida)) {
                     polizaVidaListNewPolizaVida.getClienteList().add(cliente);
                     polizaVidaListNewPolizaVida = em.merge(polizaVidaListNewPolizaVida);
+                }
+            }
+            for (Poliza polizaListNewPoliza : polizaListNew) {
+                if (!polizaListOld.contains(polizaListNewPoliza)) {
+                    Cliente oldTitularOfPolizaListNewPoliza = polizaListNewPoliza.getTitular();
+                    polizaListNewPoliza.setTitular(cliente);
+                    polizaListNewPoliza = em.merge(polizaListNewPoliza);
+                    if (oldTitularOfPolizaListNewPoliza != null && !oldTitularOfPolizaListNewPoliza.equals(cliente)) {
+                        oldTitularOfPolizaListNewPoliza.getPolizaList().remove(polizaListNewPoliza);
+                        oldTitularOfPolizaListNewPoliza = em.merge(oldTitularOfPolizaListNewPoliza);
+                    }
                 }
             }
             em.getTransaction().commit();
@@ -243,6 +290,13 @@ public class ClienteJpaController implements Serializable {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
                 illegalOrphanMessages.add("This Cliente (" + cliente + ") cannot be destroyed since the NotificacionCumple " + notificacionCumpleOrphanCheck + " in its notificacionCumple field has a non-nullable cliente field.");
+            }
+            List<Poliza> polizaListOrphanCheck = cliente.getPolizaList();
+            for (Poliza polizaListOrphanCheckPoliza : polizaListOrphanCheck) {
+                if (illegalOrphanMessages == null) {
+                    illegalOrphanMessages = new ArrayList<String>();
+                }
+                illegalOrphanMessages.add("This Cliente (" + cliente + ") cannot be destroyed since the Poliza " + polizaListOrphanCheckPoliza + " in its polizaList field has a non-nullable titular field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);

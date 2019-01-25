@@ -49,7 +49,7 @@ public class PolizaGmm implements Serializable {
     private BigDecimal deducible;
     @Basic(optional = false)
     @Column(name = "SUMAASEGURADA")
-    private BigDecimal sumaasegurada;
+    private String sumaasegurada;
     @Basic(optional = false)
     @Column(name = "COASEGURO")
     private short coaseguro;
@@ -72,7 +72,7 @@ public class PolizaGmm implements Serializable {
         this.idpoliza = idpoliza;
     }
 
-    public PolizaGmm(Integer idpoliza, BigDecimal deducible, BigDecimal sumaasegurada, short coaseguro) {
+    public PolizaGmm(Integer idpoliza, BigDecimal deducible, String sumaasegurada, short coaseguro) {
         this.idpoliza = idpoliza;
         this.deducible = deducible;
         this.sumaasegurada = sumaasegurada;
@@ -95,11 +95,11 @@ public class PolizaGmm implements Serializable {
         this.deducible = deducible;
     }
 
-    public BigDecimal getSumaasegurada() {
+    public String getSumaasegurada() {
         return sumaasegurada;
     }
 
-    public void setSumaasegurada(BigDecimal sumaasegurada) {
+    public void setSumaasegurada(String sumaasegurada) {
         this.sumaasegurada = sumaasegurada;
     }
 
