@@ -48,7 +48,7 @@ public class Asegurado implements Serializable {
     private String nota;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
     private List<Email> emailList;
-    @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = false, updatable = false)
+    @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = true, updatable = true)
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Cliente cliente;
     @JoinColumn(name = "IDDOMICILIO", referencedColumnName = "IDDOMICILIO")
@@ -110,6 +110,9 @@ public class Asegurado implements Serializable {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
+        if (cliente.getIdcliente() != null){
+            setIdcliente(cliente.getIdcliente());
+        }
     }
 
     public Domicilio getIddomicilio() {

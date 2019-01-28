@@ -74,12 +74,24 @@ public class AseguradoJpaController implements Serializable {
             em.getTransaction().begin();
             Cliente cliente = asegurado.getCliente();
             if (cliente != null) {
-                cliente = em.getReference(cliente.getClass(), cliente.getIdcliente());
+                try {
+                    // Si el cliente no existe
+                    cliente = em.getReference(cliente.getClass(), cliente.getIdcliente());
+                } catch (Exception exception) {
+                    ClienteJpaController clienteJpaController = new ClienteJpaController(getEntityManager().getEntityManagerFactory());
+                    clienteJpaController.create(cliente);
+                }
                 asegurado.setCliente(cliente);
             }
             Domicilio iddomicilio = asegurado.getIddomicilio();
             if (iddomicilio != null) {
-                iddomicilio = em.getReference(iddomicilio.getClass(), iddomicilio.getIddomicilio());
+                try {
+                    // Si no existe el domicilio
+                    iddomicilio = em.getReference(iddomicilio.getClass(), iddomicilio.getIddomicilio());
+                } catch (Exception exception) {
+                    DomicilioJpaController domicilioJpaController = new DomicilioJpaController(getEntityManager().getEntityManagerFactory());
+                    domicilioJpaController.create(iddomicilio);
+                }
                 asegurado.setIddomicilio(iddomicilio);
             }
             TipoPersona tipopersona = asegurado.getTipopersona();
@@ -164,6 +176,9 @@ public class AseguradoJpaController implements Serializable {
         } catch (Exception ex) {
             if (findAsegurado(asegurado.getIdcliente()) != null) {
                 throw new PreexistingEntityException("Asegurado " + asegurado + " already exists.", ex);
+            }
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
             }
             throw ex;
         } finally {
@@ -477,5 +492,5 @@ public class AseguradoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
 }

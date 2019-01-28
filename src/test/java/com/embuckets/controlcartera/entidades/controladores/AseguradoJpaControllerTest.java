@@ -14,6 +14,9 @@ import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -82,7 +85,7 @@ public class AseguradoJpaControllerTest {
         asegurado.getCliente().setNombre("Cliente" + random);
         asegurado.getCliente().setApellidopaterno("Paterno" + random);
         asegurado.getCliente().setApellidomaterno("Materno" + random);
-        asegurado.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T12:00:00")));
+        asegurado.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:00.00Z")));
         asegurado.setTipopersona(new TipoPersona("Fisica"));
         asegurado.setIddomicilio(new Domicilio());
         asegurado.getIddomicilio().setCalle("Calle" + random);
@@ -92,9 +95,10 @@ public class AseguradoJpaControllerTest {
 //        asegurado.getEmailList().add(new Email(asegurado.getIdcliente(), "correo2" + random + "@correo.com"));
 //        asegurado.setTelefonoList(new ArrayList<>());
 //        asegurado.getTelefonoList().add(new Telefono(asegurado.getIdcliente(), "" + random + random + random));
-        ClienteJpaController clienteJpaController = new ClienteJpaController(entityManagerFactory);
-        clienteJpaController.create(asegurado.getCliente());
+//        ClienteJpaController clienteJpaController = new ClienteJpaController(entityManagerFactory);
+//        clienteJpaController.create(asegurado.getCliente());
 //        clienteJpaController.getEntityManager().createNamedQuery("")
+
         AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
         instance.create(asegurado);
         // TODO review the generated test code and remove the default call to fail.
