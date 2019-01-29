@@ -49,6 +49,11 @@ public class Email implements Serializable {
     public Email(int idcliente, String email) {
         this.emailPK = new EmailPK(idcliente, email);
     }
+    
+    public Email(String email){
+        this.emailPK = new EmailPK();
+        this.emailPK.setEmail(email);
+    }
 
     public EmailPK getEmailPK() {
         return emailPK;

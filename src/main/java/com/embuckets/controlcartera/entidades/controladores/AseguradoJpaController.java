@@ -41,142 +41,50 @@ public class AseguradoJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Asegurado asegurado) throws IllegalOrphanException, PreexistingEntityException, Exception {
-        if (asegurado.getEmailList() == null) {
-            asegurado.setEmailList(new ArrayList<Email>());
-        }
-        if (asegurado.getPolizaList() == null) {
-            asegurado.setPolizaList(new ArrayList<Poliza>());
-        }
-        if (asegurado.getDocumentoAseguradoList() == null) {
-            asegurado.setDocumentoAseguradoList(new ArrayList<DocumentoAsegurado>());
-        }
-        if (asegurado.getTelefonoList() == null) {
-            asegurado.setTelefonoList(new ArrayList<Telefono>());
-        }
-        List<String> illegalOrphanMessages = null;
-        Cliente clienteOrphanCheck = asegurado.getCliente();
-        if (clienteOrphanCheck != null) {
-            Asegurado oldAseguradoOfCliente = clienteOrphanCheck.getAsegurado();
-            if (oldAseguradoOfCliente != null) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("The Cliente " + clienteOrphanCheck + " already has an item of type Asegurado whose cliente column cannot be null. Please make another selection for the cliente field.");
-            }
-        }
-        if (illegalOrphanMessages != null) {
-            throw new IllegalOrphanException(illegalOrphanMessages);
-        }
+    public void create(Asegurado asegurado) throws PreexistingEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
             Cliente cliente = asegurado.getCliente();
-            if (cliente != null) {
-                try {
-                    // Si el cliente no existe
-                    cliente = em.getReference(cliente.getClass(), cliente.getIdcliente());
-                } catch (Exception exception) {
-                    ClienteJpaController clienteJpaController = new ClienteJpaController(getEntityManager().getEntityManagerFactory());
-                    clienteJpaController.create(cliente);
-                }
-                asegurado.setCliente(cliente);
+            //save cliente
+            em.persist(cliente);
+            asegurado.setIdcliente(cliente.getIdcliente());
+//            ClienteJpaController clienteJpaController = new ClienteJpaController(emf);
+//            clienteJpaController.create(cliente);
+//            asegurado.setCliente(cliente);
+            //save domicilio
+            if (asegurado.getIddomicilio() != null) {
+                Domicilio domicilio = asegurado.getIddomicilio();
+//                DomicilioJpaController domicilioJpaController = new DomicilioJpaController(emf);
+//                domicilioJpaController.create(domicilio);
+//                asegurado.setIddomicilio(domicilio);
+                em.persist(domicilio);
             }
-            Domicilio iddomicilio = asegurado.getIddomicilio();
-            if (iddomicilio != null) {
-                try {
-                    // Si no existe el domicilio
-                    iddomicilio = em.getReference(iddomicilio.getClass(), iddomicilio.getIddomicilio());
-                } catch (Exception exception) {
-                    DomicilioJpaController domicilioJpaController = new DomicilioJpaController(getEntityManager().getEntityManagerFactory());
-                    domicilioJpaController.create(iddomicilio);
-                }
-                asegurado.setIddomicilio(iddomicilio);
-            }
-            TipoPersona tipopersona = asegurado.getTipopersona();
-            if (tipopersona != null) {
-                tipopersona = em.getReference(tipopersona.getClass(), tipopersona.getTipopersona());
-                asegurado.setTipopersona(tipopersona);
-            }
-            List<Email> attachedEmailList = new ArrayList<Email>();
-            for (Email emailListEmailToAttach : asegurado.getEmailList()) {
-                emailListEmailToAttach = em.getReference(emailListEmailToAttach.getClass(), emailListEmailToAttach.getEmailPK());
-                attachedEmailList.add(emailListEmailToAttach);
-            }
-            asegurado.setEmailList(attachedEmailList);
-            List<Poliza> attachedPolizaList = new ArrayList<Poliza>();
-            for (Poliza polizaListPolizaToAttach : asegurado.getPolizaList()) {
-                polizaListPolizaToAttach = em.getReference(polizaListPolizaToAttach.getClass(), polizaListPolizaToAttach.getIdpoliza());
-                attachedPolizaList.add(polizaListPolizaToAttach);
-            }
-            asegurado.setPolizaList(attachedPolizaList);
-            List<DocumentoAsegurado> attachedDocumentoAseguradoList = new ArrayList<DocumentoAsegurado>();
-            for (DocumentoAsegurado documentoAseguradoListDocumentoAseguradoToAttach : asegurado.getDocumentoAseguradoList()) {
-                documentoAseguradoListDocumentoAseguradoToAttach = em.getReference(documentoAseguradoListDocumentoAseguradoToAttach.getClass(), documentoAseguradoListDocumentoAseguradoToAttach.getDocumentoAseguradoPK());
-                attachedDocumentoAseguradoList.add(documentoAseguradoListDocumentoAseguradoToAttach);
-            }
-            asegurado.setDocumentoAseguradoList(attachedDocumentoAseguradoList);
-            List<Telefono> attachedTelefonoList = new ArrayList<Telefono>();
-            for (Telefono telefonoListTelefonoToAttach : asegurado.getTelefonoList()) {
-                telefonoListTelefonoToAttach = em.getReference(telefonoListTelefonoToAttach.getClass(), telefonoListTelefonoToAttach.getTelefonoPK());
-                attachedTelefonoList.add(telefonoListTelefonoToAttach);
-            }
-            asegurado.setTelefonoList(attachedTelefonoList);
+            //Cascade emails y telefono???
             em.persist(asegurado);
-            if (cliente != null) {
-                cliente.setAsegurado(asegurado);
-                cliente = em.merge(cliente);
-            }
-            if (iddomicilio != null) {
-                iddomicilio.getAseguradoList().add(asegurado);
-                iddomicilio = em.merge(iddomicilio);
-            }
-            if (tipopersona != null) {
-                tipopersona.getAseguradoList().add(asegurado);
-                tipopersona = em.merge(tipopersona);
-            }
-            for (Email emailListEmail : asegurado.getEmailList()) {
-                Asegurado oldAseguradoOfEmailListEmail = emailListEmail.getAsegurado();
-                emailListEmail.setAsegurado(asegurado);
-                emailListEmail = em.merge(emailListEmail);
-                if (oldAseguradoOfEmailListEmail != null) {
-                    oldAseguradoOfEmailListEmail.getEmailList().remove(emailListEmail);
-                    oldAseguradoOfEmailListEmail = em.merge(oldAseguradoOfEmailListEmail);
+            //save emails
+            if (asegurado.getEmailList() != null) {
+                List<Email> emailsDeAsegurado = asegurado.getEmailList();
+                for (Email email : emailsDeAsegurado) {
+                    email.getEmailPK().setIdcliente(asegurado.getIdcliente());
+                    em.persist(email);
                 }
             }
-            for (Poliza polizaListPoliza : asegurado.getPolizaList()) {
-                Asegurado oldContratanteOfPolizaListPoliza = polizaListPoliza.getContratante();
-                polizaListPoliza.setContratante(asegurado);
-                polizaListPoliza = em.merge(polizaListPoliza);
-                if (oldContratanteOfPolizaListPoliza != null) {
-                    oldContratanteOfPolizaListPoliza.getPolizaList().remove(polizaListPoliza);
-                    oldContratanteOfPolizaListPoliza = em.merge(oldContratanteOfPolizaListPoliza);
-                }
-            }
-            for (DocumentoAsegurado documentoAseguradoListDocumentoAsegurado : asegurado.getDocumentoAseguradoList()) {
-                Asegurado oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado = documentoAseguradoListDocumentoAsegurado.getAsegurado();
-                documentoAseguradoListDocumentoAsegurado.setAsegurado(asegurado);
-                documentoAseguradoListDocumentoAsegurado = em.merge(documentoAseguradoListDocumentoAsegurado);
-                if (oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado != null) {
-                    oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAseguradoListDocumentoAsegurado);
-                    oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado = em.merge(oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado);
-                }
-            }
-            for (Telefono telefonoListTelefono : asegurado.getTelefonoList()) {
-                Asegurado oldAseguradoOfTelefonoListTelefono = telefonoListTelefono.getAsegurado();
-                telefonoListTelefono.setAsegurado(asegurado);
-                telefonoListTelefono = em.merge(telefonoListTelefono);
-                if (oldAseguradoOfTelefonoListTelefono != null) {
-                    oldAseguradoOfTelefonoListTelefono.getTelefonoList().remove(telefonoListTelefono);
-                    oldAseguradoOfTelefonoListTelefono = em.merge(oldAseguradoOfTelefonoListTelefono);
+            //save telefonos
+            if (asegurado.getTelefonoList() != null) {
+                List<Telefono> telefonosDeAsegurado = asegurado.getTelefonoList();
+                for (Telefono telefono : telefonosDeAsegurado) {
+                    telefono.getTelefonoPK().setIdcliente(asegurado.getIdcliente());
+                    em.persist(telefono);
                 }
             }
             em.getTransaction().commit();
+
         } catch (Exception ex) {
-            if (findAsegurado(asegurado.getIdcliente()) != null) {
-                throw new PreexistingEntityException("Asegurado " + asegurado + " already exists.", ex);
-            }
+//            if (findAsegurado(asegurado.getIdcliente()) != null) {
+//                throw new PreexistingEntityException("Asegurado " + asegurado + " already exists.", ex);
+//            }
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -188,180 +96,195 @@ public class AseguradoJpaController implements Serializable {
         }
     }
 
+        
     public void edit(Asegurado asegurado) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Asegurado persistentAsegurado = em.find(Asegurado.class, asegurado.getIdcliente());
-            Cliente clienteOld = persistentAsegurado.getCliente();
-            Cliente clienteNew = asegurado.getCliente();
-            Domicilio iddomicilioOld = persistentAsegurado.getIddomicilio();
-            Domicilio iddomicilioNew = asegurado.getIddomicilio();
-            TipoPersona tipopersonaOld = persistentAsegurado.getTipopersona();
-            TipoPersona tipopersonaNew = asegurado.getTipopersona();
-            List<Email> emailListOld = persistentAsegurado.getEmailList();
-            List<Email> emailListNew = asegurado.getEmailList();
-            List<Poliza> polizaListOld = persistentAsegurado.getPolizaList();
-            List<Poliza> polizaListNew = asegurado.getPolizaList();
-            List<DocumentoAsegurado> documentoAseguradoListOld = persistentAsegurado.getDocumentoAseguradoList();
-            List<DocumentoAsegurado> documentoAseguradoListNew = asegurado.getDocumentoAseguradoList();
-            List<Telefono> telefonoListOld = persistentAsegurado.getTelefonoList();
-            List<Telefono> telefonoListNew = asegurado.getTelefonoList();
-            List<String> illegalOrphanMessages = null;
-            if (clienteNew != null && !clienteNew.equals(clienteOld)) {
-                Asegurado oldAseguradoOfCliente = clienteNew.getAsegurado();
-                if (oldAseguradoOfCliente != null) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("The Cliente " + clienteNew + " already has an item of type Asegurado whose cliente column cannot be null. Please make another selection for the cliente field.");
-                }
-            }
-            for (Email emailListOldEmail : emailListOld) {
-                if (!emailListNew.contains(emailListOldEmail)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain Email " + emailListOldEmail + " since its asegurado field is not nullable.");
-                }
-            }
-            for (Poliza polizaListOldPoliza : polizaListOld) {
-                if (!polizaListNew.contains(polizaListOldPoliza)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain Poliza " + polizaListOldPoliza + " since its contratante field is not nullable.");
-                }
-            }
-            for (DocumentoAsegurado documentoAseguradoListOldDocumentoAsegurado : documentoAseguradoListOld) {
-                if (!documentoAseguradoListNew.contains(documentoAseguradoListOldDocumentoAsegurado)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain DocumentoAsegurado " + documentoAseguradoListOldDocumentoAsegurado + " since its asegurado field is not nullable.");
-                }
-            }
-            for (Telefono telefonoListOldTelefono : telefonoListOld) {
-                if (!telefonoListNew.contains(telefonoListOldTelefono)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain Telefono " + telefonoListOldTelefono + " since its asegurado field is not nullable.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            if (clienteNew != null) {
-                clienteNew = em.getReference(clienteNew.getClass(), clienteNew.getIdcliente());
-                asegurado.setCliente(clienteNew);
-            }
-            if (iddomicilioNew != null) {
-                iddomicilioNew = em.getReference(iddomicilioNew.getClass(), iddomicilioNew.getIddomicilio());
-                asegurado.setIddomicilio(iddomicilioNew);
-            }
-            if (tipopersonaNew != null) {
-                tipopersonaNew = em.getReference(tipopersonaNew.getClass(), tipopersonaNew.getTipopersona());
-                asegurado.setTipopersona(tipopersonaNew);
-            }
-            List<Email> attachedEmailListNew = new ArrayList<Email>();
-            for (Email emailListNewEmailToAttach : emailListNew) {
-                emailListNewEmailToAttach = em.getReference(emailListNewEmailToAttach.getClass(), emailListNewEmailToAttach.getEmailPK());
-                attachedEmailListNew.add(emailListNewEmailToAttach);
-            }
-            emailListNew = attachedEmailListNew;
-            asegurado.setEmailList(emailListNew);
-            List<Poliza> attachedPolizaListNew = new ArrayList<Poliza>();
-            for (Poliza polizaListNewPolizaToAttach : polizaListNew) {
-                polizaListNewPolizaToAttach = em.getReference(polizaListNewPolizaToAttach.getClass(), polizaListNewPolizaToAttach.getIdpoliza());
-                attachedPolizaListNew.add(polizaListNewPolizaToAttach);
-            }
-            polizaListNew = attachedPolizaListNew;
-            asegurado.setPolizaList(polizaListNew);
-            List<DocumentoAsegurado> attachedDocumentoAseguradoListNew = new ArrayList<DocumentoAsegurado>();
-            for (DocumentoAsegurado documentoAseguradoListNewDocumentoAseguradoToAttach : documentoAseguradoListNew) {
-                documentoAseguradoListNewDocumentoAseguradoToAttach = em.getReference(documentoAseguradoListNewDocumentoAseguradoToAttach.getClass(), documentoAseguradoListNewDocumentoAseguradoToAttach.getDocumentoAseguradoPK());
-                attachedDocumentoAseguradoListNew.add(documentoAseguradoListNewDocumentoAseguradoToAttach);
-            }
-            documentoAseguradoListNew = attachedDocumentoAseguradoListNew;
-            asegurado.setDocumentoAseguradoList(documentoAseguradoListNew);
-            List<Telefono> attachedTelefonoListNew = new ArrayList<Telefono>();
-            for (Telefono telefonoListNewTelefonoToAttach : telefonoListNew) {
-                telefonoListNewTelefonoToAttach = em.getReference(telefonoListNewTelefonoToAttach.getClass(), telefonoListNewTelefonoToAttach.getTelefonoPK());
-                attachedTelefonoListNew.add(telefonoListNewTelefonoToAttach);
-            }
-            telefonoListNew = attachedTelefonoListNew;
-            asegurado.setTelefonoList(telefonoListNew);
-            asegurado = em.merge(asegurado);
-            if (clienteOld != null && !clienteOld.equals(clienteNew)) {
-                clienteOld.setAsegurado(null);
-                clienteOld = em.merge(clienteOld);
-            }
-            if (clienteNew != null && !clienteNew.equals(clienteOld)) {
-                clienteNew.setAsegurado(asegurado);
-                clienteNew = em.merge(clienteNew);
-            }
-            if (iddomicilioOld != null && !iddomicilioOld.equals(iddomicilioNew)) {
-                iddomicilioOld.getAseguradoList().remove(asegurado);
-                iddomicilioOld = em.merge(iddomicilioOld);
-            }
-            if (iddomicilioNew != null && !iddomicilioNew.equals(iddomicilioOld)) {
-                iddomicilioNew.getAseguradoList().add(asegurado);
-                iddomicilioNew = em.merge(iddomicilioNew);
-            }
-            if (tipopersonaOld != null && !tipopersonaOld.equals(tipopersonaNew)) {
-                tipopersonaOld.getAseguradoList().remove(asegurado);
-                tipopersonaOld = em.merge(tipopersonaOld);
-            }
-            if (tipopersonaNew != null && !tipopersonaNew.equals(tipopersonaOld)) {
-                tipopersonaNew.getAseguradoList().add(asegurado);
-                tipopersonaNew = em.merge(tipopersonaNew);
-            }
-            for (Email emailListNewEmail : emailListNew) {
-                if (!emailListOld.contains(emailListNewEmail)) {
-                    Asegurado oldAseguradoOfEmailListNewEmail = emailListNewEmail.getAsegurado();
-                    emailListNewEmail.setAsegurado(asegurado);
-                    emailListNewEmail = em.merge(emailListNewEmail);
-                    if (oldAseguradoOfEmailListNewEmail != null && !oldAseguradoOfEmailListNewEmail.equals(asegurado)) {
-                        oldAseguradoOfEmailListNewEmail.getEmailList().remove(emailListNewEmail);
-                        oldAseguradoOfEmailListNewEmail = em.merge(oldAseguradoOfEmailListNewEmail);
-                    }
-                }
-            }
-            for (Poliza polizaListNewPoliza : polizaListNew) {
-                if (!polizaListOld.contains(polizaListNewPoliza)) {
-                    Asegurado oldContratanteOfPolizaListNewPoliza = polizaListNewPoliza.getContratante();
-                    polizaListNewPoliza.setContratante(asegurado);
-                    polizaListNewPoliza = em.merge(polizaListNewPoliza);
-                    if (oldContratanteOfPolizaListNewPoliza != null && !oldContratanteOfPolizaListNewPoliza.equals(asegurado)) {
-                        oldContratanteOfPolizaListNewPoliza.getPolizaList().remove(polizaListNewPoliza);
-                        oldContratanteOfPolizaListNewPoliza = em.merge(oldContratanteOfPolizaListNewPoliza);
-                    }
-                }
-            }
-            for (DocumentoAsegurado documentoAseguradoListNewDocumentoAsegurado : documentoAseguradoListNew) {
-                if (!documentoAseguradoListOld.contains(documentoAseguradoListNewDocumentoAsegurado)) {
-                    Asegurado oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado = documentoAseguradoListNewDocumentoAsegurado.getAsegurado();
-                    documentoAseguradoListNewDocumentoAsegurado.setAsegurado(asegurado);
-                    documentoAseguradoListNewDocumentoAsegurado = em.merge(documentoAseguradoListNewDocumentoAsegurado);
-                    if (oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado != null && !oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado.equals(asegurado)) {
-                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAseguradoListNewDocumentoAsegurado);
-                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado = em.merge(oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado);
-                    }
-                }
-            }
-            for (Telefono telefonoListNewTelefono : telefonoListNew) {
-                if (!telefonoListOld.contains(telefonoListNewTelefono)) {
-                    Asegurado oldAseguradoOfTelefonoListNewTelefono = telefonoListNewTelefono.getAsegurado();
-                    telefonoListNewTelefono.setAsegurado(asegurado);
-                    telefonoListNewTelefono = em.merge(telefonoListNewTelefono);
-                    if (oldAseguradoOfTelefonoListNewTelefono != null && !oldAseguradoOfTelefonoListNewTelefono.equals(asegurado)) {
-                        oldAseguradoOfTelefonoListNewTelefono.getTelefonoList().remove(telefonoListNewTelefono);
-                        oldAseguradoOfTelefonoListNewTelefono = em.merge(oldAseguradoOfTelefonoListNewTelefono);
-                    }
-                }
-            }
+             Asegurado persistentAsegurado = em.find(Asegurado.class, asegurado.getIdcliente());
+             //cambio el nombre
+             persistentAsegurado.getCliente().setNombre(asegurado.getCliente().getNombre());
+             persistentAsegurado.getCliente().setApellidopaterno(asegurado.getCliente().getApellidopaterno());
+             persistentAsegurado.setRfc(asegurado.getRfc());
+             
+             //cambio el asegurado
+             
+             //cambio del domicilio
+             
+             //cambio el telefono
+             
+             //cambio el email
+             
+//            em.merge(asegurado);
+//            Cliente clienteOld = persistentAsegurado.getCliente();
+//            Cliente clienteNew = asegurado.getCliente();
+//            Domicilio iddomicilioOld = persistentAsegurado.getIddomicilio();
+//            Domicilio iddomicilioNew = asegurado.getIddomicilio();
+//            TipoPersona tipopersonaOld = persistentAsegurado.getTipopersona();
+//            TipoPersona tipopersonaNew = asegurado.getTipopersona();
+//            List<Email> emailListOld = persistentAsegurado.getEmailList();
+//            List<Email> emailListNew = asegurado.getEmailList();
+//            List<Poliza> polizaListOld = persistentAsegurado.getPolizaList();
+//            List<Poliza> polizaListNew = asegurado.getPolizaList();
+//            List<DocumentoAsegurado> documentoAseguradoListOld = persistentAsegurado.getDocumentoAseguradoList();
+//            List<DocumentoAsegurado> documentoAseguradoListNew = asegurado.getDocumentoAseguradoList();
+//            List<Telefono> telefonoListOld = persistentAsegurado.getTelefonoList();
+//            List<Telefono> telefonoListNew = asegurado.getTelefonoList();
+//            List<String> illegalOrphanMessages = null;
+//            if (clienteNew != null && !clienteNew.equals(clienteOld)) {
+//                Asegurado oldAseguradoOfCliente = clienteNew.getAsegurado();
+//                if (oldAseguradoOfCliente != null) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("The Cliente " + clienteNew + " already has an item of type Asegurado whose cliente column cannot be null. Please make another selection for the cliente field.");
+//                }
+//            }
+//            for (Email emailListOldEmail : emailListOld) {
+//                if (!emailListNew.contains(emailListOldEmail)) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("You must retain Email " + emailListOldEmail + " since its asegurado field is not nullable.");
+//                }
+//            }
+//            for (Poliza polizaListOldPoliza : polizaListOld) {
+//                if (!polizaListNew.contains(polizaListOldPoliza)) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("You must retain Poliza " + polizaListOldPoliza + " since its contratante field is not nullable.");
+//                }
+//            }
+//            for (DocumentoAsegurado documentoAseguradoListOldDocumentoAsegurado : documentoAseguradoListOld) {
+//                if (!documentoAseguradoListNew.contains(documentoAseguradoListOldDocumentoAsegurado)) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("You must retain DocumentoAsegurado " + documentoAseguradoListOldDocumentoAsegurado + " since its asegurado field is not nullable.");
+//                }
+//            }
+//            for (Telefono telefonoListOldTelefono : telefonoListOld) {
+//                if (!telefonoListNew.contains(telefonoListOldTelefono)) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("You must retain Telefono " + telefonoListOldTelefono + " since its asegurado field is not nullable.");
+//                }
+//            }
+//            if (illegalOrphanMessages != null) {
+//                throw new IllegalOrphanException(illegalOrphanMessages);
+//            }
+//            if (clienteNew != null) {
+//                clienteNew = em.getReference(clienteNew.getClass(), clienteNew.getIdcliente());
+//                asegurado.setCliente(clienteNew);
+//            }
+//            if (iddomicilioNew != null) {
+//                iddomicilioNew = em.getReference(iddomicilioNew.getClass(), iddomicilioNew.getIddomicilio());
+//                asegurado.setIddomicilio(iddomicilioNew);
+//            }
+//            if (tipopersonaNew != null) {
+//                tipopersonaNew = em.getReference(tipopersonaNew.getClass(), tipopersonaNew.getTipopersona());
+//                asegurado.setTipopersona(tipopersonaNew);
+//            }
+//            List<Email> attachedEmailListNew = new ArrayList<Email>();
+//            for (Email emailListNewEmailToAttach : emailListNew) {
+//                emailListNewEmailToAttach = em.getReference(emailListNewEmailToAttach.getClass(), emailListNewEmailToAttach.getEmailPK());
+//                attachedEmailListNew.add(emailListNewEmailToAttach);
+//            }
+//            emailListNew = attachedEmailListNew;
+//            asegurado.setEmailList(emailListNew);
+//            List<Poliza> attachedPolizaListNew = new ArrayList<Poliza>();
+//            for (Poliza polizaListNewPolizaToAttach : polizaListNew) {
+//                polizaListNewPolizaToAttach = em.getReference(polizaListNewPolizaToAttach.getClass(), polizaListNewPolizaToAttach.getIdpoliza());
+//                attachedPolizaListNew.add(polizaListNewPolizaToAttach);
+//            }
+//            polizaListNew = attachedPolizaListNew;
+//            asegurado.setPolizaList(polizaListNew);
+//            List<DocumentoAsegurado> attachedDocumentoAseguradoListNew = new ArrayList<DocumentoAsegurado>();
+//            for (DocumentoAsegurado documentoAseguradoListNewDocumentoAseguradoToAttach : documentoAseguradoListNew) {
+//                documentoAseguradoListNewDocumentoAseguradoToAttach = em.getReference(documentoAseguradoListNewDocumentoAseguradoToAttach.getClass(), documentoAseguradoListNewDocumentoAseguradoToAttach.getDocumentoAseguradoPK());
+//                attachedDocumentoAseguradoListNew.add(documentoAseguradoListNewDocumentoAseguradoToAttach);
+//            }
+//            documentoAseguradoListNew = attachedDocumentoAseguradoListNew;
+//            asegurado.setDocumentoAseguradoList(documentoAseguradoListNew);
+//            List<Telefono> attachedTelefonoListNew = new ArrayList<Telefono>();
+//            for (Telefono telefonoListNewTelefonoToAttach : telefonoListNew) {
+//                telefonoListNewTelefonoToAttach = em.getReference(telefonoListNewTelefonoToAttach.getClass(), telefonoListNewTelefonoToAttach.getTelefonoPK());
+//                attachedTelefonoListNew.add(telefonoListNewTelefonoToAttach);
+//            }
+//            telefonoListNew = attachedTelefonoListNew;
+//            asegurado.setTelefonoList(telefonoListNew);
+//            asegurado = em.merge(asegurado);
+//            if (clienteOld != null && !clienteOld.equals(clienteNew)) {
+//                clienteOld.setAsegurado(null);
+//                clienteOld = em.merge(clienteOld);
+//            }
+//            if (clienteNew != null && !clienteNew.equals(clienteOld)) {
+//                clienteNew.setAsegurado(asegurado);
+//                clienteNew = em.merge(clienteNew);
+//            }
+//            if (iddomicilioOld != null && !iddomicilioOld.equals(iddomicilioNew)) {
+//                iddomicilioOld.getAseguradoList().remove(asegurado);
+//                iddomicilioOld = em.merge(iddomicilioOld);
+//            }
+//            if (iddomicilioNew != null && !iddomicilioNew.equals(iddomicilioOld)) {
+//                iddomicilioNew.getAseguradoList().add(asegurado);
+//                iddomicilioNew = em.merge(iddomicilioNew);
+//            }
+//            if (tipopersonaOld != null && !tipopersonaOld.equals(tipopersonaNew)) {
+//                tipopersonaOld.getAseguradoList().remove(asegurado);
+//                tipopersonaOld = em.merge(tipopersonaOld);
+//            }
+//            if (tipopersonaNew != null && !tipopersonaNew.equals(tipopersonaOld)) {
+//                tipopersonaNew.getAseguradoList().add(asegurado);
+//                tipopersonaNew = em.merge(tipopersonaNew);
+//            }
+//            for (Email emailListNewEmail : emailListNew) {
+//                if (!emailListOld.contains(emailListNewEmail)) {
+//                    Asegurado oldAseguradoOfEmailListNewEmail = emailListNewEmail.getAsegurado();
+//                    emailListNewEmail.setAsegurado(asegurado);
+//                    emailListNewEmail = em.merge(emailListNewEmail);
+//                    if (oldAseguradoOfEmailListNewEmail != null && !oldAseguradoOfEmailListNewEmail.equals(asegurado)) {
+//                        oldAseguradoOfEmailListNewEmail.getEmailList().remove(emailListNewEmail);
+//                        oldAseguradoOfEmailListNewEmail = em.merge(oldAseguradoOfEmailListNewEmail);
+//                    }
+//                }
+//            }
+//            for (Poliza polizaListNewPoliza : polizaListNew) {
+//                if (!polizaListOld.contains(polizaListNewPoliza)) {
+//                    Asegurado oldContratanteOfPolizaListNewPoliza = polizaListNewPoliza.getContratante();
+//                    polizaListNewPoliza.setContratante(asegurado);
+//                    polizaListNewPoliza = em.merge(polizaListNewPoliza);
+//                    if (oldContratanteOfPolizaListNewPoliza != null && !oldContratanteOfPolizaListNewPoliza.equals(asegurado)) {
+//                        oldContratanteOfPolizaListNewPoliza.getPolizaList().remove(polizaListNewPoliza);
+//                        oldContratanteOfPolizaListNewPoliza = em.merge(oldContratanteOfPolizaListNewPoliza);
+//                    }
+//                }
+//            }
+//            for (DocumentoAsegurado documentoAseguradoListNewDocumentoAsegurado : documentoAseguradoListNew) {
+//                if (!documentoAseguradoListOld.contains(documentoAseguradoListNewDocumentoAsegurado)) {
+//                    Asegurado oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado = documentoAseguradoListNewDocumentoAsegurado.getAsegurado();
+//                    documentoAseguradoListNewDocumentoAsegurado.setAsegurado(asegurado);
+//                    documentoAseguradoListNewDocumentoAsegurado = em.merge(documentoAseguradoListNewDocumentoAsegurado);
+//                    if (oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado != null && !oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado.equals(asegurado)) {
+//                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAseguradoListNewDocumentoAsegurado);
+//                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado = em.merge(oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado);
+//                    }
+//                }
+//            }
+//            for (Telefono telefonoListNewTelefono : telefonoListNew) {
+//                if (!telefonoListOld.contains(telefonoListNewTelefono)) {
+//                    Asegurado oldAseguradoOfTelefonoListNewTelefono = telefonoListNewTelefono.getAsegurado();
+//                    telefonoListNewTelefono.setAsegurado(asegurado);
+//                    telefonoListNewTelefono = em.merge(telefonoListNewTelefono);
+//                    if (oldAseguradoOfTelefonoListNewTelefono != null && !oldAseguradoOfTelefonoListNewTelefono.equals(asegurado)) {
+//                        oldAseguradoOfTelefonoListNewTelefono.getTelefonoList().remove(telefonoListNewTelefono);
+//                        oldAseguradoOfTelefonoListNewTelefono = em.merge(oldAseguradoOfTelefonoListNewTelefono);
+//                    }
+//                }
+//            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -378,6 +301,345 @@ public class AseguradoJpaController implements Serializable {
             }
         }
     }
+
+    
+//    public void create(Asegurado asegurado) throws IllegalOrphanException, PreexistingEntityException, Exception {
+//        if (asegurado.getEmailList() == null) {
+//            asegurado.setEmailList(new ArrayList<Email>());
+//        }
+//        if (asegurado.getPolizaList() == null) {
+//            asegurado.setPolizaList(new ArrayList<Poliza>());
+//        }
+//        if (asegurado.getDocumentoAseguradoList() == null) {
+//            asegurado.setDocumentoAseguradoList(new ArrayList<DocumentoAsegurado>());
+//        }
+//        if (asegurado.getTelefonoList() == null) {
+//            asegurado.setTelefonoList(new ArrayList<Telefono>());
+//        }
+//        List<String> illegalOrphanMessages = null;
+//        Cliente clienteOrphanCheck = asegurado.getCliente();
+//        if (clienteOrphanCheck != null) {
+//            Asegurado oldAseguradoOfCliente = clienteOrphanCheck.getAsegurado();
+//            if (oldAseguradoOfCliente != null) {
+//                if (illegalOrphanMessages == null) {
+//                    illegalOrphanMessages = new ArrayList<String>();
+//                }
+//                illegalOrphanMessages.add("The Cliente " + clienteOrphanCheck + " already has an item of type Asegurado whose cliente column cannot be null. Please make another selection for the cliente field.");
+//            }
+//        }
+//        if (illegalOrphanMessages != null) {
+//            throw new IllegalOrphanException(illegalOrphanMessages);
+//        }
+//        EntityManager em = null;
+//        try {
+//            em = getEntityManager();
+//            em.getTransaction().begin();
+//            Cliente cliente = asegurado.getCliente();
+//            if (cliente != null) {
+//                try {
+//                    // Si el cliente no existe
+//                    cliente = em.getReference(cliente.getClass(), cliente.getIdcliente());
+//                } catch (Exception exception) {
+//                    ClienteJpaController clienteJpaController = new ClienteJpaController(getEntityManager().getEntityManagerFactory());
+//                    clienteJpaController.create(cliente);
+//                }
+//                asegurado.setCliente(cliente);
+//            }
+//            Domicilio iddomicilio = asegurado.getIddomicilio();
+//            if (iddomicilio != null) {
+//                try {
+//                    // Si no existe el domicilio
+//                    iddomicilio = em.getReference(iddomicilio.getClass(), iddomicilio.getIddomicilio());
+//                } catch (Exception exception) {
+//                    DomicilioJpaController domicilioJpaController = new DomicilioJpaController(getEntityManager().getEntityManagerFactory());
+//                    domicilioJpaController.create(iddomicilio);
+//                }
+//                asegurado.setIddomicilio(iddomicilio);
+//            }
+//            TipoPersona tipopersona = asegurado.getTipopersona();
+//            if (tipopersona != null) {
+//                tipopersona = em.getReference(tipopersona.getClass(), tipopersona.getTipopersona());
+//                asegurado.setTipopersona(tipopersona);
+//            }
+//            List<Email> attachedEmailList = new ArrayList<Email>();
+//            for (Email emailListEmailToAttach : asegurado.getEmailList()) {
+//                emailListEmailToAttach = em.getReference(emailListEmailToAttach.getClass(), emailListEmailToAttach.getEmailPK());
+//                attachedEmailList.add(emailListEmailToAttach);
+//            }
+//            asegurado.setEmailList(attachedEmailList);
+//            List<Poliza> attachedPolizaList = new ArrayList<Poliza>();
+//            for (Poliza polizaListPolizaToAttach : asegurado.getPolizaList()) {
+//                polizaListPolizaToAttach = em.getReference(polizaListPolizaToAttach.getClass(), polizaListPolizaToAttach.getIdpoliza());
+//                attachedPolizaList.add(polizaListPolizaToAttach);
+//            }
+//            asegurado.setPolizaList(attachedPolizaList);
+//            List<DocumentoAsegurado> attachedDocumentoAseguradoList = new ArrayList<DocumentoAsegurado>();
+//            for (DocumentoAsegurado documentoAseguradoListDocumentoAseguradoToAttach : asegurado.getDocumentoAseguradoList()) {
+//                documentoAseguradoListDocumentoAseguradoToAttach = em.getReference(documentoAseguradoListDocumentoAseguradoToAttach.getClass(), documentoAseguradoListDocumentoAseguradoToAttach.getDocumentoAseguradoPK());
+//                attachedDocumentoAseguradoList.add(documentoAseguradoListDocumentoAseguradoToAttach);
+//            }
+//            asegurado.setDocumentoAseguradoList(attachedDocumentoAseguradoList);
+//            List<Telefono> attachedTelefonoList = new ArrayList<Telefono>();
+//            for (Telefono telefonoListTelefonoToAttach : asegurado.getTelefonoList()) {
+//                telefonoListTelefonoToAttach = em.getReference(telefonoListTelefonoToAttach.getClass(), telefonoListTelefonoToAttach.getTelefonoPK());
+//                attachedTelefonoList.add(telefonoListTelefonoToAttach);
+//            }
+//            asegurado.setTelefonoList(attachedTelefonoList);
+//            em.persist(asegurado);
+//            if (cliente != null) {
+//                cliente.setAsegurado(asegurado);
+//                cliente = em.merge(cliente);
+//            }
+//            if (iddomicilio != null) {
+//                iddomicilio.getAseguradoList().add(asegurado);
+//                iddomicilio = em.merge(iddomicilio);
+//            }
+//            if (tipopersona != null) {
+//                tipopersona.getAseguradoList().add(asegurado);
+//                tipopersona = em.merge(tipopersona);
+//            }
+//            for (Email emailListEmail : asegurado.getEmailList()) {
+//                Asegurado oldAseguradoOfEmailListEmail = emailListEmail.getAsegurado();
+//                emailListEmail.setAsegurado(asegurado);
+//                emailListEmail = em.merge(emailListEmail);
+//                if (oldAseguradoOfEmailListEmail != null) {
+//                    oldAseguradoOfEmailListEmail.getEmailList().remove(emailListEmail);
+//                    oldAseguradoOfEmailListEmail = em.merge(oldAseguradoOfEmailListEmail);
+//                }
+//            }
+//            for (Poliza polizaListPoliza : asegurado.getPolizaList()) {
+//                Asegurado oldContratanteOfPolizaListPoliza = polizaListPoliza.getContratante();
+//                polizaListPoliza.setContratante(asegurado);
+//                polizaListPoliza = em.merge(polizaListPoliza);
+//                if (oldContratanteOfPolizaListPoliza != null) {
+//                    oldContratanteOfPolizaListPoliza.getPolizaList().remove(polizaListPoliza);
+//                    oldContratanteOfPolizaListPoliza = em.merge(oldContratanteOfPolizaListPoliza);
+//                }
+//            }
+//            for (DocumentoAsegurado documentoAseguradoListDocumentoAsegurado : asegurado.getDocumentoAseguradoList()) {
+//                Asegurado oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado = documentoAseguradoListDocumentoAsegurado.getAsegurado();
+//                documentoAseguradoListDocumentoAsegurado.setAsegurado(asegurado);
+//                documentoAseguradoListDocumentoAsegurado = em.merge(documentoAseguradoListDocumentoAsegurado);
+//                if (oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado != null) {
+//                    oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAseguradoListDocumentoAsegurado);
+//                    oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado = em.merge(oldAseguradoOfDocumentoAseguradoListDocumentoAsegurado);
+//                }
+//            }
+//            for (Telefono telefonoListTelefono : asegurado.getTelefonoList()) {
+//                Asegurado oldAseguradoOfTelefonoListTelefono = telefonoListTelefono.getAsegurado();
+//                telefonoListTelefono.setAsegurado(asegurado);
+//                telefonoListTelefono = em.merge(telefonoListTelefono);
+//                if (oldAseguradoOfTelefonoListTelefono != null) {
+//                    oldAseguradoOfTelefonoListTelefono.getTelefonoList().remove(telefonoListTelefono);
+//                    oldAseguradoOfTelefonoListTelefono = em.merge(oldAseguradoOfTelefonoListTelefono);
+//                }
+//            }
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            if (findAsegurado(asegurado.getIdcliente()) != null) {
+//                throw new PreexistingEntityException("Asegurado " + asegurado + " already exists.", ex);
+//            }
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        } finally {
+//            if (em != null) {
+//                em.close();
+//            }
+//        }
+//    }
+    
+//    public void edit(Asegurado asegurado) throws IllegalOrphanException, NonexistentEntityException, Exception {
+//        EntityManager em = null;
+//        try {
+//            em = getEntityManager();
+//            em.getTransaction().begin();
+//            Asegurado persistentAsegurado = em.find(Asegurado.class, asegurado.getIdcliente());
+//            Cliente clienteOld = persistentAsegurado.getCliente();
+//            Cliente clienteNew = asegurado.getCliente();
+//            Domicilio iddomicilioOld = persistentAsegurado.getIddomicilio();
+//            Domicilio iddomicilioNew = asegurado.getIddomicilio();
+//            TipoPersona tipopersonaOld = persistentAsegurado.getTipopersona();
+//            TipoPersona tipopersonaNew = asegurado.getTipopersona();
+//            List<Email> emailListOld = persistentAsegurado.getEmailList();
+//            List<Email> emailListNew = asegurado.getEmailList();
+//            List<Poliza> polizaListOld = persistentAsegurado.getPolizaList();
+//            List<Poliza> polizaListNew = asegurado.getPolizaList();
+//            List<DocumentoAsegurado> documentoAseguradoListOld = persistentAsegurado.getDocumentoAseguradoList();
+//            List<DocumentoAsegurado> documentoAseguradoListNew = asegurado.getDocumentoAseguradoList();
+//            List<Telefono> telefonoListOld = persistentAsegurado.getTelefonoList();
+//            List<Telefono> telefonoListNew = asegurado.getTelefonoList();
+//            List<String> illegalOrphanMessages = null;
+//            if (clienteNew != null && !clienteNew.equals(clienteOld)) {
+//                Asegurado oldAseguradoOfCliente = clienteNew.getAsegurado();
+//                if (oldAseguradoOfCliente != null) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("The Cliente " + clienteNew + " already has an item of type Asegurado whose cliente column cannot be null. Please make another selection for the cliente field.");
+//                }
+//            }
+//            for (Email emailListOldEmail : emailListOld) {
+//                if (!emailListNew.contains(emailListOldEmail)) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("You must retain Email " + emailListOldEmail + " since its asegurado field is not nullable.");
+//                }
+//            }
+//            for (Poliza polizaListOldPoliza : polizaListOld) {
+//                if (!polizaListNew.contains(polizaListOldPoliza)) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("You must retain Poliza " + polizaListOldPoliza + " since its contratante field is not nullable.");
+//                }
+//            }
+//            for (DocumentoAsegurado documentoAseguradoListOldDocumentoAsegurado : documentoAseguradoListOld) {
+//                if (!documentoAseguradoListNew.contains(documentoAseguradoListOldDocumentoAsegurado)) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("You must retain DocumentoAsegurado " + documentoAseguradoListOldDocumentoAsegurado + " since its asegurado field is not nullable.");
+//                }
+//            }
+//            for (Telefono telefonoListOldTelefono : telefonoListOld) {
+//                if (!telefonoListNew.contains(telefonoListOldTelefono)) {
+//                    if (illegalOrphanMessages == null) {
+//                        illegalOrphanMessages = new ArrayList<String>();
+//                    }
+//                    illegalOrphanMessages.add("You must retain Telefono " + telefonoListOldTelefono + " since its asegurado field is not nullable.");
+//                }
+//            }
+//            if (illegalOrphanMessages != null) {
+//                throw new IllegalOrphanException(illegalOrphanMessages);
+//            }
+//            if (clienteNew != null) {
+//                clienteNew = em.getReference(clienteNew.getClass(), clienteNew.getIdcliente());
+//                asegurado.setCliente(clienteNew);
+//            }
+//            if (iddomicilioNew != null) {
+//                iddomicilioNew = em.getReference(iddomicilioNew.getClass(), iddomicilioNew.getIddomicilio());
+//                asegurado.setIddomicilio(iddomicilioNew);
+//            }
+//            if (tipopersonaNew != null) {
+//                tipopersonaNew = em.getReference(tipopersonaNew.getClass(), tipopersonaNew.getTipopersona());
+//                asegurado.setTipopersona(tipopersonaNew);
+//            }
+//            List<Email> attachedEmailListNew = new ArrayList<Email>();
+//            for (Email emailListNewEmailToAttach : emailListNew) {
+//                emailListNewEmailToAttach = em.getReference(emailListNewEmailToAttach.getClass(), emailListNewEmailToAttach.getEmailPK());
+//                attachedEmailListNew.add(emailListNewEmailToAttach);
+//            }
+//            emailListNew = attachedEmailListNew;
+//            asegurado.setEmailList(emailListNew);
+//            List<Poliza> attachedPolizaListNew = new ArrayList<Poliza>();
+//            for (Poliza polizaListNewPolizaToAttach : polizaListNew) {
+//                polizaListNewPolizaToAttach = em.getReference(polizaListNewPolizaToAttach.getClass(), polizaListNewPolizaToAttach.getIdpoliza());
+//                attachedPolizaListNew.add(polizaListNewPolizaToAttach);
+//            }
+//            polizaListNew = attachedPolizaListNew;
+//            asegurado.setPolizaList(polizaListNew);
+//            List<DocumentoAsegurado> attachedDocumentoAseguradoListNew = new ArrayList<DocumentoAsegurado>();
+//            for (DocumentoAsegurado documentoAseguradoListNewDocumentoAseguradoToAttach : documentoAseguradoListNew) {
+//                documentoAseguradoListNewDocumentoAseguradoToAttach = em.getReference(documentoAseguradoListNewDocumentoAseguradoToAttach.getClass(), documentoAseguradoListNewDocumentoAseguradoToAttach.getDocumentoAseguradoPK());
+//                attachedDocumentoAseguradoListNew.add(documentoAseguradoListNewDocumentoAseguradoToAttach);
+//            }
+//            documentoAseguradoListNew = attachedDocumentoAseguradoListNew;
+//            asegurado.setDocumentoAseguradoList(documentoAseguradoListNew);
+//            List<Telefono> attachedTelefonoListNew = new ArrayList<Telefono>();
+//            for (Telefono telefonoListNewTelefonoToAttach : telefonoListNew) {
+//                telefonoListNewTelefonoToAttach = em.getReference(telefonoListNewTelefonoToAttach.getClass(), telefonoListNewTelefonoToAttach.getTelefonoPK());
+//                attachedTelefonoListNew.add(telefonoListNewTelefonoToAttach);
+//            }
+//            telefonoListNew = attachedTelefonoListNew;
+//            asegurado.setTelefonoList(telefonoListNew);
+//            asegurado = em.merge(asegurado);
+//            if (clienteOld != null && !clienteOld.equals(clienteNew)) {
+//                clienteOld.setAsegurado(null);
+//                clienteOld = em.merge(clienteOld);
+//            }
+//            if (clienteNew != null && !clienteNew.equals(clienteOld)) {
+//                clienteNew.setAsegurado(asegurado);
+//                clienteNew = em.merge(clienteNew);
+//            }
+//            if (iddomicilioOld != null && !iddomicilioOld.equals(iddomicilioNew)) {
+//                iddomicilioOld.getAseguradoList().remove(asegurado);
+//                iddomicilioOld = em.merge(iddomicilioOld);
+//            }
+//            if (iddomicilioNew != null && !iddomicilioNew.equals(iddomicilioOld)) {
+//                iddomicilioNew.getAseguradoList().add(asegurado);
+//                iddomicilioNew = em.merge(iddomicilioNew);
+//            }
+//            if (tipopersonaOld != null && !tipopersonaOld.equals(tipopersonaNew)) {
+//                tipopersonaOld.getAseguradoList().remove(asegurado);
+//                tipopersonaOld = em.merge(tipopersonaOld);
+//            }
+//            if (tipopersonaNew != null && !tipopersonaNew.equals(tipopersonaOld)) {
+//                tipopersonaNew.getAseguradoList().add(asegurado);
+//                tipopersonaNew = em.merge(tipopersonaNew);
+//            }
+//            for (Email emailListNewEmail : emailListNew) {
+//                if (!emailListOld.contains(emailListNewEmail)) {
+//                    Asegurado oldAseguradoOfEmailListNewEmail = emailListNewEmail.getAsegurado();
+//                    emailListNewEmail.setAsegurado(asegurado);
+//                    emailListNewEmail = em.merge(emailListNewEmail);
+//                    if (oldAseguradoOfEmailListNewEmail != null && !oldAseguradoOfEmailListNewEmail.equals(asegurado)) {
+//                        oldAseguradoOfEmailListNewEmail.getEmailList().remove(emailListNewEmail);
+//                        oldAseguradoOfEmailListNewEmail = em.merge(oldAseguradoOfEmailListNewEmail);
+//                    }
+//                }
+//            }
+//            for (Poliza polizaListNewPoliza : polizaListNew) {
+//                if (!polizaListOld.contains(polizaListNewPoliza)) {
+//                    Asegurado oldContratanteOfPolizaListNewPoliza = polizaListNewPoliza.getContratante();
+//                    polizaListNewPoliza.setContratante(asegurado);
+//                    polizaListNewPoliza = em.merge(polizaListNewPoliza);
+//                    if (oldContratanteOfPolizaListNewPoliza != null && !oldContratanteOfPolizaListNewPoliza.equals(asegurado)) {
+//                        oldContratanteOfPolizaListNewPoliza.getPolizaList().remove(polizaListNewPoliza);
+//                        oldContratanteOfPolizaListNewPoliza = em.merge(oldContratanteOfPolizaListNewPoliza);
+//                    }
+//                }
+//            }
+//            for (DocumentoAsegurado documentoAseguradoListNewDocumentoAsegurado : documentoAseguradoListNew) {
+//                if (!documentoAseguradoListOld.contains(documentoAseguradoListNewDocumentoAsegurado)) {
+//                    Asegurado oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado = documentoAseguradoListNewDocumentoAsegurado.getAsegurado();
+//                    documentoAseguradoListNewDocumentoAsegurado.setAsegurado(asegurado);
+//                    documentoAseguradoListNewDocumentoAsegurado = em.merge(documentoAseguradoListNewDocumentoAsegurado);
+//                    if (oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado != null && !oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado.equals(asegurado)) {
+//                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado.getDocumentoAseguradoList().remove(documentoAseguradoListNewDocumentoAsegurado);
+//                        oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado = em.merge(oldAseguradoOfDocumentoAseguradoListNewDocumentoAsegurado);
+//                    }
+//                }
+//            }
+//            for (Telefono telefonoListNewTelefono : telefonoListNew) {
+//                if (!telefonoListOld.contains(telefonoListNewTelefono)) {
+//                    Asegurado oldAseguradoOfTelefonoListNewTelefono = telefonoListNewTelefono.getAsegurado();
+//                    telefonoListNewTelefono.setAsegurado(asegurado);
+//                    telefonoListNewTelefono = em.merge(telefonoListNewTelefono);
+//                    if (oldAseguradoOfTelefonoListNewTelefono != null && !oldAseguradoOfTelefonoListNewTelefono.equals(asegurado)) {
+//                        oldAseguradoOfTelefonoListNewTelefono.getTelefonoList().remove(telefonoListNewTelefono);
+//                        oldAseguradoOfTelefonoListNewTelefono = em.merge(oldAseguradoOfTelefonoListNewTelefono);
+//                    }
+//                }
+//            }
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            String msg = ex.getLocalizedMessage();
+//            if (msg == null || msg.length() == 0) {
+//                Integer id = asegurado.getIdcliente();
+//                if (findAsegurado(id) == null) {
+//                    throw new NonexistentEntityException("The asegurado with id " + id + " no longer exists.");
+//                }
+//            }
+//            throw ex;
+//        } finally {
+//            if (em != null) {
+//                em.close();
+//            }
+//        }
+//    }
 
     public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;

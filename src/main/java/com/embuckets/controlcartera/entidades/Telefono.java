@@ -54,6 +54,11 @@ public class Telefono implements Serializable {
         this.telefonoPK = new TelefonoPK(idcliente, telefono);
     }
 
+    public Telefono(String telefono) {
+        this.telefonoPK = new TelefonoPK();
+        this.telefonoPK.setTelefono(telefono);
+    }
+
     public TelefonoPK getTelefonoPK() {
         return telefonoPK;
     }
@@ -110,5 +115,5 @@ public class Telefono implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Telefono[ telefonoPK=" + telefonoPK + " ]";
     }
-    
+
 }
