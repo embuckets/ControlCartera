@@ -46,7 +46,7 @@ public class HomeController implements Initializable {
 
     //TreeTableView 
     @FXML
-    private TreeTableView treeAsegurados;
+    private TreeTableView<ObservablePoliza> treeAsegurados;
     @FXML
     private TreeTableColumn nombreTreeTableColumn;
     @FXML
@@ -177,11 +177,14 @@ public class HomeController implements Initializable {
 
     private List<Asegurado> createAseguradosFalsos() {
         Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
-        Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
+        asegurado1.setIdcliente(1);
         asegurado1.getCliente().setNacimiento(Date.valueOf(LocalDate.of(1993, Month.MAY, 22)));
+        Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
         asegurado2.getCliente().setNacimiento(Date.valueOf(LocalDate.of(1994, Month.SEPTEMBER, 23)));
+        asegurado2.setIdcliente(2);
 
         Poliza poliza1 = new Poliza();
+        poliza1.setIdpoliza(1);
         poliza1.setNumero("numeor1");
         poliza1.setAseguradora(new Aseguradora("GNP"));
         poliza1.setRamo(new Ramo("vida"));
@@ -193,6 +196,7 @@ public class HomeController implements Initializable {
         poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
 
         Poliza poliza2 = new Poliza();
+        poliza2.setIdpoliza(2);
         poliza2.setNumero("numeor2");
         poliza2.setAseguradora(new Aseguradora("GNP"));
         poliza2.setRamo(new Ramo("vida"));
@@ -201,10 +205,14 @@ public class HomeController implements Initializable {
         poliza2.setPrima(new BigDecimal(54789));
         poliza2.setIniciovigencia(java.util.Date.from(Instant.now()));
         poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        
+        poliza1.setContratante(asegurado1);
+        poliza2.setContratante(asegurado1);
         asegurado1.getPolizaList().add(poliza1);
         asegurado1.getPolizaList().add(poliza2);
 
         Poliza poliza3 = new Poliza();
+        poliza3.setIdpoliza(3);
         poliza3.setNumero("numeor3");
         poliza3.setAseguradora(new Aseguradora("PLAN SEGURO"));
         poliza3.setRamo(new Ramo("GASTOS MEDICOS"));
@@ -213,7 +221,10 @@ public class HomeController implements Initializable {
         poliza3.setPrima(new BigDecimal(12456));
         poliza3.setIniciovigencia(java.util.Date.from(Instant.now()));
         poliza3.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        
+        poliza3.setContratante(asegurado2);
         asegurado2.getPolizaList().add(poliza3);
+        
         List<Asegurado> list = new ArrayList<>();
         list.add(asegurado1);
         list.add(asegurado2);
@@ -235,8 +246,14 @@ public class HomeController implements Initializable {
 
     private void fillTablaRenovaciones() {
         tableViewRenovaciones.setItems(createRenovaciones());
-        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory<>("nacimiento"));
+        
+        renovacionesAseguradoTableColumn.setCellValueFactory(new PropertyValueFactory<ObservablePoliza, String>("asegurado"));
+        renovacionesPolizaTableColumn.setCellValueFactory(new PropertyValueFactory("numero"));
+        renovacionesFinVigenciaTableColumn.setCellValueFactory(new PropertyValueFactory("finVigencia"));
+        renovacionesFaltanTableColumn.setCellValueFactory(new PropertyValueFactory("faltan"));
+        
+//        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+//        cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory<>("nacimiento"));
 
 //        colNotificar.setCellValueFactory(new Callback<CellDataFeatures<ObservableAsegurado, CheckBox>, ObservableValue<CheckBox>>() {
 //            //This callback tell the cell how to bind the data model 'Registered' property to
@@ -319,11 +336,11 @@ public class HomeController implements Initializable {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private ObservableList createRenovaciones() {
+    private ObservableList<ObservablePoliza> createRenovaciones() {
         return createObservableRenovacionesList(getRenovaciones());
     }
 
-    private ObservableList createObservableRenovacionesList(List<Poliza> renovaciones) {
+    private ObservableList<ObservablePoliza> createObservableRenovacionesList(List<Poliza> renovaciones) {
         List<ObservablePoliza> result = new ArrayList<>();
         for (Poliza poliza : renovaciones) {
             ObservablePoliza observablePoliza = new ObservablePoliza(poliza);

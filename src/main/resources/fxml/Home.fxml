@@ -59,9 +59,9 @@
                                 <panes>
                                     <TitledPane animated="false" text="Renovaciones">
                                         <content>
-                                            <TableView>
+                                            <TableView fx:id="tableViewRenovaciones">
                                                 <columns>
-                                                    <TableColumn fx:id="renovacionAseguradoTableColumn" prefWidth="75.0" text="Asegurado" />
+                                                    <TableColumn fx:id="renovacionesAseguradoTableColumn" prefWidth="75.0" text="Asegurado" />
                                                     <TableColumn fx:id="renovacionesPolizaTableColumn" prefWidth="75.0" text="Poliza" />
                                                     <TableColumn fx:id="renovacionesFinVigenciaTableColumn" prefWidth="75.0" text="Fin de Vigencia" />
                                                     <TableColumn fx:id="renovacionesFaltanTableColumn" prefWidth="75.0" text="Faltan" />

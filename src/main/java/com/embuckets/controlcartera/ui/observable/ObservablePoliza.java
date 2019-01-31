@@ -6,6 +6,10 @@
 package com.embuckets.controlcartera.ui.observable;
 
 import com.embuckets.controlcartera.entidades.Poliza;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -27,17 +31,23 @@ public class ObservablePoliza {
     private StringProperty primaProperty;
     private StringProperty finVigenciaProperty;
     private ObservableAsegurado contratanteProperty;
+    private Date finVigenciaDate;
 
     public ObservablePoliza(Poliza poliza) {
         this.idPolizaProperty = new SimpleIntegerProperty(poliza.getIdpoliza());
         this.numeroProperty = new SimpleStringProperty(poliza.getNumero());
         this.aseguradoraProperty = new SimpleStringProperty(poliza.getAseguradora().getAseguradora());
-        this.ramoProperty = new SimpleStringProperty(poliza.getRamo().toString());
+        this.ramoProperty = new SimpleStringProperty(poliza.getRamo().getRamo());
         this.productoProperty = new SimpleStringProperty(poliza.getProducto());
         this.planProperty = new SimpleStringProperty(poliza.getPlan());
         this.primaProperty = new SimpleStringProperty(poliza.getPrima().toString());
         this.contratanteProperty = new ObservableAsegurado(poliza.getContratante());
-        this.finVigenciaProperty = new SimpleStringProperty(poliza.getFinvigencia().toString());
+        this.finVigenciaDate = poliza.getFinvigencia();
+        this.finVigenciaProperty = new SimpleStringProperty(formatDate(poliza.getFinvigencia()));
+    }
+
+    public StringProperty aseguradoProperty() {
+        return contratanteProperty.nombreProperty();
     }
 
     public StringProperty numeroProperty() {
@@ -71,7 +81,16 @@ public class ObservablePoliza {
         return primaProperty;
     }
 
-    public IntegerPropertyBase getIdPolizaProperty() {
+    public StringProperty finVigenciaProperty() {
+        return finVigenciaProperty;
+    }
+
+    public StringProperty faltanProperty() {
+        LocalDate fin = finVigenciaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return new SimpleStringProperty("" + (fin.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
+    }
+
+    public IntegerPropertyBase idPolizaProperty() {
         return idPolizaProperty;
     }
 
@@ -79,56 +98,28 @@ public class ObservablePoliza {
         this.idPolizaProperty = idPolizaProperty;
     }
 
-    public StringProperty getNumeroProperty() {
-        return numeroProperty;
-    }
-
     public void setNumeroProperty(StringProperty numeroProperty) {
         this.numeroProperty = numeroProperty;
-    }
-
-    public StringProperty getAseguradoraProperty() {
-        return aseguradoraProperty;
     }
 
     public void setAseguradoraProperty(StringProperty aseguradoraProperty) {
         this.aseguradoraProperty = aseguradoraProperty;
     }
 
-    public StringProperty getRamoProperty() {
-        return ramoProperty;
-    }
-
     public void setRamoProperty(StringProperty ramoProperty) {
         this.ramoProperty = ramoProperty;
-    }
-
-    public StringProperty getProductoProperty() {
-        return productoProperty;
     }
 
     public void setProductoProperty(StringProperty productoProperty) {
         this.productoProperty = productoProperty;
     }
 
-    public StringProperty getPlanProperty() {
-        return planProperty;
-    }
-
     public void setPlanProperty(StringProperty planProperty) {
         this.planProperty = planProperty;
     }
 
-    public StringProperty getPrimaProperty() {
-        return primaProperty;
-    }
-
     public void setPrimaProperty(StringProperty primaProperty) {
         this.primaProperty = primaProperty;
-    }
-
-    public StringProperty getFinVigenciaProperty() {
-        return finVigenciaProperty;
     }
 
     public void setFinVigenciaProperty(StringProperty finVigenciaProperty) {
@@ -141,6 +132,10 @@ public class ObservablePoliza {
 
     public void setContratanteProperty(ObservableAsegurado contratanteProperty) {
         this.contratanteProperty = contratanteProperty;
+    }
+
+    private String formatDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
     }
 
 }
