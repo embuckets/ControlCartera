@@ -6,6 +6,7 @@
 package com.embuckets.controlcartera.entidades;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -65,10 +66,27 @@ public class Asegurado implements Serializable {
     private List<Telefono> telefonoList;
 
     public Asegurado() {
+        emailList = new ArrayList<>();
+        cliente = new Cliente();
+        polizaList = new ArrayList<>();
+        documentoAseguradoList = new ArrayList<>();
+        telefonoList = new ArrayList<>();
     }
 
     public Asegurado(Integer idcliente) {
         this.idcliente = idcliente;
+        
+    }
+    
+    public Asegurado(String nombre, String apellidoPaterno, String apellidoMaterno){
+        this.cliente = new Cliente();
+        cliente.setNombre(nombre);
+        cliente.setApellidopaterno(apellidoPaterno);
+        cliente.setApellidomaterno(apellidoMaterno);
+        emailList = new ArrayList<>();
+        polizaList = new ArrayList<>();
+        documentoAseguradoList = new ArrayList<>();
+        telefonoList = new ArrayList<>();
     }
 
     public Integer getIdcliente() {
