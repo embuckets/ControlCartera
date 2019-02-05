@@ -7,15 +7,20 @@ package com.embuckets.controlcartera.ui;
 
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Aseguradora;
+import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.Moneda;
+import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.Ramo;
+import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.ui.observable.ObservableAsegurado;
+import com.embuckets.controlcartera.ui.observable.ObservableCliente;
+import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import com.embuckets.controlcartera.ui.observable.ObservablePoliza;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.Date;
+import java.util.Date;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -108,8 +113,8 @@ public class HomeController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         fillTablaRenovaciones();
-//        fillTablaRecibos();
-//        fillTablaCumple();
+        fillTablaRecibos();
+        fillTablaCumple();
         fillTablaAsegurados();
     }
 
@@ -178,10 +183,12 @@ public class HomeController implements Initializable {
     private List<Asegurado> createAseguradosFalsos() {
         Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
         asegurado1.setIdcliente(1);
-        asegurado1.getCliente().setNacimiento(Date.valueOf(LocalDate.of(1993, Month.MAY, 22)));
+        asegurado1.getCliente().setIdcliente(1);
+        asegurado1.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:01.00Z")));
         Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
-        asegurado2.getCliente().setNacimiento(Date.valueOf(LocalDate.of(1994, Month.SEPTEMBER, 23)));
+        asegurado2.getCliente().setNacimiento(Date.from(Instant.parse("1994-09-23T00:00:01.00Z")));
         asegurado2.setIdcliente(2);
+        asegurado2.getCliente().setIdcliente(2);
 
         Poliza poliza1 = new Poliza();
         poliza1.setIdpoliza(1);
@@ -192,7 +199,7 @@ public class HomeController implements Initializable {
         poliza1.setPlan("plan");
         poliza1.setPrima(new BigDecimal(21456));
         poliza1.setPrimamoneda(new Moneda("pesos"));
-        poliza1.setIniciovigencia(java.util.Date.from(Instant.now()));
+        poliza1.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(15))));
         poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
 
         Poliza poliza2 = new Poliza();
@@ -203,9 +210,9 @@ public class HomeController implements Initializable {
         poliza2.setProducto("producto");
         poliza2.setPlan("plan");
         poliza2.setPrima(new BigDecimal(54789));
-        poliza2.setIniciovigencia(java.util.Date.from(Instant.now()));
+        poliza2.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(20))));
         poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-        
+
         poliza1.setContratante(asegurado1);
         poliza2.setContratante(asegurado1);
         asegurado1.getPolizaList().add(poliza1);
@@ -219,42 +226,54 @@ public class HomeController implements Initializable {
         poliza3.setProducto("producto");
         poliza3.setPlan("plan");
         poliza3.setPrima(new BigDecimal(12456));
-        poliza3.setIniciovigencia(java.util.Date.from(Instant.now()));
+        poliza3.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(5))));
         poliza3.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-        
+
         poliza3.setContratante(asegurado2);
         asegurado2.getPolizaList().add(poliza3);
-        
+
         List<Asegurado> list = new ArrayList<>();
         list.add(asegurado1);
         list.add(asegurado2);
         return list;
     }
 
-    private ObservableList<ObservableAsegurado> initializeAsegurados() {
-        Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
-        Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
-        asegurado1.getCliente().setNacimiento(Date.valueOf(LocalDate.of(1993, Month.MAY, 22)));
-        asegurado2.getCliente().setNacimiento(Date.valueOf(LocalDate.of(1994, Month.SEPTEMBER, 23)));
-        List<ObservableAsegurado> list = new ArrayList<>();
+    private ObservableList<ObservableCliente> createCumple() {
+        return createObservableClientes(getClientes());
+    }
 
-        list.add(new ObservableAsegurado(asegurado1));
-        list.add(new ObservableAsegurado(asegurado2));
+    private ObservableList<ObservableCliente> createObservableClientes(List<Cliente> clientes) {
+        List<ObservableCliente> observableClientes = new ArrayList<>();
+        clientes.stream().map((cliente) -> new ObservableCliente(cliente)).forEachOrdered((obvs) -> {
+            observableClientes.add(obvs);
+        });
+        return FXCollections.observableArrayList(observableClientes);
+    }
 
-        return FXCollections.observableArrayList(list);
+    private List<Cliente> getClientes() {
+        //TODO: pedir clientes que cumplan
+        return createClientesFalsos();
+    }
+
+    private List<Cliente> createClientesFalsos() {
+        List<Asegurado> asegurados = createAseguradosFalsos();
+        List<Cliente> clientes = new ArrayList<>();
+        asegurados.forEach((asegurado) -> {
+            clientes.add(asegurado.getCliente());
+        });
+        return clientes;
     }
 
     private void fillTablaRenovaciones() {
         tableViewRenovaciones.setItems(createRenovaciones());
-        
-        renovacionesAseguradoTableColumn.setCellValueFactory(new PropertyValueFactory<ObservablePoliza, String>("asegurado"));
+
+        renovacionesAseguradoTableColumn.setCellValueFactory(new PropertyValueFactory("asegurado"));
         renovacionesPolizaTableColumn.setCellValueFactory(new PropertyValueFactory("numero"));
         renovacionesFinVigenciaTableColumn.setCellValueFactory(new PropertyValueFactory("finVigencia"));
         renovacionesFaltanTableColumn.setCellValueFactory(new PropertyValueFactory("faltan"));
-        
+
 //        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
 //        cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory<>("nacimiento"));
-
 //        colNotificar.setCellValueFactory(new Callback<CellDataFeatures<ObservableAsegurado, CheckBox>, ObservableValue<CheckBox>>() {
 //            //This callback tell the cell how to bind the data model 'Registered' property to
 //            //the cell, itself.
@@ -301,7 +320,7 @@ public class HomeController implements Initializable {
 //
 //    }
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
-        Main.getInstance().changeSceneContent("NuevoAsegurado.fxml");
+        MainApp.getInstance().changeSceneContent("NuevoAsegurado.fxml");
 //        try {
 //            Parent parent = FXMLLoader.load(getClass().getResource("NuevoAsegurado.fxml"));
 //            
@@ -323,17 +342,28 @@ public class HomeController implements Initializable {
 ////            mainWindow.show();
 //            
 //        } catch (IOException ex) {
-//            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //        
     }
 
     private void fillTablaCumple() {
-        tableViewCumple.setItems(initializeAsegurados());
+        tableViewCumple.setItems(createCumple());
+        
+        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory("nombre"));
+        cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory("nacimiento"));
     }
 
     private void fillTablaRecibos() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        tableViewRecibos.setItems(createRecibos());
+
+        recibosAseguradoTableColumn.setCellValueFactory(new PropertyValueFactory("asegurado"));
+        recibosPolizaTableColumn.setCellValueFactory(new PropertyValueFactory("poliza"));
+        recibosDesdeTableColumn.setCellValueFactory(new PropertyValueFactory("cubreDesde"));
+        recibosHastaTableColumn.setCellValueFactory(new PropertyValueFactory("cubreHasta"));
+        recibosImporteTableColumn.setCellValueFactory(new PropertyValueFactory("importe"));
+        recibosUltimaNotificacionTableColumn.setCellValueFactory(new PropertyValueFactory("enviado"));
+
     }
 
     private ObservableList<ObservablePoliza> createRenovaciones() {
@@ -362,6 +392,47 @@ public class HomeController implements Initializable {
             polizas.stream().forEach((p) -> result.add(p));
         }
         return result;
+    }
+
+    private ObservableList<ObservableNotificacionRecibo> createRecibos() {
+        return createObservableNotificacionesRecibo(getNotificacionesRecibos());
+    }
+
+    private List<NotificacionRecibo> getNotificacionesRecibos() {
+        //TODO: getNotifacaciones de la base de dato
+        return createNotificacionesRecibosFalsos();
+    }
+
+    private ObservableList<ObservableNotificacionRecibo> createObservableNotificacionesRecibo(List<NotificacionRecibo> notificacionesRecibos) {
+        List<ObservableNotificacionRecibo> result = new ArrayList<>();
+        notificacionesRecibos.stream().map((notificacionRecibo) -> new ObservableNotificacionRecibo(notificacionRecibo)).forEachOrdered((obv) -> {
+            result.add(obv);
+        });
+        return FXCollections.observableArrayList(result);
+    }
+
+    private List<NotificacionRecibo> createNotificacionesRecibosFalsos() {
+        NotificacionRecibo notificacion1 = new NotificacionRecibo();
+        notificacion1.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(2))));
+        notificacion1.setIdrecibo(1);
+        notificacion1.setRecibo(new Recibo(1, Date.from(Instant.parse("2018-12-01T00:00:01.00Z")), Date.from(Instant.parse("2018-12-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
+        notificacion1.getRecibo().setIdpoliza(new Poliza());
+        notificacion1.getRecibo().getIdpoliza().setNumero("numero1");
+        notificacion1.getRecibo().getIdpoliza().setContratante(new Asegurado("Emilio", "Hernandez", "Segovia"));
+
+        NotificacionRecibo notificacion2 = new NotificacionRecibo();
+        notificacion2.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(26))));
+        notificacion2.setIdrecibo(2);
+        notificacion2.setRecibo(new Recibo(2, Date.from(Instant.parse("2019-01-01T00:00:01.00Z")), Date.from(Instant.parse("2019-01-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
+        notificacion2.getRecibo().setIdpoliza(new Poliza());
+        notificacion2.getRecibo().getIdpoliza().setNumero("numero1");
+        notificacion2.getRecibo().getIdpoliza().setContratante(new Asegurado("Daniel", "Hernandez", "Segovia"));
+
+        List<NotificacionRecibo> result = new ArrayList<>();
+        result.add(notificacion1);
+        result.add(notificacion2);
+        return result;
+
     }
 
 }

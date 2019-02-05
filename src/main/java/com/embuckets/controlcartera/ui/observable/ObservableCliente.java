@@ -6,6 +6,8 @@
 package com.embuckets.controlcartera.ui.observable;
 
 import com.embuckets.controlcartera.entidades.Cliente;
+import java.time.ZoneId;
+import java.util.Date;
 import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -25,13 +27,13 @@ public class ObservableCliente {
 
     public ObservableCliente(Cliente cliente) {
         this.idCliente = new SimpleIntegerProperty(cliente.getIdcliente());
-        this.nombreProperty = new SimpleStringProperty(cliente.getNombre());
+        this.nombreProperty = new SimpleStringProperty(cliente.getNombre() + cliente.getApellidopaterno() + cliente.getApellidomaterno());
         this.paternoProperty = new SimpleStringProperty(cliente.getApellidopaterno());
         this.maternoProperty = new SimpleStringProperty(cliente.getApellidomaterno());
-        this.nacimientoProperty = new SimpleStringProperty(cliente.getNacimiento().toString());
+        this.nacimientoProperty = new SimpleStringProperty(formatDate(cliente.getNacimiento()));
     }
 
-    public StringProperty getNombreProperty() {
+    public StringProperty nombreProperty() {
         return nombreProperty;
     }
 
@@ -39,7 +41,7 @@ public class ObservableCliente {
         this.nombreProperty = nombreProperty;
     }
 
-    public StringProperty getPaternoProperty() {
+    public StringProperty paternoProperty() {
         return paternoProperty;
     }
 
@@ -47,7 +49,7 @@ public class ObservableCliente {
         this.paternoProperty = paternoProperty;
     }
 
-    public StringProperty getMaternoProperty() {
+    public StringProperty maternoProperty() {
         return maternoProperty;
     }
 
@@ -55,7 +57,7 @@ public class ObservableCliente {
         this.maternoProperty = maternoProperty;
     }
 
-    public StringProperty getNacimientoProperty() {
+    public StringProperty nacimientoProperty() {
         return nacimientoProperty;
     }
 
@@ -63,7 +65,7 @@ public class ObservableCliente {
         this.nacimientoProperty = nacimientoProperty;
     }
 
-    public IntegerPropertyBase getIdCliente() {
+    public IntegerPropertyBase idCliente() {
         return idCliente;
     }
 
@@ -71,4 +73,7 @@ public class ObservableCliente {
         this.idCliente = idCliente;
     }
 
+    private String formatDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+    }
 }

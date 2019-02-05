@@ -125,7 +125,7 @@ public class NuevoAseguradoController implements Initializable {
     }
 
     public void homePage(ActionEvent event) throws IOException {
-        Main.getInstance().changeSceneContent("Home.fxml");
+        MainApp.getInstance().changeSceneContent("Home.fxml");
 //        
 //        try {
 //            Parent parent = FXMLLoader.load(getClass().getResource("Home.fxml"));
@@ -146,7 +146,7 @@ public class NuevoAseguradoController implements Initializable {
 
         Asegurado asegurado = new Asegurado(nombre, paterno, materno);
 
-//        Main.getInstance().changeSceneContent("AseguradoHome.fxml");
+//        MainApp.getInstance().changeSceneContent("AseguradoHome.fxml");
     }
 
 }

@@ -8,7 +8,6 @@ package com.embuckets.controlcartera.ui.observable;
 import com.embuckets.controlcartera.entidades.Poliza;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.SimpleIntegerProperty;

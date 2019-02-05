@@ -74,14 +74,14 @@
                                     </TitledPane>
                                     <TitledPane animated="false" text="Recibos">
                                  <content>
-                                    <TableView>
+                                    <TableView fx:id="tableViewRecibos">
                                       <columns>
-                                        <TableColumn prefWidth="75.0" text="Asegurado" />
-                                        <TableColumn prefWidth="75.0" text="Poliza" />
-                                          <TableColumn prefWidth="75.0" text="Cubre Desde" />
-                                          <TableColumn prefWidth="75.0" text="Cubre Hasta" />
-                                          <TableColumn prefWidth="75.0" text="Importe" />
-                                          <TableColumn prefWidth="75.0" text="Última Notificacion" />
+                                        <TableColumn fx:id="recibosAseguradoTableColumn" prefWidth="75.0" text="Asegurado" />
+                                        <TableColumn fx:id="recibosPolizaTableColumn" prefWidth="75.0" text="Poliza" />
+                                          <TableColumn fx:id="recibosDesdeTableColumn" prefWidth="75.0" text="Cubre Desde" />
+                                          <TableColumn fx:id="recibosHastaTableColumn" prefWidth="75.0" text="Cubre Hasta" />
+                                          <TableColumn fx:id="recibosImporteTableColumn" prefWidth="75.0" text="Importe" />
+                                          <TableColumn fx:id="recibosUltimaNotificacionTableColumn" prefWidth="75.0" text="Última Notificacion" />
                                       </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

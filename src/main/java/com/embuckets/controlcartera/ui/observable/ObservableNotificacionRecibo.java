@@ -9,6 +9,8 @@ import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
+import java.time.ZoneId;
+import java.util.Date;
 import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -38,10 +40,10 @@ public class ObservableNotificacionRecibo {
         this.cubreDesdeProperty = new SimpleStringProperty(notificacionRecibo.getRecibo().getCubredesde().toString());
         this.cubreHastaProperty = new SimpleStringProperty(notificacionRecibo.getRecibo().getCubrehasta().toString());
         this.importeProperty = new SimpleStringProperty(notificacionRecibo.getRecibo().getImporte().toPlainString());
-        this.enviadoProperty = new SimpleStringProperty(notificacionRecibo.getEnviado().toString());
+        this.enviadoProperty = new SimpleStringProperty(formatDate(notificacionRecibo.getEnviado()));
     }
 
-    public IntegerPropertyBase getIdReciboProperty() {
+    public IntegerPropertyBase idReciboProperty() {
         return idReciboProperty;
     }
 
@@ -49,7 +51,7 @@ public class ObservableNotificacionRecibo {
         this.idReciboProperty = idReciboProperty;
     }
 
-    public StringProperty getPolizaProperty() {
+    public StringProperty polizaProperty() {
         return polizaProperty;
     }
 
@@ -57,7 +59,7 @@ public class ObservableNotificacionRecibo {
         this.polizaProperty = polizaProperty;
     }
 
-    public StringProperty getAseguradoProperty() {
+    public StringProperty aseguradoProperty() {
         return aseguradoProperty;
     }
 
@@ -65,7 +67,7 @@ public class ObservableNotificacionRecibo {
         this.aseguradoProperty = aseguradoProperty;
     }
 
-    public StringProperty getCubreDesdeProperty() {
+    public StringProperty cubreDesdeProperty() {
         return cubreDesdeProperty;
     }
 
@@ -73,7 +75,7 @@ public class ObservableNotificacionRecibo {
         this.cubreDesdeProperty = cubreDesdeProperty;
     }
 
-    public StringProperty getCubreHastaProperty() {
+    public StringProperty cubreHastaProperty() {
         return cubreHastaProperty;
     }
 
@@ -81,7 +83,7 @@ public class ObservableNotificacionRecibo {
         this.cubreHastaProperty = cubreHastaProperty;
     }
 
-    public StringProperty getImporteProperty() {
+    public StringProperty importeProperty() {
         return importeProperty;
     }
 
@@ -89,12 +91,17 @@ public class ObservableNotificacionRecibo {
         this.importeProperty = importeProperty;
     }
 
-    public StringProperty getEnviadoProperty() {
+    public StringProperty enviadoProperty() {
         return enviadoProperty;
     }
 
     public void setEnviadoProperty(StringProperty enviadoProperty) {
         this.enviadoProperty = enviadoProperty;
+    }
+    
+    
+    private String formatDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().toString();
     }
 
 }
