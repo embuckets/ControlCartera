@@ -320,7 +320,7 @@ public class HomeController implements Initializable {
 //
 //    }
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
-        MainApp.getInstance().changeSceneContent("NuevoAsegurado.fxml");
+        MainApp.getInstance().changeSceneContent("/fxml/NuevoAsegurado.fxml");
 //        try {
 //            Parent parent = FXMLLoader.load(getClass().getResource("NuevoAsegurado.fxml"));
 //            

@@ -47,11 +47,11 @@ public class MainApp extends Application {
     private Stage mainStage;
     private static MainApp instance;
 //    private ControlCartera controlCartera;
-    
+
     public MainApp() {
         instance = this;
     }
-    
+
     public static MainApp getInstance() {
         return instance;
     }
@@ -66,7 +66,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            
+
             //si existe base de datos ve a home.fxml
             // si no existe base de datos mostrar dialogo para importar de excel
             mainStage = primaryStage;
@@ -80,7 +80,7 @@ public class MainApp extends Application {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void changeSceneContent(String fxml) throws IOException {
         Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(fxml), null, new JavaFXBuilderFactory());
         Scene scene = mainStage.getScene();
@@ -93,7 +93,7 @@ public class MainApp extends Application {
         }
 //        mainStage.setMaximized(true);
     }
-    
+
     public void changeSceneContent(Parent page) {
         Scene scene = mainStage.getScene();
         if (scene == null) {
@@ -104,7 +104,7 @@ public class MainApp extends Application {
             mainStage.getScene().setRoot(page);
             mainStage.show();
         }
-        
+
     }
 
     @Override
@@ -113,8 +113,9 @@ public class MainApp extends Application {
 //        ControlCartera.getInstance().detenerBaseDeDatos();
         super.stop(); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
-    
-    
+
+    public Stage getStage() {
+        return mainStage;
+    }
+
 }
