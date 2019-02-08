@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -86,6 +87,8 @@
                               <TextField fx:id="maternoTextField" GridPane.columnIndex="5" GridPane.rowIndex="2" />
                               <Label text="RFC" GridPane.rowIndex="3" />
                               <TextField fx:id="rfcTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="Fecha de Nacimiento" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                              <DatePicker fx:id="nacimientoDatePicker" GridPane.columnIndex="3" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                         <HBox>
@@ -158,10 +161,10 @@
                               <Label text="Domicilio" GridPane.columnSpan="2147483647" />
                               <Label text="Calle" GridPane.rowIndex="1" />
                               <TextField fx:id="calleTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label text="No. Interior" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <Label text="No. Exterior" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                              <TextField fx:id="exteriorTextField" GridPane.columnIndex="5" GridPane.rowIndex="1" />
-                              <TextField fx:id="interiorTextField" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                              <Label text="No. Interior" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                              <Label text="No. Exterior" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <TextField fx:id="exteriorTextField" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                              <TextField fx:id="interiorTextField" GridPane.columnIndex="5" GridPane.rowIndex="1" />
                               <TextField fx:id="codigoPostaTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <TextField fx:id="coloniaTextField" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                               <Label text="Codigo Postal" GridPane.rowIndex="2" />
@@ -190,7 +193,7 @@
                               </TableView>
                               <HBox spacing="10.0" VBox.vgrow="NEVER">
                                  <children>
-                                    <TextField fx:id="archivoTextField" editable="false" prefWidth="200.0" />
+                                    <TextField fx:id="archivoTextField" editable="false" prefWidth="300.0" />
                                     <Button fx:id="selectArchivoButton" mnemonicParsing="false" onAction="#seleccionarArchivo" text="Seleccionar archivo" />
                                     <ComboBox fx:id="tipoArchivoComboBox" prefWidth="150.0" promptText="Tipo" />
                                     <Button fx:id="agregarArchivoButton" mnemonicParsing="false" onAction="#agregarDocumento" text="Agregar" />

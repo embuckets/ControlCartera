@@ -38,6 +38,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
@@ -51,7 +52,7 @@ public class HomeController implements Initializable {
 
     //TreeTableView 
     @FXML
-    private TreeTableView<ObservablePoliza> treeAsegurados;
+    private TreeTableView treeAsegurados;
     @FXML
     private TreeTableColumn nombreTreeTableColumn;
     @FXML
@@ -121,13 +122,25 @@ public class HomeController implements Initializable {
     private void fillTablaAsegurados() {
         treeAsegurados.setRoot(createTree());
         //agregar listeners
-        treeAsegurados.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            //Agregar listener para doble click que lleve a la pagina del asegurado o poliza
-            System.out.println("oldValue: " + oldValue);//item previamente seleccionado
-            System.out.println("newValue: " + newValue);//item actualmente seleccionado ObservableAsegurado | ObservablePoliza
-            System.out.println("observable: " + observable);//item actualmente seleccionado ObservableAsegurado | ObservablePoliza
-            System.out.println();
+//        treeAsegurados.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+//            //Agregar listener para doble click que lleve a la pagina del asegurado o poliza
+//            System.out.println("oldValue: " + oldValue);//item previamente seleccionado
+//            System.out.println("newValue: " + newValue);//item actualmente seleccionado ObservableAsegurado | ObservablePoliza
+//            System.out.println("observable: " + observable);//item actualmente seleccionado ObservableAsegurado | ObservablePoliza
+//            System.out.println();
+//        });
+
+        treeAsegurados.setRowFactory(table -> {
+            TreeTableRow<ObservableAsegurado> row = new TreeTableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    ObservableAsegurado obs = row.getItem();
+                    System.out.println(obs.getIdCliente());
+                }
+            });
+            return row;
         });
+
 //        treeAsegurados.getSelectionModel().selectedItemProperty().addListener();
     }
 
@@ -349,7 +362,7 @@ public class HomeController implements Initializable {
 
     private void fillTablaCumple() {
         tableViewCumple.setItems(createCumple());
-        
+
         cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory("nombre"));
         cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory("nacimiento"));
     }

@@ -22,7 +22,7 @@ import javafx.collections.ObservableList;
 public class ObservableAsegurado {
 
     //TODO: ID
-    private IntegerPropertyBase idClienteProperty;
+    private int idCliente;
     private StringProperty nombreProperty;
     private StringProperty paternoProperty;
     private StringProperty maternoProperty;
@@ -30,7 +30,7 @@ public class ObservableAsegurado {
     private ListProperty<ObservablePoliza> polizasProperty;
 
     public ObservableAsegurado(Asegurado asegurado) {
-        this.idClienteProperty = new SimpleIntegerProperty(asegurado.getIdcliente());
+        this.idCliente = asegurado.getIdcliente();
         this.nombreProperty = new SimpleStringProperty(asegurado.getCliente().getNombre());
         this.paternoProperty = new SimpleStringProperty(asegurado.getCliente().getApellidopaterno());
         this.maternoProperty = new SimpleStringProperty(asegurado.getCliente().getApellidomaterno());
@@ -54,4 +54,13 @@ public class ObservableAsegurado {
     public ListProperty<ObservablePoliza> getObservablePolizas() {
         return polizasProperty;
     }
+
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
+    }
+
 }

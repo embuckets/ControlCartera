@@ -75,10 +75,15 @@ public class Asegurado implements Serializable {
 
     public Asegurado(Integer idcliente) {
         this.idcliente = idcliente;
-        
+        emailList = new ArrayList<>();
+        cliente = new Cliente();
+        polizaList = new ArrayList<>();
+        documentoAseguradoList = new ArrayList<>();
+        telefonoList = new ArrayList<>();
+
     }
-    
-    public Asegurado(String nombre, String apellidoPaterno, String apellidoMaterno){
+
+    public Asegurado(String nombre, String apellidoPaterno, String apellidoMaterno) {
         this.cliente = new Cliente();
         cliente.setNombre(nombre);
         cliente.setApellidopaterno(apellidoPaterno);
@@ -128,7 +133,7 @@ public class Asegurado implements Serializable {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
-        if (cliente.getIdcliente() != null){
+        if (cliente.getIdcliente() != null) {
             setIdcliente(cliente.getIdcliente());
         }
     }
@@ -200,5 +205,13 @@ public class Asegurado implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Asegurado[ idcliente=" + idcliente + " ]";
     }
-    
+
+    public void agregarTelefono(Telefono telefono) {
+        telefonoList.add(telefono);
+    }
+
+    public void agregarEmail(Email email) {
+        emailList.add(email);
+    }
+
 }

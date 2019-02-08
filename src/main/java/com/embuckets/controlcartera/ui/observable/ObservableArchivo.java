@@ -14,6 +14,7 @@ import javafx.beans.property.StringProperty;
  */
 public class ObservableArchivo {
 
+    private int idCliente;
     private StringProperty archivoProperty;
     private StringProperty tipoProperty;
 
@@ -36,6 +37,14 @@ public class ObservableArchivo {
 
     public void setTipoProperty(StringProperty tipoProperty) {
         this.tipoProperty = tipoProperty;
+    }
+
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
     }
 
 }

@@ -3,9 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -14,8 +12,8 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -49,195 +47,239 @@
                <children>
                   <HBox minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="NEVER">
                      <children>
-                        <Label text="Nombre Cliente" />
+                        <Label fx:id="nombreAseguradoLabel" text="Nombre Cliente" />
                      </children>
                   </HBox>
                   <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                     <tabs>
                       <Tab text="Informacion">
                            <content>
-                              <HBox spacing="20.0">
+                              <VBox spacing="20.0">
                                  <children>
-                                    <VBox spacing="20.0" HBox.hgrow="ALWAYS">
+                                    <HBox spacing="20.0">
                                        <children>
-                                          <GridPane minHeight="-Infinity" minWidth="-Infinity">
-                                            <columnConstraints>
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                            </rowConstraints>
+                                          <VBox spacing="20.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label text="Nombre" />
-                                                <Label text="Nombre" GridPane.rowIndex="1" />
-                                                <Label text="Apellido Paterno" GridPane.rowIndex="2" />
-                                                <TextField fx:id="textNombre" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <TextField fx:id="textPaterno" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
-                                                   <children>
-                                                      <Button mnemonicParsing="false" text="edit" />
-                                                   </children>
-                                                </HBox>
-                                                <Label text="Apellido Materno" GridPane.rowIndex="3" />
-                                                <TextField fx:id="textMaterno" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                <Label text="Nacimiento" GridPane.rowIndex="4" />
-                                                <DatePicker GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                <Label text="Tipo de Persona" GridPane.rowIndex="5" />
-                                                <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                                <Label text="RFC" GridPane.rowIndex="6" />
-                                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                             </children>
-                                          </GridPane>
-                                          <BorderPane>
-                                             <top>
-                                                <GridPane BorderPane.alignment="CENTER">
+                                                <GridPane minHeight="-Infinity" minWidth="-Infinity">
                                                   <columnConstraints>
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                   </columnConstraints>
                                                   <rowConstraints>
                                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                  </rowConstraints>
-                                                   <children>
-                                                      <Label text="Telefono" />
-                                                      <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="15.0" GridPane.columnIndex="1">
-                                                         <children>
-                                                            <Button alignment="TOP_LEFT" mnemonicParsing="false" text="+" />
-                                                         </children>
-                                                      </HBox>
-                                                   </children>
-                                                </GridPane>
-                                             </top>
-                                             <center>
-                                                <ListView BorderPane.alignment="CENTER" />
-                                             </center>
-                                          </BorderPane>
-                                          <BorderPane>
-                                             <top>
-                                                <GridPane BorderPane.alignment="CENTER">
-                                                  <columnConstraints>
-                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                  </columnConstraints>
-                                                  <rowConstraints>
                                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                   </rowConstraints>
                                                    <children>
-                                                      <HBox prefHeight="100.0" prefWidth="200.0">
-                                                         <children>
-                                                            <Label text="Nota" />
-                                                         </children>
-                                                      </HBox>
+                                                      <Label text="Datos Personales" />
+                                                      <Label text="Nombre" GridPane.rowIndex="1" />
+                                                      <Label text="Apellido Paterno" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="nombreTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="paternoteTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                       <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
                                                          <children>
-                                                            <Button mnemonicParsing="false" text="+" />
+                                                            <Button mnemonicParsing="false" onAction="#editarDatosPersonales" text="edit" />
                                                          </children>
                                                       </HBox>
+                                                      <Label text="Apellido Materno" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="maternoTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                      <Label text="Fecha de Nacimiento" GridPane.rowIndex="4" />
+                                                      <Label text="Tipo de Persona" GridPane.rowIndex="5" />
+                                                      <Label text="RFC" GridPane.rowIndex="6" />
+                                                      <TextField fx:id="rfcTextField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                      <TextField fx:id="nacimientoTextField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                      <TextField fx:id="tipoPersonaTextField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                                    </children>
                                                 </GridPane>
-                                             </top>
-                                             <center>
-                                                <ListView BorderPane.alignment="CENTER" />
-                                             </center>
-                                          </BorderPane>
-                                       </children></VBox>
-                                    <VBox spacing="20.0" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <GridPane>
-                                            <columnConstraints>
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                            </rowConstraints>
-                                             <children>
-                                                <Label text="Domicilio" />
-                                                <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
-                                                   <children>
-                                                      <Button mnemonicParsing="false" text="Edit" />
-                                                   </children>
-                                                </HBox>
-                                                <Label text="Calle" GridPane.rowIndex="1" />
-                                                <Label text="No. Exterior" GridPane.rowIndex="2" />
-                                                <Label text="No. Interior" GridPane.rowIndex="3" />
-                                                <Label text="Código Postal" GridPane.rowIndex="4" />
-                                                <Label text="Colonia" GridPane.rowIndex="5" />
-                                                <Label text="Delegación" GridPane.rowIndex="6" />
-                                                <Label text="Estado" GridPane.rowIndex="7" />
-                                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                                <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                                <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="7" />
                                              </children>
-                                          </GridPane>
-                                          <BorderPane>
-                                             <top>
-                                                <GridPane BorderPane.alignment="CENTER">
+                                          </VBox>
+                                          <VBox spacing="20.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <GridPane>
                                                   <columnConstraints>
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                   </columnConstraints>
                                                   <rowConstraints>
                                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                   </rowConstraints>
                                                    <children>
-                                                      <Label text="Documentos" />
-                                                      <HBox alignment="TOP_RIGHT" GridPane.columnIndex="1">
+                                                      <Label text="Domicilio" />
+                                                      <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
                                                          <children>
-                                                            <Button mnemonicParsing="false" text="+" />
+                                                            <Button mnemonicParsing="false" onAction="#editarDomicilio" text="Edit" />
                                                          </children>
                                                       </HBox>
+                                                      <Label text="Calle" GridPane.rowIndex="1" />
+                                                      <Label text="No. Exterior" GridPane.rowIndex="2" />
+                                                      <Label text="No. Interior" GridPane.rowIndex="3" />
+                                                      <Label text="Código Postal" GridPane.rowIndex="4" />
+                                                      <Label text="Colonia" GridPane.rowIndex="5" />
+                                                      <Label text="Delegación" GridPane.rowIndex="6" />
+                                                      <Label text="Estado" GridPane.rowIndex="7" />
+                                                      <TextField fx:id="calleTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="exteriorTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="interiorTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="codigoPostaTextField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                      <TextField fx:id="coloniaTextField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                      <TextField fx:id="delegacionTextField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                      <TextField fx:id="estadoTextField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                                                    </children>
                                                 </GridPane>
-                                             </top>
-                                             <center>
-                                                <ListView BorderPane.alignment="CENTER" />
-                                             </center>
-                                          </BorderPane>
-                                       </children></VBox>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                    <HBox VBox.vgrow="NEVER">
+                                       <children>
+                                          <Label text="Información de Contacto" />
+                                       </children>
+                                    </HBox>
+                                    <HBox prefHeight="150.0" spacing="20.0">
+                                       <children>
+                                          <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <TableView fx:id="telefonoTableView">
+                                                   <columns>
+                                                      <TableColumn fx:id="telefonoTableColumn" prefWidth="75.0" text="Telefono" />
+                                                      <TableColumn fx:id="extensionTableColumn" prefWidth="75.0" text="Extension" />
+                                                      <TableColumn fx:id="tipoTelefonoTableColumn" prefWidth="75.0" text="Tipo" />
+                                                   </columns>
+                                                   <columnResizePolicy>
+                                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TableView>
+                                                <HBox spacing="10.0" VBox.vgrow="NEVER">
+                                                   <children>
+                                                      <TextField fx:id="telefonoTextField" promptText="Telefono" />
+                                                      <TextField fx:id="extensionTextField" promptText="Extension" />
+                                                      <ComboBox fx:id="tipoTelefonoComboBox" prefWidth="150.0" promptText="Tipo" />
+                                                      <Button fx:id="agregarTelefonoButton" mnemonicParsing="false" onAction="#agregarTelefono" text="Agregar" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                          <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <TableView fx:id="emailTableView">
+                                                   <columns>
+                                                      <TableColumn fx:id="emailTableColumn" prefWidth="75.0" text="Email" />
+                                                      <TableColumn fx:id="tipoEmailTableColumn" prefWidth="75.0" text="Tipo" />
+                                                   </columns>
+                                                   <columnResizePolicy>
+                                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TableView>
+                                                <HBox spacing="10.0" VBox.vgrow="NEVER">
+                                                   <children>
+                                                      <TextField fx:id="emailTextField" promptText="Email" />
+                                                      <ComboBox fx:id="tipoEmailComboBox" prefWidth="150.0" promptText="Tipo" />
+                                                      <Button fx:id="agregarEmailButton" mnemonicParsing="false" onAction="#agregarEmail" text="Agregar" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                    <HBox>
+                                       <children>
+                                          <Label text="Documentos" />
+                                       </children>
+                                    </HBox>
+                                    <VBox prefHeight="150.0" spacing="10.0">
+                                       <children>
+                                          <TableView fx:id="documentoTableView">
+                                             <columns>
+                                                <TableColumn fx:id="archivoTableColumn" prefWidth="75.0" text="Archivo" />
+                                                <TableColumn fx:id="tipoArchivoTableColumn" prefWidth="75.0" text="Tipo" />
+                                             </columns>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                          <HBox spacing="10.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <TextField fx:id="archivoTextField" editable="false" prefWidth="300.0" />
+                                                <Button fx:id="selectArchivoButton" mnemonicParsing="false" onAction="#seleccionarArchivo" text="Seleccionar archivo" />
+                                                <ComboBox fx:id="tipoArchivoComboBox" prefWidth="150.0" promptText="Tipo" />
+                                                <Button fx:id="agregarArchivoButton" mnemonicParsing="false" onAction="#agregarDocumento" text="Agregar" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <GridPane minHeight="-Infinity" minWidth="-Infinity">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="20.0" prefHeight="60.0" vgrow="ALWAYS" />
+                                       </rowConstraints>
+                                       <children>
+                                          <Label text="Notas" GridPane.columnSpan="2147483647" />
+                                          <TextArea fx:id="notaTextArea" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                          <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                             <children>
+                                                <Button mnemonicParsing="false" onAction="#editarNota" text="edit" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </GridPane>
+                                    <HBox alignment="BOTTOM_LEFT" nodeOrientation="RIGHT_TO_LEFT" spacing="10.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Button fx:id="informacionTabRegesarButton" mnemonicParsing="false" onAction="#homePage" text="Regresar" />
+                                       </children>
+                                    </HBox>
                                  </children>
-                              </HBox>
+                              </VBox>
                            </content>
                         </Tab>
                       <Tab text="Polizas">
                            <content>
-                              <HBox>
+                              <VBox prefHeight="150.0">
                                  <children>
-                                    <TableView HBox.hgrow="ALWAYS">
-                                      <columns>
-                                        <TableColumn minWidth="100.0" prefWidth="-1.0" text="No. Poliza" />
-                                        <TableColumn minWidth="100.0" prefWidth="-1.0" text="Aseguradora" />
-                                          <TableColumn minWidth="100.0" prefWidth="-1.0" text="Ramo" />
-                                          <TableColumn minWidth="100.0" prefWidth="-1.0" text="Producto" />
-                                          <TableColumn minWidth="100.0" prefWidth="-1.0" text="Plan" />
-                                      </columns>
-                                       <columnResizePolicy>
-                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                       </columnResizePolicy>
-                                    </TableView>
+                                    <HBox>
+                                       <children>
+                                          <TableView fx:id="polizasTableView" HBox.hgrow="ALWAYS">
+                                            <columns>
+                                              <TableColumn fx:id="polizaTableColumn" minWidth="100.0" prefWidth="-1.0" text="Poliza" />
+                                              <TableColumn fx:id="aseguradoraTableColumn" minWidth="100.0" prefWidth="-1.0" text="Aseguradora" />
+                                                <TableColumn fx:id="ramoTableColumn" minWidth="100.0" prefWidth="-1.0" text="Ramo" />
+                                                <TableColumn fx:id="productoTableColumn" minWidth="100.0" prefWidth="-1.0" text="Producto" />
+                                                <TableColumn fx:id="planTableColumn" minWidth="100.0" prefWidth="-1.0" text="Plan" />
+                                                <TableColumn fx:id="primaTableColumn" minWidth="100.0" prefWidth="-1.0" text="Prima" />
+                                            </columns>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="BOTTOM_LEFT" nodeOrientation="RIGHT_TO_LEFT" spacing="10.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Button fx:id="polizasTabRegresarButton" mnemonicParsing="false" onAction="#homePage" text="Regresar" />
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </HBox>
                                  </children>
-                                 <padding>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                 </padding>
-                              </HBox>
+                              </VBox>
                            </content></Tab>
                     </tabs>
                   </TabPane>
