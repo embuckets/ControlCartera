@@ -19,7 +19,7 @@ import javafx.collections.ObservableList;
  *
  * @author emilio
  */
-public class ObservableAsegurado {
+public class ObservableAsegurado implements ObservableTreeItem {
 
     //TODO: ID
     private int idCliente;
@@ -36,9 +36,10 @@ public class ObservableAsegurado {
         this.maternoProperty = new SimpleStringProperty(asegurado.getCliente().getApellidomaterno());
         this.nacimientoProperty = new SimpleStringProperty(asegurado.getCliente().getNacimiento().toString());
         ObservableList<ObservablePoliza> obsList = FXCollections.observableArrayList();
-        this.polizasProperty = new SimpleListProperty<ObservablePoliza>(obsList);
+        this.polizasProperty = new SimpleListProperty<>(obsList);
     }
 
+    @Override
     public StringProperty nombreProperty() {
         return new SimpleStringProperty(nombreProperty.get() + " " + paternoProperty.get() + " " + maternoProperty.get());
     }
@@ -61,6 +62,41 @@ public class ObservableAsegurado {
 
     public void setIdCliente(int idCliente) {
         this.idCliente = idCliente;
+    }
+
+    @Override
+    public int getId() {
+        return idCliente;
+    }
+
+    @Override
+    public StringProperty numeroProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty aseguradoraProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty ramoProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty productoProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty planProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty primaProperty() {
+        return new SimpleStringProperty("");
     }
 
 }

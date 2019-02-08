@@ -204,7 +204,7 @@
                             <TreeTableView fx:id="treeAsegurados" minWidth="-Infinity" showRoot="false" BorderPane.alignment="CENTER">
                                 <columns>
                                     <TreeTableColumn fx:id="nombreTreeTableColumn" minWidth="100.0" prefWidth="-1.0" text="Nombre" />
-                              <TreeTableColumn fx:id="numeroPolizaTreeTableColumn" minWidth="100.0" prefWidth="-1.0" text="Numero Poliza" />
+                              <TreeTableColumn fx:id="numeroPolizaTreeTableColumn" minWidth="100.0" prefWidth="-1.0" text="Póliza" />
                               <TreeTableColumn fx:id="aseguradoraTreeTableColumn" minWidth="100.0" prefWidth="75.0" text="Aseguradora" />
                               <TreeTableColumn fx:id="ramoTreeTableColumn" minWidth="100.0" prefWidth="75.0" text="Ramo" />
                               <TreeTableColumn fx:id="productoTreeTableColumn" minWidth="100.0" prefWidth="75.0" text="Producto" />

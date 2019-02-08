@@ -5,16 +5,28 @@
  */
 package com.embuckets.controlcartera.ui.observable;
 
-import javafx.beans.property.Property;
+import javafx.beans.property.StringProperty;
 
 /**
  *
  * @author emilio
  */
 public interface ObservableTreeItem {
-    Property nombreProperty();
-    Property numeroProperty();
-    Property aseguradoraProperty();
-    Property primaProperty();
-    
+
+    int getId();
+
+    StringProperty nombreProperty();
+
+    StringProperty numeroProperty();
+
+    StringProperty aseguradoraProperty();
+
+    StringProperty ramoProperty();
+
+    StringProperty productoProperty();
+
+    StringProperty planProperty();
+
+    StringProperty primaProperty();
+
 }

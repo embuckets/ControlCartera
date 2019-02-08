@@ -17,6 +17,7 @@ import com.embuckets.controlcartera.ui.observable.ObservableAsegurado;
 import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import com.embuckets.controlcartera.ui.observable.ObservablePoliza;
+import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -42,6 +43,7 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.input.KeyCode;
 
 /**
  * FXML Controller class
@@ -52,7 +54,7 @@ public class HomeController implements Initializable {
 
     //TreeTableView 
     @FXML
-    private TreeTableView treeAsegurados;
+    private TreeTableView<ObservableTreeItem> treeAsegurados;
     @FXML
     private TreeTableColumn nombreTreeTableColumn;
     @FXML
@@ -131,11 +133,21 @@ public class HomeController implements Initializable {
 //        });
 
         treeAsegurados.setRowFactory(table -> {
-            TreeTableRow<ObservableAsegurado> row = new TreeTableRow<>();
+            TreeTableRow<ObservableTreeItem> row = new TreeTableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    ObservableAsegurado obs = row.getItem();
-                    System.out.println(obs.getIdCliente());
+                    ObservableTreeItem obs = row.getItem();
+                    if (obs instanceof ObservableAsegurado){
+                        //mandar el id y que el controlador de AsegurdoHome lo tome de la base
+                    }
+                    System.out.println(obs.getId());
+                }
+            });
+            row.setOnKeyPressed(event -> {
+                //TODO: no funciona
+                if (event.getCode() == (KeyCode.ENTER)) {
+                    ObservableTreeItem obs = row.getItem();
+                    System.out.println(obs.getId());
                 }
             });
             return row;

@@ -18,10 +18,10 @@ import javafx.beans.property.StringProperty;
  *
  * @author emilio
  */
-public class ObservablePoliza {
+public class ObservablePoliza implements ObservableTreeItem {
 
     //TODO: ID
-    private IntegerPropertyBase idPolizaProperty;
+    private int idPoliza;
     private StringProperty numeroProperty;
     private StringProperty aseguradoraProperty;
     private StringProperty ramoProperty;
@@ -33,7 +33,7 @@ public class ObservablePoliza {
     private Date finVigenciaDate;
 
     public ObservablePoliza(Poliza poliza) {
-        this.idPolizaProperty = new SimpleIntegerProperty(poliza.getIdpoliza());
+        this.idPoliza = poliza.getIdpoliza();
         this.numeroProperty = new SimpleStringProperty(poliza.getNumero());
         this.aseguradoraProperty = new SimpleStringProperty(poliza.getAseguradora().getAseguradora());
         this.ramoProperty = new SimpleStringProperty(poliza.getRamo().getRamo());
@@ -49,14 +49,17 @@ public class ObservablePoliza {
         return contratanteProperty.nombreProperty();
     }
 
+    @Override
     public StringProperty numeroProperty() {
         return numeroProperty;
     }
 
+    @Override
     public StringProperty aseguradoraProperty() {
         return aseguradoraProperty;
     }
 
+    @Override
     public StringProperty ramoProperty() {
         return ramoProperty;
     }
@@ -65,19 +68,22 @@ public class ObservablePoliza {
 //        //TODO: regresar PLAN + PRODUCTO
 //        return numeroProperty;
 //    }
+    @Override
     public StringProperty productoProperty() {
         //TODO: regresar PLAN + PRODUCTO
         return productoProperty;
     }
 
+    @Override
     public StringProperty planProperty() {
         //TODO: regresar PLAN + PRODUCTO
         return planProperty;
     }
 
+    @Override
     public StringProperty primaProperty() {
         //TODO: regresar PLAN + PRODUCTO
-        return primaProperty;
+        return new SimpleStringProperty("$" + primaProperty.get());
     }
 
     public StringProperty finVigenciaProperty() {
@@ -87,14 +93,6 @@ public class ObservablePoliza {
     public StringProperty faltanProperty() {
         LocalDate fin = finVigenciaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return new SimpleStringProperty("" + (fin.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
-    }
-
-    public IntegerPropertyBase idPolizaProperty() {
-        return idPolizaProperty;
-    }
-
-    public void setIdPolizaProperty(IntegerPropertyBase idPolizaProperty) {
-        this.idPolizaProperty = idPolizaProperty;
     }
 
     public void setNumeroProperty(StringProperty numeroProperty) {
@@ -135,6 +133,24 @@ public class ObservablePoliza {
 
     private String formatDate(Date date) {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+    }
+
+    @Override
+    public int getId() {
+        return getIdPoliza();
+    }
+
+    public int getIdPoliza() {
+        return idPoliza;
+    }
+
+    public void setIdPoliza(int idPoliza) {
+        this.idPoliza = idPoliza;
+    }
+
+    @Override
+    public StringProperty nombreProperty() {
+        return new SimpleStringProperty("");
     }
 
 }
