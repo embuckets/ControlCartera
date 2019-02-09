@@ -137,7 +137,7 @@ public class HomeController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     ObservableTreeItem obs = row.getItem();
-                    if (obs instanceof ObservableAsegurado){
+                    if (obs instanceof Asegurado) {
                         //mandar el id y que el controlador de AsegurdoHome lo tome de la base
                     }
                     System.out.println(obs.getId());
@@ -157,7 +157,7 @@ public class HomeController implements Initializable {
     }
 
     private TreeItem createTree() {
-        List<ObservableAsegurado> observableAsegurados = createObservableAsegurados(getAsegurados());
+        List<ObservableTreeItem> observableAsegurados = (List<ObservableTreeItem>) getAsegurados();
         //make root item
         TreeItem root = new TreeItem(new Asegurado("Control Cartera", "", ""));
         root.setExpanded(true);
@@ -174,7 +174,7 @@ public class HomeController implements Initializable {
         observableAsegurados.stream().forEach((asegurado) -> {
             TreeItem aseguradoItem = new TreeItem(asegurado);
             root.getChildren().add(aseguradoItem);
-            asegurado.getObservablePolizas().stream().forEach((poliza) -> {
+            asegurado.getPolizaListProperty().stream().forEach((poliza) -> {
                 aseguradoItem.getChildren().add(new TreeItem(poliza));
             });
         });
@@ -182,25 +182,25 @@ public class HomeController implements Initializable {
 
     }
 
-    private List<ObservableAsegurado> createObservableAsegurados(List<Asegurado> list) {
-        List<ObservableAsegurado> obsList = new ArrayList<>();
-        for (Asegurado ase : list) {
-            ObservableAsegurado obsAsegurdo = new ObservableAsegurado(ase);
-            for (Poliza pol : ase.getPolizaList()) {
-                ObservablePoliza obsPoliza = new ObservablePoliza(pol);
-                obsAsegurdo.addObservablePoliza(obsPoliza);
-            }
-            obsList.add(obsAsegurdo);
-        }
-        return obsList;
-    }
+//    private List<ObservableTreeItem> createObservableAsegurados(List<Asegurado> list) {
+//        List<ObservableAsegurado> obsList = new ArrayList<>();
+//        for (Asegurado ase : list) {
+//            ObservableAsegurado obsAsegurdo = new ObservableAsegurado(ase);
+//            for (Poliza pol : ase.getPolizaList()) {
+//                ObservablePoliza obsPoliza = new ObservablePoliza(pol);
+//                obsAsegurdo.addObservablePoliza(obsPoliza);
+//            }
+//            obsList.add(obsAsegurdo);
+//        }
+//        return obsList;
+//    }
 
     /**
      * lee todos los asegurados de la base
      *
      * @return lista de todos los asegurados
      */
-    private List<Asegurado> getAsegurados() {
+    private List<? extends ObservableTreeItem> getAsegurados() {
         //TODO: pedir al sistema ControlCartera todos los asegurados
         return createAseguradosFalsos();
     }
@@ -411,7 +411,7 @@ public class HomeController implements Initializable {
 
     private List<Poliza> createRenovacionesFalsas() {
         List<Poliza> result = new ArrayList<>();
-        List<Asegurado> asegurados = getAsegurados();
+        List<Asegurado> asegurados = (List<Asegurado>) getAsegurados();
         for (Asegurado asegurado : asegurados) {
             List<Poliza> polizas = asegurado.getPolizaList();
             polizas.stream().forEach((p) -> result.add(p));

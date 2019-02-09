@@ -6,10 +6,13 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -47,7 +50,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Poliza.findByFinvigencia", query = "SELECT p FROM Poliza p WHERE p.finvigencia = :finvigencia"),
     @NamedQuery(name = "Poliza.findByPrima", query = "SELECT p FROM Poliza p WHERE p.prima = :prima"),
     @NamedQuery(name = "Poliza.findByNota", query = "SELECT p FROM Poliza p WHERE p.nota = :nota")})
-public class Poliza implements Serializable {
+public class Poliza implements Serializable, ObservableTreeItem {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -319,5 +322,50 @@ public class Poliza implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Poliza[ idpoliza=" + idpoliza + " ]";
     }
-    
+
+    @Override
+    public int getId() {
+        return getIdpoliza();
+    }
+
+    @Override
+    public StringProperty nombreProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty numeroProperty() {
+        return new SimpleStringProperty(numero);
+    }
+
+    @Override
+    public StringProperty aseguradoraProperty() {
+        return new SimpleStringProperty(aseguradora.getAseguradora());
+    }
+
+    @Override
+    public StringProperty ramoProperty() {
+        return new SimpleStringProperty(ramo.getRamo());
+    }
+
+    @Override
+    public StringProperty productoProperty() {
+        return new SimpleStringProperty(producto);
+    }
+
+    @Override
+    public StringProperty planProperty() {
+        return new SimpleStringProperty(plan);
+    }
+
+    @Override
+    public StringProperty primaProperty() {
+        return new SimpleStringProperty("$" + prima);
+    }
+
+    @Override
+    public List<? extends ObservableTreeItem> getPolizaListProperty() {
+        return null;
+    }
+
 }

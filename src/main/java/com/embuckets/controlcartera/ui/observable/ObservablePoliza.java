@@ -18,7 +18,7 @@ import javafx.beans.property.StringProperty;
  *
  * @author emilio
  */
-public class ObservablePoliza implements ObservableTreeItem {
+public class ObservablePoliza {
 
     //TODO: ID
     private int idPoliza;
@@ -49,17 +49,17 @@ public class ObservablePoliza implements ObservableTreeItem {
         return contratanteProperty.nombreProperty();
     }
 
-    @Override
+    
     public StringProperty numeroProperty() {
         return numeroProperty;
     }
 
-    @Override
+    
     public StringProperty aseguradoraProperty() {
         return aseguradoraProperty;
     }
 
-    @Override
+    
     public StringProperty ramoProperty() {
         return ramoProperty;
     }
@@ -68,19 +68,19 @@ public class ObservablePoliza implements ObservableTreeItem {
 //        //TODO: regresar PLAN + PRODUCTO
 //        return numeroProperty;
 //    }
-    @Override
+    
     public StringProperty productoProperty() {
         //TODO: regresar PLAN + PRODUCTO
         return productoProperty;
     }
 
-    @Override
+    
     public StringProperty planProperty() {
         //TODO: regresar PLAN + PRODUCTO
         return planProperty;
     }
 
-    @Override
+    
     public StringProperty primaProperty() {
         //TODO: regresar PLAN + PRODUCTO
         return new SimpleStringProperty("$" + primaProperty.get());
@@ -135,7 +135,7 @@ public class ObservablePoliza implements ObservableTreeItem {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
     }
 
-    @Override
+    
     public int getId() {
         return getIdPoliza();
     }
@@ -148,7 +148,7 @@ public class ObservablePoliza implements ObservableTreeItem {
         this.idPoliza = idPoliza;
     }
 
-    @Override
+    
     public StringProperty nombreProperty() {
         return new SimpleStringProperty("");
     }

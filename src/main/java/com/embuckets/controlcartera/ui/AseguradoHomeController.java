@@ -223,31 +223,31 @@ public class AseguradoHomeController implements Initializable {
     }
 
     private void llenarTablaTelefono() {
-        List<ObservableTelefono> obsTelefonoList = new ArrayList<>();
-        for (Telefono telefono : asegurado.getTelefonoList()) {
-            ObservableTelefono obsTel = new ObservableTelefono(telefono.getTelefonoPK().getTelefono(), telefono.getExtension(), telefono.getTipotelefono().getTipotelefono());
-            obsTel.setIdCliente(telefono.getTelefonoPK().getIdcliente());
-            obsTelefonoList.add(obsTel);
-        }
+//        List<Telefono> obsTelefonoList = new ArrayList<>();
+//        for (Telefono telefono : asegurado.getTelefonoList()) {
+//            ObservableTelefono obsTel = new ObservableTelefono(telefono.getTelefonoPK().getTelefono(), telefono.getExtension(), telefono.getTipotelefono().getTipotelefono());
+//            obsTel.setIdCliente(telefono.getTelefonoPK().getIdcliente());
+//            obsTelefonoList.add(obsTel);
+//        }
 
-        telefonoTableView.setItems(FXCollections.observableArrayList(obsTelefonoList));
+        telefonoTableView.setItems(FXCollections.observableArrayList(asegurado.getTelefonoList()));
         telefonoTableColumn.setCellValueFactory(new PropertyValueFactory("telefono"));
         extensionTableColumn.setCellValueFactory(new PropertyValueFactory("extension"));
         tipoTelefonoTableColumn.setCellValueFactory(new PropertyValueFactory("tipo"));
         fillTipoTelefonoComboBox();
 
-        telefonoTableView.setRowFactory(new Callback<TableView<ObservableTelefono>, TableRow<ObservableTelefono>>() {
+        telefonoTableView.setRowFactory(new Callback<TableView<Telefono>, TableRow<Telefono>>() {
             @Override
-            public TableRow<ObservableTelefono> call(TableView<ObservableTelefono> tableView) {
-                final TableRow<ObservableTelefono> row = new TableRow<>();
+            public TableRow<Telefono> call(TableView<Telefono> tableView) {
+                final TableRow<Telefono> row = new TableRow<>();
                 final ContextMenu rowMenu = new ContextMenu();
                 MenuItem removeItem = new MenuItem("Borrar");
                 removeItem.setOnAction(new EventHandler<ActionEvent>() {
 
                     @Override
                     public void handle(ActionEvent event) {
-                        ObservableTelefono item = row.getItem();
-                        Telefono tel = new Telefono(new TelefonoPK(item.getIdCliente(), item.telefonoProperty().get()));
+                        Telefono tel = row.getItem();
+//                        Telefono tel = new Telefono(new TelefonoPK(item.getIdCliente(), item.telefonoProperty().get()));
                         asegurado.getTelefonoList().remove(tel);
                         telefonoTableView.getItems().remove(row.getItem());
                         //TODO: borrar telefono de la base de datos
@@ -275,7 +275,7 @@ public class AseguradoHomeController implements Initializable {
         });
     }
 
-    private Dialog<Telefono> createEditTelefonoDialog(ObservableTelefono telefono) {
+    private Dialog<Telefono> createEditTelefonoDialog(Telefono telefono) {
         Dialog<Telefono> dialog = new Dialog<>();
         dialog.setTitle("Editar telefono");
         //set the button types
@@ -309,9 +309,50 @@ public class AseguradoHomeController implements Initializable {
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
-                Telefono newTel = new Telefono(new TelefonoPK(telefono.getIdCliente(), telefonoTextField.getText()));
+                Telefono newTel = new Telefono(new TelefonoPK(telefono.getTelefonoPK().getIdcliente(), telefonoTextField.getText()));
                 newTel.setExtension(extensionTextField.getText());
                 newTel.setTipotelefono(new TipoTelefono(tipoTelefonoComboBox.getValue().toString()));
+                return newTel;
+            }
+            return null;
+        });
+
+        return dialog;
+
+    }
+
+    private Dialog<Email> createEditEmailDialog(Email email) {
+        Dialog<Email> dialog = new Dialog<>();
+        dialog.setTitle("Editar email");
+        //set the button types
+        ButtonType guardar = new ButtonType("Guardar", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(guardar, ButtonType.CANCEL);
+
+        //create labels and fields
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField emailField = new TextField();
+        emailField.setText(email.getEmailPK().getEmail());
+
+        //combo box
+        String[] tipoEmail = {"Personal", "Trabajo"};
+        ObservableList<String> list = FXCollections.observableArrayList(tipoEmail);
+        ComboBox tipoEmailBox = new ComboBox(list);
+        tipoEmailBox.getSelectionModel().select(list.indexOf(email.tipoProperty().get()));
+
+        grid.add(new Label("Email"), 0, 0);
+        grid.add(emailField, 1, 0);
+        grid.add(new Label("Tipo de email"), 0, 1);
+        grid.add(tipoEmailBox, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == guardar) {
+                Email newTel = new Email(new EmailPK(email.getEmailPK().getIdcliente(), emailField.getText()));
+                newTel.setTipoemail(new TipoEmail(tipoEmailBox.getValue().toString()));
                 return newTel;
             }
             return null;
@@ -330,30 +371,28 @@ public class AseguradoHomeController implements Initializable {
     }
 
     private void llenarTablaEmail() {
-        List<ObservableEmail> obsEmailList = new ArrayList<>();
-        for (Email email : asegurado.getEmailList()) {
-            ObservableEmail obs = new ObservableEmail(email.getEmailPK().getEmail(), email.getTipoemail().getTipoemail());
-            obs.setIdCliente(email.getEmailPK().getIdcliente());
-            obsEmailList.add(obs);
-        }
-        emailTableView.setItems(FXCollections.observableArrayList(obsEmailList));
+//        List<ObservableEmail> obsEmailList = new ArrayList<>();
+//        for (Email email : asegurado.getEmailList()) {
+//            ObservableEmail obs = new ObservableEmail(email.getEmailPK().getEmail(), email.getTipoemail().getTipoemail());
+//            obs.setIdCliente(email.getEmailPK().getIdcliente());
+//            obsEmailList.add(obs);
+//        }
+        emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
         emailTableColumn.setCellValueFactory(new PropertyValueFactory("email"));
         tipoEmailTableColumn.setCellValueFactory(new PropertyValueFactory("tipo"));
         fillTipoEmailComboBox();
 
-        emailTableView.setRowFactory(new Callback<TableView<ObservableEmail>, TableRow<ObservableEmail>>() {
+        emailTableView.setRowFactory(new Callback<TableView<Email>, TableRow<Email>>() {
             @Override
-            public TableRow<ObservableEmail> call(TableView<ObservableEmail> tableView) {
-                final TableRow<ObservableEmail> row = new TableRow<>();
+            public TableRow<Email> call(TableView<Email> tableView) {
+                final TableRow<Email> row = new TableRow<>();
                 final ContextMenu rowMenu = new ContextMenu();
                 MenuItem removeItem = new MenuItem("Borrar");
                 removeItem.setOnAction(new EventHandler<ActionEvent>() {
 
                     @Override
                     public void handle(ActionEvent event) {
-                        ObservableEmail item = row.getItem();
-                        Email email = new Email(new EmailPK(item.getIdCliente(), item.emailProperty().get()));
-                        asegurado.getEmailList().remove(email);
+                        asegurado.getEmailList().remove(row.getItem());
                         emailTableView.getItems().remove(row.getItem());
                         //TODO: borrar email de la base de datos
                     }
@@ -363,8 +402,10 @@ public class AseguradoHomeController implements Initializable {
 
                     @Override
                     public void handle(ActionEvent event) {
-                        ObservableEmail item = row.getItem();
-                        Email tel = new Email(new EmailPK(item.getIdCliente(), item.emailProperty().get()));
+                        Optional<Email> result = createEditEmailDialog(row.getItem()).showAndWait();
+                        result.ifPresent(email -> {
+                            System.out.println(email);
+                        });
                         //crear display window para editar telefono y guardar cambios
                         //TODO: borrar telefono de la base de datos
                     }
@@ -418,7 +459,7 @@ public class AseguradoHomeController implements Initializable {
         Telefono telefono = new Telefono(asegurado.getIdcliente(), telefonoTextField.getText());
         telefono.setExtension(extensionTextField.getText());
         telefono.setTipotelefono(new TipoTelefono(tipoTelefonoComboBox.getValue().toString()));
-        telefonoTableView.getItems().add(new ObservableTelefono(telefono));
+        telefonoTableView.getItems().add(telefono);
         //
         asegurado.agregarTelefono(telefono);
         //TODO: persist telefono
@@ -428,7 +469,7 @@ public class AseguradoHomeController implements Initializable {
     private void agregarEmail(ActionEvent event) {
         Email email = new Email(asegurado.getIdcliente(), emailTextField.getText());
         email.setTipoemail(new TipoEmail(tipoEmailComboBox.getValue().toString()));
-        emailTableView.getItems().add(new ObservableEmail(email));
+        emailTableView.getItems().add(email);
         asegurado.agregarEmail(email);
         //TODO: persist email
     }

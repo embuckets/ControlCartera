@@ -11,12 +11,9 @@ import javafx.beans.property.StringProperty;
  *
  * @author emilio
  */
-public interface ObservableTelefono {
+public interface ObservableDocumentoAsegurado {
 
-    StringProperty telefonoProperty();
-
-    StringProperty extensionProperty();
+    StringProperty archivoProperty();
 
     StringProperty tipoProperty();
-
 }

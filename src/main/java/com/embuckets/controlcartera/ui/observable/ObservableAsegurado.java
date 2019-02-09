@@ -19,7 +19,7 @@ import javafx.collections.ObservableList;
  *
  * @author emilio
  */
-public class ObservableAsegurado implements ObservableTreeItem {
+public class ObservableAsegurado {
 
     //TODO: ID
     private int idCliente;
@@ -39,7 +39,6 @@ public class ObservableAsegurado implements ObservableTreeItem {
         this.polizasProperty = new SimpleListProperty<>(obsList);
     }
 
-    @Override
     public StringProperty nombreProperty() {
         return new SimpleStringProperty(nombreProperty.get() + " " + paternoProperty.get() + " " + maternoProperty.get());
     }
@@ -64,37 +63,30 @@ public class ObservableAsegurado implements ObservableTreeItem {
         this.idCliente = idCliente;
     }
 
-    @Override
     public int getId() {
         return idCliente;
     }
 
-    @Override
     public StringProperty numeroProperty() {
         return new SimpleStringProperty("");
     }
 
-    @Override
     public StringProperty aseguradoraProperty() {
         return new SimpleStringProperty("");
     }
 
-    @Override
     public StringProperty ramoProperty() {
         return new SimpleStringProperty("");
     }
 
-    @Override
     public StringProperty productoProperty() {
         return new SimpleStringProperty("");
     }
 
-    @Override
     public StringProperty planProperty() {
         return new SimpleStringProperty("");
     }
 
-    @Override
     public StringProperty primaProperty() {
         return new SimpleStringProperty("");
     }

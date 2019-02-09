@@ -318,20 +318,22 @@ public class NuevoAseguradoController implements Initializable {
         return FXCollections.observableArrayList(list);
     }
 
-    private ObservableList<ObservableTelefono> createObservableTelefonoList() {
-        List<ObservableTelefono> list = new ArrayList<>();
+    private ObservableList<Telefono> createObservableTelefonoList() {
+        List<Telefono> list = new ArrayList<>();
         return FXCollections.observableArrayList(list);
     }
 
-    private ObservableList<ObservableEmail> createObservableEmailList() {
-        List<ObservableEmail> list = new ArrayList<>();
+    private ObservableList<Email> createObservableEmailList() {
+        List<Email> list = new ArrayList<>();
         return FXCollections.observableArrayList(list);
     }
 
     public void agregarTelefono(ActionEvent event) {
         //si los textfield no estan vacios
         if (!telefonoTextField.getText().isEmpty()) {
-            ObservableTelefono obs = new ObservableTelefono(telefonoTextField.getText(), extensionTextField.getText(), tipoTelefonoComboBox.getValue().toString());
+            Telefono obs = new Telefono(telefonoTextField.getText());
+            obs.setExtension(extensionTextField.getText());
+            obs.setTipotelefono(new TipoTelefono(tipoTelefonoComboBox.getValue().toString()));
             //agregar a la tabla
             telefonoTableView.getItems().add(obs);
             telefonoTextField.setText("");
@@ -342,7 +344,8 @@ public class NuevoAseguradoController implements Initializable {
     public void agregarEmail(ActionEvent event) {
         //si los textfield no estan vacios
         if (!emailTextField.getText().isEmpty() && validarEmail(emailTextField.getText())) {
-            ObservableEmail obs = new ObservableEmail(emailTextField.getText(), tipoEmailComboBox.getValue().toString());
+            Email obs = new Email(emailTextField.getText());
+            obs.setTipoemail(new TipoEmail(tipoEmailComboBox.getValue().toString()));
             //agregar a la tabla
             emailTableView.getItems().add(obs);
             emailTextField.setText("");

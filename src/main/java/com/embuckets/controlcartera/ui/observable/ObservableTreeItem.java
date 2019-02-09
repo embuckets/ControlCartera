@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.ui.observable;
 
+import java.util.List;
 import javafx.beans.property.StringProperty;
 
 /**
@@ -28,5 +29,7 @@ public interface ObservableTreeItem {
     StringProperty planProperty();
 
     StringProperty primaProperty();
+
+    List<? extends ObservableTreeItem> getPolizaListProperty();
 
 }
