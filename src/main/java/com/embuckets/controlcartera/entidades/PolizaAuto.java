@@ -6,6 +6,7 @@
 package com.embuckets.controlcartera.entidades;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -50,10 +51,14 @@ public class PolizaAuto implements Serializable {
     private List<Auto> autoList;
 
     public PolizaAuto() {
+        this.sumaaseguradaauto = new SumaAseguradaAuto();
+        this.autoList = new ArrayList<>();
     }
 
     public PolizaAuto(Integer idpoliza) {
         this.idpoliza = idpoliza;
+        this.sumaaseguradaauto = new SumaAseguradaAuto();
+        this.autoList = new ArrayList<>();
     }
 
     public Integer getIdpoliza() {

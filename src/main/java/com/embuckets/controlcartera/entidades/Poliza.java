@@ -6,9 +6,12 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableRenovacion;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
@@ -50,7 +53,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Poliza.findByFinvigencia", query = "SELECT p FROM Poliza p WHERE p.finvigencia = :finvigencia"),
     @NamedQuery(name = "Poliza.findByPrima", query = "SELECT p FROM Poliza p WHERE p.prima = :prima"),
     @NamedQuery(name = "Poliza.findByNota", query = "SELECT p FROM Poliza p WHERE p.nota = :nota")})
-public class Poliza implements Serializable, ObservableTreeItem {
+public class Poliza implements Serializable, ObservableTreeItem, ObservableRenovacion {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -366,6 +369,36 @@ public class Poliza implements Serializable, ObservableTreeItem {
     @Override
     public List<? extends ObservableTreeItem> getPolizaListProperty() {
         return null;
+    }
+
+    @Override
+    public StringProperty aseguradoProperty() {
+        return new SimpleStringProperty(this.contratante.getCliente().nomberProperty().get());
+    }
+
+    @Override
+    public StringProperty polizaProperty() {
+        return numeroProperty();
+    }
+
+    @Override
+    public StringProperty finVigenciaProperty() {
+        return new SimpleStringProperty(this.finvigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
+    public StringProperty inicioVigenciaProperty() {
+        return new SimpleStringProperty(this.iniciovigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
+    @Override
+    public StringProperty faltanProperty() {
+        LocalDate fin = finvigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return new SimpleStringProperty("" + (fin.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
+    }
+
+    @Override
+    public StringProperty estadoProperty() {
+        return new SimpleStringProperty(estado.getEstado());
     }
 
 }

@@ -734,6 +734,7 @@ INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Zurich');
 INSERT INTO RAMO (Ramo) VALUES ('Autos');
 INSERT INTO RAMO (Ramo) VALUES ('Accidentes personales');
 INSERT INTO RAMO (Ramo) VALUES ('Empresarial');
+INSERT INTO RAMO (Ramo) VALUES ('Flotilla');
 INSERT INTO RAMO (Ramo) VALUES ('Gastos médicos');
 INSERT INTO RAMO (Ramo) VALUES ('Hogar');
 INSERT INTO RAMO (Ramo) VALUES ('Inversión');

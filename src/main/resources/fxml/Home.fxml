@@ -61,10 +61,10 @@
                                         <content>
                                             <TableView fx:id="tableViewRenovaciones">
                                                 <columns>
-                                                    <TableColumn fx:id="renovacionesAseguradoTableColumn" prefWidth="75.0" text="Asegurado" />
-                                                    <TableColumn fx:id="renovacionesPolizaTableColumn" prefWidth="75.0" text="Poliza" />
-                                                    <TableColumn fx:id="renovacionesFinVigenciaTableColumn" prefWidth="75.0" text="Fin de Vigencia" />
-                                                    <TableColumn fx:id="renovacionesFaltanTableColumn" prefWidth="75.0" text="Faltan" />
+                                                    <TableColumn fx:id="renovacionesAseguradoTableColumn" minWidth="100.0" prefWidth="-1.0" text="Asegurado" />
+                                                    <TableColumn fx:id="renovacionesPolizaTableColumn" minWidth="100.0" prefWidth="-1.0" text="Poliza" />
+                                                    <TableColumn fx:id="renovacionesFinVigenciaTableColumn" minWidth="100.0" prefWidth="-1.0" text="Fin de Vigencia" />
+                                                    <TableColumn fx:id="renovacionesFaltanTableColumn" minWidth="100.0" prefWidth="-1.0" text="Faltan" />
                                                 </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -93,8 +93,8 @@
                                         <content>
                                             <TableView fx:id="tableViewCumple">
                                                 <columns>
-                                                    <TableColumn fx:id="cumpleNombreTableColumn" text="Nombre" />
-                                                    <TableColumn fx:id="cumpleNacimientoTableColumn" text="Fecha de Nacimiento" />
+                                                    <TableColumn fx:id="cumpleNombreTableColumn" minWidth="200.0" prefWidth="-1.0" text="Nombre" />
+                                                    <TableColumn fx:id="cumpleNacimientoTableColumn" minWidth="200.0" prefWidth="-1.0" text="Fecha de Nacimiento" />
                                                 </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

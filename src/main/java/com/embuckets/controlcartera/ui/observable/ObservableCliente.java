@@ -17,63 +17,10 @@ import javafx.beans.property.StringProperty;
  *
  * @author emilio
  */
-public class ObservableCliente {
+public interface ObservableCliente {
 
-    private IntegerPropertyBase idCliente;
-    private StringProperty nombreProperty;
-    private StringProperty paternoProperty;
-    private StringProperty maternoProperty;
-    private StringProperty nacimientoProperty;
+    StringProperty nomberProperty();
 
-    public ObservableCliente(Cliente cliente) {
-        this.idCliente = new SimpleIntegerProperty(cliente.getIdcliente());
-        this.nombreProperty = new SimpleStringProperty(cliente.getNombre() + cliente.getApellidopaterno() + cliente.getApellidomaterno());
-        this.paternoProperty = new SimpleStringProperty(cliente.getApellidopaterno());
-        this.maternoProperty = new SimpleStringProperty(cliente.getApellidomaterno());
-        this.nacimientoProperty = new SimpleStringProperty(formatDate(cliente.getNacimiento()));
-    }
+    StringProperty nacimientoProperty();
 
-    public StringProperty nombreProperty() {
-        return nombreProperty;
-    }
-
-    public void setNombreProperty(StringProperty nombreProperty) {
-        this.nombreProperty = nombreProperty;
-    }
-
-    public StringProperty paternoProperty() {
-        return paternoProperty;
-    }
-
-    public void setPaternoProperty(StringProperty paternoProperty) {
-        this.paternoProperty = paternoProperty;
-    }
-
-    public StringProperty maternoProperty() {
-        return maternoProperty;
-    }
-
-    public void setMaternoProperty(StringProperty maternoProperty) {
-        this.maternoProperty = maternoProperty;
-    }
-
-    public StringProperty nacimientoProperty() {
-        return nacimientoProperty;
-    }
-
-    public void setNacimientoProperty(StringProperty nacimientoProperty) {
-        this.nacimientoProperty = nacimientoProperty;
-    }
-
-    public IntegerPropertyBase idCliente() {
-        return idCliente;
-    }
-
-    public void setIdCliente(IntegerPropertyBase idCliente) {
-        this.idCliente = idCliente;
-    }
-
-    private String formatDate(Date date) {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
-    }
 }

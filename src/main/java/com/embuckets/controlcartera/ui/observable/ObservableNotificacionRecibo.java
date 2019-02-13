@@ -20,88 +20,20 @@ import javafx.beans.property.StringProperty;
  *
  * @author emilio
  */
-public class ObservableNotificacionRecibo {
+public interface ObservableNotificacionRecibo {
 
-    private IntegerPropertyBase idReciboProperty;
-    private StringProperty polizaProperty;
-    private StringProperty aseguradoProperty;
-    private StringProperty cubreDesdeProperty;
-    private StringProperty cubreHastaProperty;
-    private StringProperty importeProperty;
-    private StringProperty enviadoProperty;
+    int getId();
 
-    public ObservableNotificacionRecibo(NotificacionRecibo notificacionRecibo) {
-        Poliza poliza = notificacionRecibo.getRecibo().getIdpoliza();
-        Asegurado asegurado = poliza.getContratante();
-        Cliente cliente = asegurado.getCliente();
-        this.idReciboProperty = new SimpleIntegerProperty(notificacionRecibo.getRecibo().getIdrecibo());
-        this.polizaProperty = new SimpleStringProperty(poliza.getNumero());
-        this.aseguradoProperty = new SimpleStringProperty(cliente.getNombre() + " " + cliente.getApellidopaterno() + " " + cliente.getApellidomaterno());
-        this.cubreDesdeProperty = new SimpleStringProperty(notificacionRecibo.getRecibo().getCubredesde().toString());
-        this.cubreHastaProperty = new SimpleStringProperty(notificacionRecibo.getRecibo().getCubrehasta().toString());
-        this.importeProperty = new SimpleStringProperty(notificacionRecibo.getRecibo().getImporte().toPlainString());
-        this.enviadoProperty = new SimpleStringProperty(formatDate(notificacionRecibo.getEnviado()));
-    }
+    StringProperty polizaProperty();
 
-    public IntegerPropertyBase idReciboProperty() {
-        return idReciboProperty;
-    }
+    StringProperty aseguradoProperty();
 
-    public void setIdReciboProperty(IntegerPropertyBase idReciboProperty) {
-        this.idReciboProperty = idReciboProperty;
-    }
+    StringProperty cubreDesdeProperty();
 
-    public StringProperty polizaProperty() {
-        return polizaProperty;
-    }
+    StringProperty cubreHastaProperty();
 
-    public void setPolizaProperty(StringProperty polizaProperty) {
-        this.polizaProperty = polizaProperty;
-    }
+    StringProperty importeProperty();
 
-    public StringProperty aseguradoProperty() {
-        return aseguradoProperty;
-    }
-
-    public void setAseguradoProperty(StringProperty aseguradoProperty) {
-        this.aseguradoProperty = aseguradoProperty;
-    }
-
-    public StringProperty cubreDesdeProperty() {
-        return cubreDesdeProperty;
-    }
-
-    public void setCubreDesdeProperty(StringProperty cubreDesdeProperty) {
-        this.cubreDesdeProperty = cubreDesdeProperty;
-    }
-
-    public StringProperty cubreHastaProperty() {
-        return cubreHastaProperty;
-    }
-
-    public void setCubreHastaProperty(StringProperty cubreHastaProperty) {
-        this.cubreHastaProperty = cubreHastaProperty;
-    }
-
-    public StringProperty importeProperty() {
-        return importeProperty;
-    }
-
-    public void setImporteProperty(StringProperty importeProperty) {
-        this.importeProperty = importeProperty;
-    }
-
-    public StringProperty enviadoProperty() {
-        return enviadoProperty;
-    }
-
-    public void setEnviadoProperty(StringProperty enviadoProperty) {
-        this.enviadoProperty = enviadoProperty;
-    }
-    
-    
-    private String formatDate(Date date) {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().toString();
-    }
+    StringProperty enviadoProperty();
 
 }

@@ -68,6 +68,8 @@ public class Domicilio implements Serializable {
     private List<Asegurado> aseguradoList;
 
     public Domicilio() {
+        this.delegacion = new Delegacion();
+        this.estado = new Estado();
     }
 
     public Domicilio(Integer iddomicilio) {
@@ -177,5 +179,5 @@ public class Domicilio implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Domicilio[ iddomicilio=" + iddomicilio + " ]";
     }
-    
+
 }

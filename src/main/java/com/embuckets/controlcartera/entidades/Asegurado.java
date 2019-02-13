@@ -262,4 +262,9 @@ public class Asegurado implements Serializable, ObservableTreeItem {
         return getPolizaList();
     }
 
+    @Override
+    public StringProperty estadoProperty() {
+        return new SimpleStringProperty("");
+    }
+
 }
