@@ -43,12 +43,13 @@ import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 public class MainApp extends Application {
 
     private Stage mainStage;
     private static MainApp instance;
-    private Deque<Object> windowStack;
+    private Deque<Pair<Object, String>> windowStack;
 //    private ControlCartera controlCartera;
 
     public MainApp() {
@@ -85,9 +86,9 @@ public class MainApp extends Application {
         }
     }
 
-    public void changeSceneContent(Object previousFxml, String nextFxml) throws IOException {
+    public void changeSceneContent(Object previousController, String previousFxml, String nextFxml) throws IOException {
         Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(nextFxml), null, new JavaFXBuilderFactory());
-        windowStack.addLast(previousFxml);
+        windowStack.addLast(new Pair(previousController, previousFxml));
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -99,10 +100,8 @@ public class MainApp extends Application {
 //        mainStage.setMaximized(true);
     }
 
-    
-    public void changeSceneContent(Object previousFxml, Parent page, FXMLLoader loader) {
-        String file = loader.getLocation().getPath();
-        windowStack.addLast(previousFxml);
+    public void changeSceneContent(Object previousController, String previousFxml, Parent page, FXMLLoader loader) {
+        windowStack.addLast(new Pair<>(previousController, previousFxml));
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -115,7 +114,22 @@ public class MainApp extends Application {
     }
 
     public void goBack() throws IOException {
-        Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(windowStack.getLast()), null, new JavaFXBuilderFactory());
+//        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AseguradoHome.fxml"), null, new JavaFXBuilderFactory());
+//                            Parent parent = loader.load();
+//                            AseguradoHomeController controller = loader.<AseguradoHomeController>getController();
+//                            controller.setAsegurado((Asegurado) obs);
+////            controller.setAseguradoId(id);
+////        loader.setController(controller);
+//                            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
+        
+        
+        Pair pair = windowStack.getLast();
+        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource((String) pair.getValue()));
+        Parent page = (Parent) loader.load();
+        Controller controller = loader.<Controller>getController();
+        controller.setData(((Controller)pair.getKey()).getData());
+//        loader.setController(((Controller)pair.getKey()).getData());
+//        Parent page = (Parent) loader.load(MainApp.class.getResource((String)pair.getValue()), null, new JavaFXBuilderFactory());
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);

@@ -67,7 +67,7 @@ import javafx.scene.input.KeyCode;
  *
  * @author emilio
  */
-public class HomeController implements Initializable {
+public class HomeController implements Initializable, Controller {
 
     private String location = "/fxml/Home.fxml";
     //TreeTableView 
@@ -163,7 +163,7 @@ public class HomeController implements Initializable {
                             controller.setAsegurado((Asegurado) obs);
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
-                            MainApp.getInstance().changeSceneContent(location, parent, loader);
+                            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
 //mandar el id y que el controlador de AsegurdoHome lo tome de la base
                         } catch (IOException ex) {
                             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
@@ -176,7 +176,7 @@ public class HomeController implements Initializable {
                             controller.setPoliza((Poliza) obs);
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
-                            MainApp.getInstance().changeSceneContent(location, parent, loader);
+                            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
 //mandar el id y que el controlador de AsegurdoHome lo tome de la base
                         } catch (IOException ex) {
                             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
@@ -419,7 +419,7 @@ public class HomeController implements Initializable {
 //
 //    }
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
-        MainApp.getInstance().changeSceneContent(location, "/fxml/NuevoAsegurado.fxml");
+        MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevoAsegurado.fxml");
 //        try {
 //            Parent parent = FXMLLoader.load(getClass().getResource("NuevoAsegurado.fxml"));
 //            
@@ -531,6 +531,16 @@ public class HomeController implements Initializable {
         result.add(notificacion2);
         return result;
 
+    }
+
+    @Override
+    public void setData(Object obj) {
+        //do nothing
+    }
+
+    @Override
+    public Object getData() {
+        return null;
     }
 
 }

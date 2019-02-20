@@ -431,7 +431,7 @@ public class NuevoAseguradoController implements Initializable {
             controller.setAsegurado(asegurado);
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
-            MainApp.getInstance().changeSceneContent(location, parent, loader);
+            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
         }
 
 //        MainApp.getInstance().changeSceneContent("AseguradoHome.fxml");

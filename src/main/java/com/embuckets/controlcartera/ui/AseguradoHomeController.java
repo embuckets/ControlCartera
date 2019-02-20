@@ -77,7 +77,7 @@ import javafx.util.Callback;
  *
  * @author emilio
  */
-public class AseguradoHomeController implements Initializable {
+public class AseguradoHomeController implements Initializable, Controller {
 
     private String location = "/fxml/AseguradoHome.fxml";
     private Asegurado asegurado;
@@ -366,7 +366,7 @@ public class AseguradoHomeController implements Initializable {
             });
             MenuItem editItem = new MenuItem("Editar");
             editItem.setOnAction(new EventHandler<ActionEvent>() {
-                
+
                 @Override
                 public void handle(ActionEvent event) {
                     Optional<Email> result = createEditEmailDialog(row.getItem()).showAndWait();
@@ -379,7 +379,7 @@ public class AseguradoHomeController implements Initializable {
                 }
             });
             rowMenu.getItems().addAll(editItem, removeItem);
-            
+
             // only display context menu for non-null items:
             row.contextMenuProperty().bind(
                     Bindings.when(Bindings.isNotNull(row.itemProperty()))
@@ -535,7 +535,7 @@ public class AseguradoHomeController implements Initializable {
                         controller.setPoliza((Poliza) row.getItem());
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
-                        MainApp.getInstance().changeSceneContent(location, parent, loader);
+                        MainApp.getInstance().changeSceneContent(this, location, parent, loader);
 //mandar el id y que el controlador de AsegurdoHome lo tome de la base
                     } catch (IOException ex) {
                         Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
@@ -768,6 +768,16 @@ public class AseguradoHomeController implements Initializable {
 
     @FXML
     private void editarNota(ActionEvent event) {
+    }
+
+    @Override
+    public void setData(Object obj) {
+        setAsegurado((Asegurado) obj);
+    }
+
+    @Override
+    public Object getData() {
+        return this.asegurado;
     }
 
 }
