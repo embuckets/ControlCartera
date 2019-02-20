@@ -19,7 +19,7 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableCliente {
 
-    StringProperty nomberProperty();
+    StringProperty nombreProperty();
 
     StringProperty nacimientoProperty();
 

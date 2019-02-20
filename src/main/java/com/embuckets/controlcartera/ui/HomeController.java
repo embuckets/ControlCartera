@@ -16,10 +16,13 @@ import com.embuckets.controlcartera.entidades.Moneda;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
+import com.embuckets.controlcartera.entidades.PolizaGmm;
+import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
 import com.embuckets.controlcartera.entidades.TipoPersona;
+import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.ui.observable.ObservableAsegurado;
 import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
@@ -66,6 +69,7 @@ import javafx.scene.input.KeyCode;
  */
 public class HomeController implements Initializable {
 
+    private String location = "/fxml/Home.fxml";
     //TreeTableView 
     @FXML
     private TreeTableView<ObservableTreeItem> treeAsegurados;
@@ -159,7 +163,7 @@ public class HomeController implements Initializable {
                             controller.setAsegurado((Asegurado) obs);
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
-                            MainApp.getInstance().changeSceneContent(parent);
+                            MainApp.getInstance().changeSceneContent(location, parent, loader);
 //mandar el id y que el controlador de AsegurdoHome lo tome de la base
                         } catch (IOException ex) {
                             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
@@ -172,7 +176,7 @@ public class HomeController implements Initializable {
                             controller.setPoliza((Poliza) obs);
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
-                            MainApp.getInstance().changeSceneContent(parent);
+                            MainApp.getInstance().changeSceneContent(location, parent, loader);
 //mandar el id y que el controlador de AsegurdoHome lo tome de la base
                         } catch (IOException ex) {
                             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
@@ -267,6 +271,13 @@ public class HomeController implements Initializable {
         poliza1.setEstado(new EstadoPoliza("Vigente"));
         poliza1.setConductocobro(new ConductoCobro("agente"));
         poliza1.setFormapago(new FormaPago("mensual"));
+        Cliente benef = new Cliente("beneficiario1", "hijo", "hijo");
+        benef.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
+        poliza1.setPolizaVida(new PolizaVida(1));
+        poliza1.getPolizaVida().setSumaasegurada(BigDecimal.valueOf(50000));
+        poliza1.getPolizaVida().setSumaaseguradamoneda(new Moneda("Dolares"));
+        poliza1.getPolizaVida().getClienteList().add(benef);
+        poliza1.generarRecibos(3, new BigDecimal(10123.12), new BigDecimal(9123.12));
 
         Poliza poliza2 = new Poliza();
         poliza2.setIdpoliza(2);
@@ -285,6 +296,7 @@ public class HomeController implements Initializable {
         poliza2.getPolizaAuto().getAutoList().add(new Auto(2, "STD 4PT RL", "VW", "Jetta", Year.of(2016)));
         poliza2.setConductocobro(new ConductoCobro("agente"));
         poliza2.setFormapago(new FormaPago("mensual"));
+        poliza2.generarRecibos(4, new BigDecimal(10123.12), new BigDecimal(9123.12));
 
         poliza1.setContratante(asegurado1);
         poliza1.setTitular(asegurado1.getCliente());
@@ -297,17 +309,26 @@ public class HomeController implements Initializable {
         poliza3.setIdpoliza(3);
         poliza3.setNumero("numeor3");
         poliza3.setAseguradora(new Aseguradora("PLAN SEGURO"));
-        poliza3.setRamo(new Ramo("GASTOS MEDICOS"));
+        poliza3.setRamo(new Ramo("gastos medicos"));
         poliza3.setProducto("producto");
         poliza3.setPlan("plan");
         poliza3.setPrima(new BigDecimal(12456));
+        poliza3.setPrimamoneda(new Moneda("PESOS"));
         poliza3.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(5))));
         poliza3.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
         poliza3.setEstado(new EstadoPoliza("No vigente"));
         poliza3.setConductocobro(new ConductoCobro("agente"));
-        poliza3.setFormapago(new FormaPago("mensual"));
+        poliza3.setFormapago(new FormaPago(Globals.FORMA_PAGO_TRIMESTRAL));
+        poliza3.setPolizaGmm(new PolizaGmm(3, BigDecimal.valueOf(789654.12), "100,000,000", (short) 10));
+        poliza3.getPolizaGmm().setDeduciblemoneda(new Moneda("PESOS"));
+        poliza3.getPolizaGmm().setSumaaseguradamondeda(new Moneda("PESOS"));
+        Cliente depend = new Cliente("beneficiario1", "hijo", "hijo");
+        depend.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
+        poliza3.getPolizaGmm().getClienteList().add(depend);
+        poliza3.generarRecibos(2, new BigDecimal(10123.12), new BigDecimal(9123.12));
 
         poliza3.setContratante(asegurado2);
+        poliza3.setTitular(asegurado2.getCliente());
         asegurado2.getPolizaList().add(poliza3);
 
         List<Asegurado> list = new ArrayList<>();
@@ -398,7 +419,7 @@ public class HomeController implements Initializable {
 //
 //    }
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
-        MainApp.getInstance().changeSceneContent("/fxml/NuevoAsegurado.fxml");
+        MainApp.getInstance().changeSceneContent(location, "/fxml/NuevoAsegurado.fxml");
 //        try {
 //            Parent parent = FXMLLoader.load(getClass().getResource("NuevoAsegurado.fxml"));
 //            

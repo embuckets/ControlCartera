@@ -130,7 +130,7 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
 
     @Override
     public StringProperty aseguradoProperty() {
-        return new SimpleStringProperty(this.recibo.getIdpoliza().getContratante().getCliente().nomberProperty().get());
+        return new SimpleStringProperty(this.recibo.getIdpoliza().getContratante().getCliente().nombreProperty().get());
     }
 
     @Override
@@ -152,6 +152,11 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
     @Override
     public StringProperty enviadoProperty() {
         return new SimpleStringProperty(this.enviado.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().toString());
+    }
+
+    @Override
+    public StringProperty cobranzaProperty() {
+        return recibo.cobranzaProperty();
     }
 
 }

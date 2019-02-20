@@ -33,6 +33,8 @@ public interface ObservableNotificacionRecibo {
     StringProperty cubreHastaProperty();
 
     StringProperty importeProperty();
+    
+    StringProperty cobranzaProperty();
 
     StringProperty enviadoProperty();
 

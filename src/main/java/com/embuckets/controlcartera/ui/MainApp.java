@@ -33,6 +33,8 @@ package com.embuckets.controlcartera.ui;
 
 //import dominio.ControlCartera;
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -46,10 +48,12 @@ public class MainApp extends Application {
 
     private Stage mainStage;
     private static MainApp instance;
+    private Deque<Object> windowStack;
 //    private ControlCartera controlCartera;
 
     public MainApp() {
         instance = this;
+        windowStack = new ArrayDeque<>();
     }
 
     public static MainApp getInstance() {
@@ -81,8 +85,9 @@ public class MainApp extends Application {
         }
     }
 
-    public void changeSceneContent(String fxml) throws IOException {
-        Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(fxml), null, new JavaFXBuilderFactory());
+    public void changeSceneContent(Object previousFxml, String nextFxml) throws IOException {
+        Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(nextFxml), null, new JavaFXBuilderFactory());
+        windowStack.addLast(previousFxml);
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -94,7 +99,10 @@ public class MainApp extends Application {
 //        mainStage.setMaximized(true);
     }
 
-    public void changeSceneContent(Parent page) {
+    
+    public void changeSceneContent(Object previousFxml, Parent page, FXMLLoader loader) {
+        String file = loader.getLocation().getPath();
+        windowStack.addLast(previousFxml);
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -104,7 +112,31 @@ public class MainApp extends Application {
             mainStage.getScene().setRoot(page);
             mainStage.show();
         }
+    }
 
+    public void goBack() throws IOException {
+        Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(windowStack.getLast()), null, new JavaFXBuilderFactory());
+        Scene scene = mainStage.getScene();
+        if (scene == null) {
+            scene = new Scene(page);
+//            scene.getStylesheets().add(MainApp.class.getResource("demo.css").toExternalForm());
+            mainStage.setScene(scene);
+        } else {
+            mainStage.getScene().setRoot(page);
+        }
+    }
+
+    public void goHome() throws IOException {
+        Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource("/fxml/Home.fxml"), null, new JavaFXBuilderFactory());
+        windowStack.clear();
+        Scene scene = mainStage.getScene();
+        if (scene == null) {
+            scene = new Scene(page);
+//            scene.getStylesheets().add(MainApp.class.getResource("demo.css").toExternalForm());
+            mainStage.setScene(scene);
+        } else {
+            mainStage.getScene().setRoot(page);
+        }
     }
 
     @Override

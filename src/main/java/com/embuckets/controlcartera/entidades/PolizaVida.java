@@ -7,6 +7,7 @@ package com.embuckets.controlcartera.entidades;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -55,15 +56,18 @@ public class PolizaVida implements Serializable {
     private Poliza poliza;
 
     public PolizaVida() {
+        this.clienteList = new ArrayList<>();
     }
 
     public PolizaVida(Integer idpoliza) {
         this.idpoliza = idpoliza;
+        this.clienteList = new ArrayList<>();
     }
 
     public PolizaVida(Integer idpoliza, BigDecimal sumaasegurada) {
         this.idpoliza = idpoliza;
         this.sumaasegurada = sumaasegurada;
+        this.clienteList = new ArrayList<>();
     }
 
     public Integer getIdpoliza() {
@@ -131,5 +135,5 @@ public class PolizaVida implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.PolizaVida[ idpoliza=" + idpoliza + " ]";
     }
-    
+
 }

@@ -79,6 +79,7 @@ import javafx.util.Callback;
  */
 public class AseguradoHomeController implements Initializable {
 
+    private String location = "/fxml/AseguradoHome.fxml";
     private Asegurado asegurado;
     private int aseguradoId;
     @FXML
@@ -126,7 +127,7 @@ public class AseguradoHomeController implements Initializable {
     @FXML
     private Button agregarTelefonoButton;
     @FXML
-    private TableView emailTableView;
+    private TableView<Email> emailTableView;
     @FXML
     private TableColumn emailTableColumn;
     @FXML
@@ -354,46 +355,37 @@ public class AseguradoHomeController implements Initializable {
         tipoEmailTableColumn.setCellValueFactory(new PropertyValueFactory("tipo"));
         fillTipoEmailComboBox();
 
-        emailTableView.setRowFactory(new Callback<TableView<Email>, TableRow<Email>>() {
-            @Override
-            public TableRow<Email> call(TableView<Email> tableView) {
-                final TableRow<Email> row = new TableRow<>();
-                final ContextMenu rowMenu = new ContextMenu();
-                MenuItem removeItem = new MenuItem("Borrar");
-                removeItem.setOnAction(new EventHandler<ActionEvent>() {
-
-                    @Override
-                    public void handle(ActionEvent event) {
-                        asegurado.getEmailList().remove(row.getItem());
-                        emailTableView.getItems().remove(row.getItem());
-                        //TODO: borrar email de la base de datos
-                    }
-                });
-                MenuItem editItem = new MenuItem("Editar");
-                editItem.setOnAction(new EventHandler<ActionEvent>() {
-
-                    @Override
-                    public void handle(ActionEvent event) {
-                        System.out.println(asegurado.getEmailList());
-                        Optional<Email> result = createEditEmailDialog(row.getItem()).showAndWait();
-                        result.ifPresent(email -> {
-                            System.out.println(asegurado.getEmailList());
-                            emailTableView.getItems().clear();
-                            emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
-                        });
-                        //crear display window para editar telefono y guardar cambios
-                        //TODO: borrar telefono de la base de datos
-                    }
-                });
-                rowMenu.getItems().addAll(editItem, removeItem);
-
-                // only display context menu for non-null items:
-                row.contextMenuProperty().bind(
-                        Bindings.when(Bindings.isNotNull(row.itemProperty()))
-                                .then(rowMenu)
-                                .otherwise((ContextMenu) null));
-                return row;
-            }
+        emailTableView.setRowFactory((TableView<Email> tableView) -> {
+            final TableRow<Email> row = new TableRow<>();
+            final ContextMenu rowMenu = new ContextMenu();
+            MenuItem removeItem = new MenuItem("Borrar");
+            removeItem.setOnAction((ActionEvent event) -> {
+                asegurado.getEmailList().remove(row.getItem());
+                emailTableView.getItems().remove(row.getItem());
+                //TODO: borrar email de la base de datos
+            });
+            MenuItem editItem = new MenuItem("Editar");
+            editItem.setOnAction(new EventHandler<ActionEvent>() {
+                
+                @Override
+                public void handle(ActionEvent event) {
+                    Optional<Email> result = createEditEmailDialog(row.getItem()).showAndWait();
+                    result.ifPresent(email -> {
+                        emailTableView.getItems().clear();
+                        emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
+                    });
+                    //crear display window para editar telefono y guardar cambios
+                    //TODO: borrar telefono de la base de datos
+                }
+            });
+            rowMenu.getItems().addAll(editItem, removeItem);
+            
+            // only display context menu for non-null items:
+            row.contextMenuProperty().bind(
+                    Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                            .then(rowMenu)
+                            .otherwise((ContextMenu) null));
+            return row;
         });
     }
 
@@ -516,7 +508,7 @@ public class AseguradoHomeController implements Initializable {
     @FXML
     private void homePage(ActionEvent event) {
         try {
-            MainApp.getInstance().changeSceneContent("/fxml/Home.fxml");
+            MainApp.getInstance().goHome();
         } catch (IOException ex) {
             Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -543,7 +535,7 @@ public class AseguradoHomeController implements Initializable {
                         controller.setPoliza((Poliza) row.getItem());
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
-                        MainApp.getInstance().changeSceneContent(parent);
+                        MainApp.getInstance().changeSceneContent(location, parent, loader);
 //mandar el id y que el controlador de AsegurdoHome lo tome de la base
                     } catch (IOException ex) {
                         Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);

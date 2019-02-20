@@ -62,6 +62,7 @@ import javafx.util.Callback;
  */
 public class NuevoAseguradoController implements Initializable {
 
+    private String location = "fxml/NuevoAsegurado.fxml";
     //Informacion Personal
     @FXML
     private ToggleGroup tipoPersonaGroup;
@@ -374,7 +375,7 @@ public class NuevoAseguradoController implements Initializable {
     }
 
     public void homePage(ActionEvent event) throws IOException {
-        MainApp.getInstance().changeSceneContent("/fxml/Home.fxml");
+        MainApp.getInstance().goHome();
 //        
 //        try {
 //            Parent parent = FXMLLoader.load(getClass().getResource("Home.fxml"));
@@ -430,7 +431,7 @@ public class NuevoAseguradoController implements Initializable {
             controller.setAsegurado(asegurado);
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
-            MainApp.getInstance().changeSceneContent(parent);
+            MainApp.getInstance().changeSceneContent(location, parent, loader);
         }
 
 //        MainApp.getInstance().changeSceneContent("AseguradoHome.fxml");

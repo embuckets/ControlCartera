@@ -5,9 +5,12 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
@@ -104,12 +107,20 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
         this.cubredesde = cubredesde;
     }
 
+    public void setCubredesde(LocalDate cubredesde) {
+        this.cubredesde = Date.from(cubredesde.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+    }
+
     public Date getCubrehasta() {
         return cubrehasta;
     }
 
     public void setCubrehasta(Date cubrehasta) {
         this.cubrehasta = cubrehasta;
+    }
+
+    public void setCubrehasta(LocalDate cubrehasta) {
+        this.cubrehasta = Date.from(cubrehasta.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public BigDecimal getImporte() {
@@ -210,7 +221,16 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     @Override
     public StringProperty enviadoProperty() {
         //puede ser null
-        return notificacionRecibo.enviadoProperty();
+        if (notificacionRecibo != null) {
+            return notificacionRecibo.enviadoProperty();
+        } else {
+            return new SimpleStringProperty(Globals.NOTIFICACION_ESTADO_PENDIENTE);
+        }
+    }
+
+    @Override
+    public StringProperty cobranzaProperty() {
+        return new SimpleStringProperty(cobranza.getCobranza());
     }
 
 }

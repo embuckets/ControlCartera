@@ -7,6 +7,7 @@ package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -94,6 +95,12 @@ public class Cliente implements Serializable, ObservableCliente {
         this.nombre = nombre;
     }
 
+    public Cliente(String nombre, String paterno, String materno) {
+        this.nombre = nombre;
+        this.apellidopaterno = paterno;
+        this.apellidomaterno = materno;
+    }
+
     public Integer getIdcliente() {
         return idcliente;
     }
@@ -130,8 +137,16 @@ public class Cliente implements Serializable, ObservableCliente {
         return nacimiento;
     }
 
+    public LocalDate getNacimientoLocalDate() {
+        return nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
     public void setNacimiento(Date nacimiento) {
         this.nacimiento = nacimiento;
+    }
+
+    public void setNacimiento(LocalDate nacimiento) {
+        this.nacimiento = Date.from(nacimiento.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     @XmlTransient
@@ -203,7 +218,7 @@ public class Cliente implements Serializable, ObservableCliente {
     }
 
     @Override
-    public StringProperty nomberProperty() {
+    public StringProperty nombreProperty() {
         return new SimpleStringProperty(nombre + " " + apellidopaterno + " " + apellidomaterno);
     }
 
