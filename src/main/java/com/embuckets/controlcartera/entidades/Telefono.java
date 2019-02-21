@@ -5,7 +5,10 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableTelefono;
 import java.io.Serializable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -29,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Telefono.findByIdcliente", query = "SELECT t FROM Telefono t WHERE t.telefonoPK.idcliente = :idcliente"),
     @NamedQuery(name = "Telefono.findByTelefono", query = "SELECT t FROM Telefono t WHERE t.telefonoPK.telefono = :telefono"),
     @NamedQuery(name = "Telefono.findByExtension", query = "SELECT t FROM Telefono t WHERE t.extension = :extension")})
-public class Telefono implements Serializable {
+public class Telefono implements Serializable, ObservableTelefono {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -52,6 +55,11 @@ public class Telefono implements Serializable {
 
     public Telefono(int idcliente, String telefono) {
         this.telefonoPK = new TelefonoPK(idcliente, telefono);
+    }
+
+    public Telefono(String telefono) {
+        this.telefonoPK = new TelefonoPK();
+        this.telefonoPK.setTelefono(telefono);
     }
 
     public TelefonoPK getTelefonoPK() {
@@ -110,5 +118,20 @@ public class Telefono implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Telefono[ telefonoPK=" + telefonoPK + " ]";
     }
-    
+
+    @Override
+    public StringProperty telefonoProperty() {
+        return new SimpleStringProperty(telefonoPK.getTelefono());
+    }
+
+    @Override
+    public StringProperty extensionProperty() {
+        return new SimpleStringProperty(extension);
+    }
+
+    @Override
+    public StringProperty tipoProperty() {
+        return new SimpleStringProperty(tipotelefono.getTipotelefono());
+    }
+
 }

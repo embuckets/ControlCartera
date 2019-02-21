@@ -7,6 +7,8 @@ package com.embuckets.controlcartera.entidades;
 
 import java.io.Serializable;
 import java.util.Date;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -145,5 +147,9 @@ public class Caratula implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Caratula[ idpoliza=" + idpoliza + " ]";
     }
-    
+
+    public StringProperty nombreProperty() {
+        return new SimpleStringProperty(nombre + extension);
+    }
+
 }

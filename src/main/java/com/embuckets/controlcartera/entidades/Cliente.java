@@ -5,9 +5,14 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -43,7 +48,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Cliente.findByApellidopaterno", query = "SELECT c FROM Cliente c WHERE c.apellidopaterno = :apellidopaterno"),
     @NamedQuery(name = "Cliente.findByApellidomaterno", query = "SELECT c FROM Cliente c WHERE c.apellidomaterno = :apellidomaterno"),
     @NamedQuery(name = "Cliente.findByNacimiento", query = "SELECT c FROM Cliente c WHERE c.nacimiento = :nacimiento")})
-public class Cliente implements Serializable {
+public class Cliente implements Serializable, ObservableCliente {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -90,6 +95,12 @@ public class Cliente implements Serializable {
         this.nombre = nombre;
     }
 
+    public Cliente(String nombre, String paterno, String materno) {
+        this.nombre = nombre;
+        this.apellidopaterno = paterno;
+        this.apellidomaterno = materno;
+    }
+
     public Integer getIdcliente() {
         return idcliente;
     }
@@ -126,8 +137,16 @@ public class Cliente implements Serializable {
         return nacimiento;
     }
 
+    public LocalDate getNacimientoLocalDate() {
+        return nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
     public void setNacimiento(Date nacimiento) {
         this.nacimiento = nacimiento;
+    }
+
+    public void setNacimiento(LocalDate nacimiento) {
+        this.nacimiento = Date.from(nacimiento.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     @XmlTransient
@@ -197,5 +216,15 @@ public class Cliente implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Cliente[ idcliente=" + idcliente + " ]";
     }
-    
+
+    @Override
+    public StringProperty nombreProperty() {
+        return new SimpleStringProperty(nombre + " " + apellidopaterno + " " + apellidomaterno);
+    }
+
+    @Override
+    public StringProperty nacimientoProperty() {
+        return new SimpleStringProperty(nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
 }

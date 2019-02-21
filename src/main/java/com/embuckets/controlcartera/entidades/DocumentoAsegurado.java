@@ -5,8 +5,12 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
+import com.embuckets.controlcartera.ui.observable.ObservableDocumentoAsegurado;
 import java.io.Serializable;
 import java.util.Date;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -36,7 +40,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "DocumentoAsegurado.findByExtension", query = "SELECT d FROM DocumentoAsegurado d WHERE d.extension = :extension"),
     @NamedQuery(name = "DocumentoAsegurado.findByTipodocumento", query = "SELECT d FROM DocumentoAsegurado d WHERE d.documentoAseguradoPK.tipodocumento = :tipodocumento"),
     @NamedQuery(name = "DocumentoAsegurado.findByActualizado", query = "SELECT d FROM DocumentoAsegurado d WHERE d.actualizado = :actualizado")})
-public class DocumentoAsegurado implements Serializable {
+public class DocumentoAsegurado implements Serializable, ObservableDocumentoAsegurado {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -57,6 +61,7 @@ public class DocumentoAsegurado implements Serializable {
     @JoinColumn(name = "TIPODOCUMENTO", referencedColumnName = "TIPODOCUMENTO", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private TipoDocumentoAsegurado tipoDocumentoAsegurado;
+    private String path;
 
     public DocumentoAsegurado() {
     }
@@ -147,5 +152,15 @@ public class DocumentoAsegurado implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.DocumentoAsegurado[ documentoAseguradoPK=" + documentoAseguradoPK + " ]";
     }
-    
+
+    @Override
+    public StringProperty archivoProperty() {
+        return new SimpleStringProperty(documentoAseguradoPK.getNombre() + extension);
+    }
+
+    @Override
+    public StringProperty tipoProperty() {
+        return new SimpleStringProperty(tipoDocumentoAsegurado.getTipodocumento());
+    }
+
 }

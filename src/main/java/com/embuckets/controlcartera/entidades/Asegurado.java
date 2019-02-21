@@ -5,8 +5,12 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -35,7 +39,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Asegurado.findByIdcliente", query = "SELECT a FROM Asegurado a WHERE a.idcliente = :idcliente"),
     @NamedQuery(name = "Asegurado.findByRfc", query = "SELECT a FROM Asegurado a WHERE a.rfc = :rfc"),
     @NamedQuery(name = "Asegurado.findByNota", query = "SELECT a FROM Asegurado a WHERE a.nota = :nota")})
-public class Asegurado implements Serializable {
+public class Asegurado implements Serializable, ObservableTreeItem {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -65,10 +69,32 @@ public class Asegurado implements Serializable {
     private List<Telefono> telefonoList;
 
     public Asegurado() {
+        emailList = new ArrayList<>();
+        cliente = new Cliente();
+        polizaList = new ArrayList<>();
+        documentoAseguradoList = new ArrayList<>();
+        telefonoList = new ArrayList<>();
     }
 
     public Asegurado(Integer idcliente) {
         this.idcliente = idcliente;
+        emailList = new ArrayList<>();
+        cliente = new Cliente();
+        polizaList = new ArrayList<>();
+        documentoAseguradoList = new ArrayList<>();
+        telefonoList = new ArrayList<>();
+
+    }
+
+    public Asegurado(String nombre, String apellidoPaterno, String apellidoMaterno) {
+        this.cliente = new Cliente();
+        cliente.setNombre(nombre);
+        cliente.setApellidopaterno(apellidoPaterno);
+        cliente.setApellidomaterno(apellidoMaterno);
+        emailList = new ArrayList<>();
+        polizaList = new ArrayList<>();
+        documentoAseguradoList = new ArrayList<>();
+        telefonoList = new ArrayList<>();
     }
 
     public Integer getIdcliente() {
@@ -110,7 +136,7 @@ public class Asegurado implements Serializable {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
-        if (cliente.getIdcliente() != null){
+        if (cliente.getIdcliente() != null) {
             setIdcliente(cliente.getIdcliente());
         }
     }
@@ -182,5 +208,63 @@ public class Asegurado implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Asegurado[ idcliente=" + idcliente + " ]";
     }
-    
+
+    public void agregarTelefono(Telefono telefono) {
+        telefonoList.add(telefono);
+    }
+
+    public void agregarEmail(Email email) {
+        emailList.add(email);
+    }
+
+    @Override
+    public int getId() {
+        return getIdcliente();
+    }
+
+    @Override
+    public StringProperty nombreProperty() {
+        return new SimpleStringProperty(cliente.getNombre() + " " + cliente.getApellidopaterno() + " " + cliente.getApellidomaterno());
+    }
+
+    @Override
+    public StringProperty numeroProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty aseguradoraProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty ramoProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty productoProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty planProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty primaProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public List<? extends ObservableTreeItem> getPolizaListProperty() {
+        return getPolizaList();
+    }
+
+    @Override
+    public StringProperty estadoProperty() {
+        return new SimpleStringProperty("");
+    }
+
 }

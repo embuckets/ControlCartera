@@ -5,8 +5,12 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import java.io.Serializable;
+import java.time.ZoneId;
 import java.util.Date;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,7 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "NotificacionRecibo.findAll", query = "SELECT n FROM NotificacionRecibo n"),
     @NamedQuery(name = "NotificacionRecibo.findByIdrecibo", query = "SELECT n FROM NotificacionRecibo n WHERE n.idrecibo = :idrecibo"),
     @NamedQuery(name = "NotificacionRecibo.findByEnviado", query = "SELECT n FROM NotificacionRecibo n WHERE n.enviado = :enviado")})
-public class NotificacionRecibo implements Serializable {
+public class NotificacionRecibo implements Serializable, ObservableNotificacionRecibo {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -113,5 +117,46 @@ public class NotificacionRecibo implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.NotificacionRecibo[ idrecibo=" + idrecibo + " ]";
     }
-    
+
+    @Override
+    public int getId() {
+        return idrecibo;
+    }
+
+    @Override
+    public StringProperty polizaProperty() {
+        return new SimpleStringProperty(this.recibo.getIdpoliza().getNumero());
+    }
+
+    @Override
+    public StringProperty aseguradoProperty() {
+        return new SimpleStringProperty(this.recibo.getIdpoliza().getContratante().getCliente().nombreProperty().get());
+    }
+
+    @Override
+    public StringProperty cubreDesdeProperty() {
+        return new SimpleStringProperty(this.recibo.getCubredesde().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+
+    }
+
+    @Override
+    public StringProperty cubreHastaProperty() {
+        return new SimpleStringProperty(this.recibo.getCubrehasta().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
+    @Override
+    public StringProperty importeProperty() {
+        return new SimpleStringProperty("$" + this.recibo.getImporte().toString());
+    }
+
+    @Override
+    public StringProperty enviadoProperty() {
+        return new SimpleStringProperty(this.enviado.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().toString());
+    }
+
+    @Override
+    public StringProperty cobranzaProperty() {
+        return recibo.cobranzaProperty();
+    }
+
 }

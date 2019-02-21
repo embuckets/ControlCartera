@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -5,10 +6,18 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.ui.observable.ObservableRenovacion;
+import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -46,7 +55,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Poliza.findByFinvigencia", query = "SELECT p FROM Poliza p WHERE p.finvigencia = :finvigencia"),
     @NamedQuery(name = "Poliza.findByPrima", query = "SELECT p FROM Poliza p WHERE p.prima = :prima"),
     @NamedQuery(name = "Poliza.findByNota", query = "SELECT p FROM Poliza p WHERE p.nota = :nota")})
-public class Poliza implements Serializable {
+public class Poliza implements Serializable, ObservableTreeItem, ObservableRenovacion {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -111,10 +120,12 @@ public class Poliza implements Serializable {
     private List<Recibo> reciboList;
 
     public Poliza() {
+        this.reciboList = new ArrayList<>();
     }
 
     public Poliza(Integer idpoliza) {
         this.idpoliza = idpoliza;
+        this.reciboList = new ArrayList<>();
     }
 
     public Poliza(Integer idpoliza, String numero, Date iniciovigencia, Date finvigencia, BigDecimal prima) {
@@ -123,6 +134,7 @@ public class Poliza implements Serializable {
         this.iniciovigencia = iniciovigencia;
         this.finvigencia = finvigencia;
         this.prima = prima;
+        this.reciboList = new ArrayList<>();
     }
 
     public Integer getIdpoliza() {
@@ -318,5 +330,142 @@ public class Poliza implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Poliza[ idpoliza=" + idpoliza + " ]";
     }
-    
+
+    @Override
+    public int getId() {
+        return getIdpoliza();
+    }
+
+    @Override
+    public StringProperty nombreProperty() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty numeroProperty() {
+        return new SimpleStringProperty(numero);
+    }
+
+    @Override
+    public StringProperty aseguradoraProperty() {
+        return new SimpleStringProperty(aseguradora.getAseguradora());
+    }
+
+    @Override
+    public StringProperty ramoProperty() {
+        return new SimpleStringProperty(ramo.getRamo());
+    }
+
+    @Override
+    public StringProperty productoProperty() {
+        return new SimpleStringProperty(producto);
+    }
+
+    @Override
+    public StringProperty planProperty() {
+        return new SimpleStringProperty(plan);
+    }
+
+    @Override
+    public StringProperty primaProperty() {
+        return new SimpleStringProperty("$" + prima);
+    }
+
+    @Override
+    public List<? extends ObservableTreeItem> getPolizaListProperty() {
+        return null;
+    }
+
+    @Override
+    public StringProperty aseguradoProperty() {
+        return new SimpleStringProperty(this.contratante.getCliente().nombreProperty().get());
+    }
+
+    @Override
+    public StringProperty polizaProperty() {
+        return numeroProperty();
+    }
+
+    @Override
+    public StringProperty finVigenciaProperty() {
+        return new SimpleStringProperty(this.finvigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
+    public StringProperty inicioVigenciaProperty() {
+        return new SimpleStringProperty(this.iniciovigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
+    @Override
+    public StringProperty faltanProperty() {
+        LocalDate fin = finvigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return new SimpleStringProperty("" + (fin.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
+    }
+
+    @Override
+    public StringProperty estadoProperty() {
+        return new SimpleStringProperty(estado.getEstado());
+    }
+
+    public void generarRecibos(int recibosPagados, BigDecimal importeConDerechoDePoliza, BigDecimal importeSubsecuente) {
+        int recibos = cuantosRecibos();
+        int siguienteMes = siguienteMes();
+        LocalDate inicioVigenciaAnterior = this.iniciovigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate finVigenciaAnterior = inicioVigenciaAnterior.plusMonths(siguienteMes);
+        Recibo recibo = new Recibo();
+        recibo.setIdpoliza(this);
+        recibo.setCubredesde(inicioVigenciaAnterior);
+        recibo.setCubrehasta(finVigenciaAnterior);
+        recibo.setImporte(importeConDerechoDePoliza);
+
+        if (recibosPagados > 0) {
+            recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PAGADO));
+            recibosPagados--;
+        }
+        this.reciboList.add(recibo);
+        for (int i = 1; i < recibos; i++) {
+            inicioVigenciaAnterior = finVigenciaAnterior;
+            finVigenciaAnterior = finVigenciaAnterior.plusMonths(siguienteMes);
+            recibo = new Recibo();
+            recibo.setIdpoliza(this);
+            recibo.setCubredesde(inicioVigenciaAnterior);
+            recibo.setCubrehasta(finVigenciaAnterior);
+            recibo.setImporte(importeSubsecuente);
+            if (recibosPagados > 0) {
+                recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PAGADO));
+                recibosPagados--;
+            } else {
+                recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PENDIENTE));
+            }
+            this.reciboList.add(recibo);
+        }
+    }
+
+    private int cuantosRecibos() {
+        if (this.formapago.getFormapago().equalsIgnoreCase(Globals.FORMA_PAGO_ANUAL)) {
+            return 1;
+        } else if (this.formapago.getFormapago().equalsIgnoreCase(Globals.FORMA_PAGO_SEMESTRAL)) {
+            return 2;
+        } else if (this.formapago.getFormapago().equalsIgnoreCase(Globals.FORMA_PAGO_TRIMESTRAL)) {
+            return 4;
+        } else if (this.formapago.getFormapago().equalsIgnoreCase(Globals.FORMA_PAGO_MENSUAL)) {
+            return 12;
+        } else {
+            return 1;
+        }
+    }
+
+    private int siguienteMes() {
+        if (this.formapago.getFormapago().equalsIgnoreCase(Globals.FORMA_PAGO_ANUAL)) {
+            return 12;
+        } else if (this.formapago.getFormapago().equalsIgnoreCase(Globals.FORMA_PAGO_SEMESTRAL)) {
+            return 6;
+        } else if (this.formapago.getFormapago().equalsIgnoreCase(Globals.FORMA_PAGO_TRIMESTRAL)) {
+            return 3;
+        } else if (this.formapago.getFormapago().equalsIgnoreCase(Globals.FORMA_PAGO_MENSUAL)) {
+            return 1;
+        } else {
+            return 1;
+        }
+    }
+
 }

@@ -5,9 +5,16 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -39,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Recibo.findByCubredesde", query = "SELECT r FROM Recibo r WHERE r.cubredesde = :cubredesde"),
     @NamedQuery(name = "Recibo.findByCubrehasta", query = "SELECT r FROM Recibo r WHERE r.cubrehasta = :cubrehasta"),
     @NamedQuery(name = "Recibo.findByImporte", query = "SELECT r FROM Recibo r WHERE r.importe = :importe")})
-public class Recibo implements Serializable {
+public class Recibo implements Serializable, ObservableNotificacionRecibo {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -100,12 +107,20 @@ public class Recibo implements Serializable {
         this.cubredesde = cubredesde;
     }
 
+    public void setCubredesde(LocalDate cubredesde) {
+        this.cubredesde = Date.from(cubredesde.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+    }
+
     public Date getCubrehasta() {
         return cubrehasta;
     }
 
     public void setCubrehasta(Date cubrehasta) {
         this.cubrehasta = cubrehasta;
+    }
+
+    public void setCubrehasta(LocalDate cubrehasta) {
+        this.cubrehasta = Date.from(cubrehasta.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public BigDecimal getImporte() {
@@ -172,5 +187,50 @@ public class Recibo implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Recibo[ idrecibo=" + idrecibo + " ]";
     }
-    
+
+    @Override
+    public int getId() {
+        return idrecibo;
+    }
+
+    @Override
+    public StringProperty polizaProperty() {
+        return getIdpoliza().numeroProperty();
+    }
+
+    @Override
+    public StringProperty aseguradoProperty() {
+        return getIdpoliza().getContratante().nombreProperty();
+    }
+
+    @Override
+    public StringProperty cubreDesdeProperty() {
+        return new SimpleStringProperty(cubredesde.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
+    @Override
+    public StringProperty cubreHastaProperty() {
+        return new SimpleStringProperty(cubrehasta.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
+    @Override
+    public StringProperty importeProperty() {
+        return new SimpleStringProperty("$" + importe);
+    }
+
+    @Override
+    public StringProperty enviadoProperty() {
+        //puede ser null
+        if (notificacionRecibo != null) {
+            return notificacionRecibo.enviadoProperty();
+        } else {
+            return new SimpleStringProperty(Globals.NOTIFICACION_ESTADO_PENDIENTE);
+        }
+    }
+
+    @Override
+    public StringProperty cobranzaProperty() {
+        return new SimpleStringProperty(cobranza.getCobranza());
+    }
+
 }

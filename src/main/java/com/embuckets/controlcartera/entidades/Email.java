@@ -5,7 +5,10 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableEmail;
 import java.io.Serializable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Email.findAll", query = "SELECT e FROM Email e"),
     @NamedQuery(name = "Email.findByIdcliente", query = "SELECT e FROM Email e WHERE e.emailPK.idcliente = :idcliente"),
     @NamedQuery(name = "Email.findByEmail", query = "SELECT e FROM Email e WHERE e.emailPK.email = :email")})
-public class Email implements Serializable {
+public class Email implements Serializable, ObservableEmail {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -48,6 +51,11 @@ public class Email implements Serializable {
 
     public Email(int idcliente, String email) {
         this.emailPK = new EmailPK(idcliente, email);
+    }
+
+    public Email(String email) {
+        this.emailPK = new EmailPK();
+        this.emailPK.setEmail(email);
     }
 
     public EmailPK getEmailPK() {
@@ -98,5 +106,15 @@ public class Email implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Email[ emailPK=" + emailPK + " ]";
     }
-    
+
+    @Override
+    public StringProperty emailProperty() {
+        return new SimpleStringProperty(this.emailPK.getEmail());
+    }
+
+    @Override
+    public StringProperty tipoProperty() {
+        return new SimpleStringProperty(this.tipoemail.getTipoemail());
+    }
+
 }

@@ -9,18 +9,17 @@ import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.Email;
-import com.embuckets.controlcartera.entidades.EmailPK;
-import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.TipoPersona;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -57,6 +56,25 @@ public class AseguradoJpaControllerTest {
 
     @After
     public void tearDown() {
+        if (entityManagerFactory != null) {
+            entityManagerFactory.close();
+        }
+        try {
+            DriverManager.getConnection("jdbc:derby:;shutdown=true");
+        } catch (SQLException ex) {
+            if (((ex.getErrorCode() == 50000)
+                    && ("XJ015".equals(ex.getSQLState())))) {
+                // we got the expected exception
+//                System.out.println("Derby shut down normally");
+                // Note that for single database shutdown, the expected
+                // SQL state is "08006", and the error code is 45000.
+            } else {
+                // if the error code or SQLState is different, we have
+                // an unexpected exception (shutdown failed)
+//                System.err.println("Derby did not shut down normally");
+                Logger.getLogger(AseguradoJpaControllerTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /**
@@ -77,7 +95,7 @@ public class AseguradoJpaControllerTest {
      * Test of create method, of class AseguradoJpaController.
      */
     @Test
-    public void testCreate() throws Exception {
+    public void testCreateNombreYDomicilio() throws Exception {
         System.out.println("create");
         int random = new Random().nextInt(20);
         Asegurado asegurado = new Asegurado();
@@ -101,6 +119,76 @@ public class AseguradoJpaControllerTest {
 
         AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
         instance.create(asegurado);
+        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of create method, of class AseguradoJpaController.
+     */
+    @Test
+    public void testCreateNombreYDomicilioYTelefonoYEmails() throws Exception {
+        System.out.println("create");
+        int random = new Random().nextInt(20);
+        Asegurado asegurado = new Asegurado();
+        asegurado.setCliente(new Cliente());
+        asegurado.getCliente().setNombre("Cliente" + random);
+        asegurado.getCliente().setApellidopaterno("Paterno" + random);
+        asegurado.getCliente().setApellidomaterno("Materno" + random);
+        asegurado.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:00.00Z")));
+        asegurado.setTipopersona(new TipoPersona("Fisica"));
+        asegurado.setIddomicilio(new Domicilio());
+        asegurado.getIddomicilio().setCalle("Calle" + random);
+        asegurado.getIddomicilio().setExterior("Exterior" + random);
+        asegurado.setEmailList(new ArrayList<>());
+        asegurado.getEmailList().add(new Email("correo" + random + "@correo.com"));
+        asegurado.getEmailList().add(new Email("correo2" + random + "@correo.com"));
+        asegurado.setTelefonoList(new ArrayList<>());
+        asegurado.getTelefonoList().add(new Telefono("" + random + random + random));
+//        ClienteJpaController clienteJpaController = new ClienteJpaController(entityManagerFactory);
+//        clienteJpaController.create(asegurado.getCliente());
+//        clienteJpaController.getEntityManager().createNamedQuery("")
+
+        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+        instance.create(asegurado);
+        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of create method, of class AseguradoJpaController.
+     */
+    @Test
+    public void testCreateNombreYDomicilioYTelefonoYEmailsYEdit() throws Exception {
+        System.out.println("create");
+        int random = new Random().nextInt(20);
+        Asegurado asegurado = new Asegurado();
+        asegurado.setCliente(new Cliente());
+        asegurado.getCliente().setNombre("Cliente" + random);
+        asegurado.getCliente().setApellidopaterno("Paterno" + random);
+        asegurado.getCliente().setApellidomaterno("Materno" + random);
+        asegurado.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:00.00Z")));
+        asegurado.setTipopersona(new TipoPersona("Fisica"));
+        asegurado.setIddomicilio(new Domicilio());
+        asegurado.getIddomicilio().setCalle("Calle" + random);
+        asegurado.getIddomicilio().setExterior("Exterior" + random);
+        asegurado.setEmailList(new ArrayList<>());
+        Email email = new Email("correo" + random + "@correo.com");
+        asegurado.getEmailList().add(email);
+        asegurado.getEmailList().add(new Email("correo2" + random + "@correo.com"));
+        asegurado.setTelefonoList(new ArrayList<>());
+        asegurado.getTelefonoList().add(new Telefono("" + random + random + random));
+//        ClienteJpaController clienteJpaController = new ClienteJpaController(entityManagerFactory);
+//        clienteJpaController.create(asegurado.getCliente());
+//        clienteJpaController.getEntityManager().createNamedQuery("")
+
+        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+        instance.create(asegurado);
+        asegurado.getCliente().setApellidopaterno("OtroAppellido");
+        asegurado.setRfc("RFC" + random);
+        asegurado.getEmailList().remove(email);
+        asegurado.getTelefonoList().add(new Telefono("55" + random));
+        instance.edit(asegurado);
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }

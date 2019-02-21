@@ -5,8 +5,16 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableAuto;
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+import java.time.ZoneId;
 import java.util.Date;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Auto.findByMarca", query = "SELECT a FROM Auto a WHERE a.marca = :marca"),
     @NamedQuery(name = "Auto.findBySubmarca", query = "SELECT a FROM Auto a WHERE a.submarca = :submarca"),
     @NamedQuery(name = "Auto.findByModelo", query = "SELECT a FROM Auto a WHERE a.modelo = :modelo")})
-public class Auto implements Serializable {
+public class Auto implements Serializable, ObservableAuto {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -69,12 +77,12 @@ public class Auto implements Serializable {
         this.idauto = idauto;
     }
 
-    public Auto(Integer idauto, String descripcion, String marca, String submarca, Date modelo) {
+    public Auto(Integer idauto, String descripcion, String marca, String submarca, Year modelo) {
         this.idauto = idauto;
         this.descripcion = descripcion;
         this.marca = marca;
         this.submarca = submarca;
-        this.modelo = modelo;
+        this.modelo = Date.from(LocalDate.of(modelo.getValue(), Month.JANUARY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     public Integer getIdauto() {
@@ -113,8 +121,8 @@ public class Auto implements Serializable {
         return modelo;
     }
 
-    public void setModelo(Date modelo) {
-        this.modelo = modelo;
+    public void setModelo(Year modelo) {
+        this.modelo = Date.from(LocalDate.of(modelo.getValue(), Month.JANUARY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     public PolizaAuto getIdpoliza() {
@@ -149,5 +157,25 @@ public class Auto implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.Auto[ idauto=" + idauto + " ]";
     }
-    
+
+    @Override
+    public StringProperty descripcionProperty() {
+        return new SimpleStringProperty(descripcion);
+    }
+
+    @Override
+    public StringProperty marcaProperty() {
+        return new SimpleStringProperty(marca);
+    }
+
+    @Override
+    public StringProperty submarcaProperty() {
+        return new SimpleStringProperty(submarca);
+    }
+
+    @Override
+    public StringProperty modeloProperty() {
+        return new SimpleStringProperty("" + modelo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getYear());
+    }
+
 }
