@@ -5,6 +5,9 @@
  */
 package com.embuckets.controlcartera.entidades.globals;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+
 /**
  *
  * @author emilio
@@ -52,7 +55,7 @@ public class Globals {
     public static String POLIZA_RAMO_FLOTILLA = "Flotilla";
 
     public static String POLIZA_ESTADO_VIGENTE = "Vigente";
-    public static String POLIZA_ESTADO_NO_VIGENTE = "No vigente";
+    public static String POLIZA_ESTADO_RENOVADA = "Renovada";
     public static String POLIZA_ESTADO_CANCELADA = "Cancelada";
 
     public static String NOTIFICACION_ESTADO_PENDIENTE = "Pendiente";
@@ -61,4 +64,19 @@ public class Globals {
     public static String POLIZA_AUTO_SUMA_FACTURA = "Factura";
     public static String POLIZA_AUTO_SUMA_COMERCIAL = "Comercial";
 
+    public static String formatCantidad(Object cantidad) {
+        DecimalFormat formatter = new DecimalFormat("$###,###,###.##");
+        if (cantidad instanceof String) {
+            String cantidadString = (String) cantidad;
+            //si es un digito
+            try {
+                Float cantidadFloat = Float.valueOf(cantidadString);
+                return formatter.format(cantidadFloat);
+            } catch (Exception e) {
+                return cantidadString.toUpperCase();
+            }
+        } else {
+            return formatter.format(cantidad);
+        }
+    }
 }

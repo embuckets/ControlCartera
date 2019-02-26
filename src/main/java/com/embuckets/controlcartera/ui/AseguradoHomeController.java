@@ -13,16 +13,19 @@ import com.embuckets.controlcartera.entidades.Email;
 import com.embuckets.controlcartera.entidades.EmailPK;
 import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.Poliza;
+import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.TelefonoPK;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
+import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
 import com.embuckets.controlcartera.ui.observable.ObservableEmail;
 import com.embuckets.controlcartera.ui.observable.ObservablePoliza;
 import com.embuckets.controlcartera.ui.observable.ObservableTelefono;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -49,6 +52,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -65,8 +69,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -79,11 +85,10 @@ import javafx.util.Callback;
  */
 public class AseguradoHomeController implements Initializable, Controller {
 
-    private String location = "/fxml/AseguradoHome.fxml";
-    private Asegurado asegurado;
-    private int aseguradoId;
     @FXML
     private Label nombreAseguradoLabel;
+    private String location = "/fxml/AseguradoHome.fxml";
+    private Asegurado asegurado;
     @FXML
     private TextField nombreTextField;
     @FXML
@@ -139,7 +144,7 @@ public class AseguradoHomeController implements Initializable, Controller {
     @FXML
     private Button agregarEmailButton;
     @FXML
-    private TableView documentoTableView;
+    private TableView<DocumentoAsegurado> documentoTableView;
     @FXML
     private TableColumn archivoTableColumn;
     @FXML
@@ -157,7 +162,7 @@ public class AseguradoHomeController implements Initializable, Controller {
     @FXML
     private Button informacionTabRegesarButton;
     @FXML
-    private TableView<ObservableTreeItem> polizasTableView;
+    private TableView<Poliza> polizasTableView;
     @FXML
     private TableColumn polizaTableColumn;
     @FXML
@@ -195,10 +200,6 @@ public class AseguradoHomeController implements Initializable, Controller {
         this.asegurado = asegurado;
     }
 
-    public void setAseguradoId(int id) {
-        aseguradoId = id;
-    }
-
     private void initData() {
         llenarDatosPersonales();
         llenarDomicilio();
@@ -216,6 +217,7 @@ public class AseguradoHomeController implements Initializable, Controller {
     }
 
     private void llenarDatosPersonales() {
+        nombreAseguradoLabel.setText(asegurado.getCliente().nombreProperty().get());
         nombreTextField.setText(asegurado.getCliente().getNombre());
         paternoteTextField.setText(asegurado.getCliente().getApellidopaterno());
         maternoTextField.setText(asegurado.getCliente().getApellidomaterno());
@@ -438,16 +440,109 @@ public class AseguradoHomeController implements Initializable, Controller {
     }
 
     private void llenarTablaDocumento() {
-        List<ObservableArchivo> documentos = new ArrayList<>();
-        for (DocumentoAsegurado doc : asegurado.getDocumentoAseguradoList()) {
-            ObservableArchivo obs = new ObservableArchivo(doc.getDocumentoAseguradoPK().getNombre(), doc.getTipoDocumentoAsegurado().getTipodocumento());
-            obs.setIdCliente(doc.getDocumentoAseguradoPK().getIdcliente());
-            documentos.add(obs);
-        }
-        documentoTableView.setItems(FXCollections.observableArrayList(documentos));
+        documentoTableView.setItems(FXCollections.observableArrayList(asegurado.getDocumentoAseguradoList()));
         archivoTableColumn.setCellValueFactory(new PropertyValueFactory("archivo"));
         tipoArchivoTableColumn.setCellValueFactory(new PropertyValueFactory("tipo"));
+
+        documentoTableView.setRowFactory((TableView<DocumentoAsegurado> table) -> {
+            final TableRow<DocumentoAsegurado> row = new TableRow<>();
+            final ContextMenu menu = new ContextMenu();
+            MenuItem verItem = new MenuItem("Ver");
+            verItem.setOnAction((event) -> {
+                DocumentoAsegurado documento = row.getItem();
+                File file = new File(documento.getDocumentoAseguradoPK().getNombre());
+                if (!Desktop.isDesktopSupported()) {
+                    System.out.println("Desktop not supported");
+                }
+                if (file.exists()) {
+                    try {
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException ex) {
+                        Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+            MenuItem editarItem = new MenuItem("Editar");
+            editarItem.setOnAction((event) -> {
+                Optional<DocumentoAsegurado> documentoEditado = createDialogEditarDocumento(row.getItem()).showAndWait();
+                documentoEditado.ifPresent((present) -> {
+                    //TODO: update documento en base de datos
+                    //refresh tabla documentos
+                    documentoTableView.getItems().clear();
+                    documentoTableView.setItems(FXCollections.observableArrayList(asegurado.getDocumentoAseguradoList()));
+                });
+            });
+            MenuItem eliminarItem = new MenuItem("Eliminar");
+            eliminarItem.setOnAction((event) -> {
+                //TODO: eliminar de base de datos
+                asegurado.getDocumentoAseguradoList().remove(row.getItem());
+                documentoTableView.getItems().clear();
+                documentoTableView.setItems(FXCollections.observableArrayList(asegurado.getDocumentoAseguradoList()));
+
+            });
+            menu.getItems().addAll(verItem, editarItem, eliminarItem);
+            row.contextMenuProperty().bind(
+                    Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                            .then(menu)
+                            .otherwise((ContextMenu) null));
+
+            return row; //To change body of generated lambdas, choose Tools | Templates.
+        });
+
         fillTipoDocumentoComboBox();
+    }
+
+    private Dialog<DocumentoAsegurado> createDialogEditarDocumento(DocumentoAsegurado doc) {
+        Dialog<DocumentoAsegurado> dialog = new Dialog<>();
+        dialog.setTitle("Editar documento");
+        //set the button types
+        ButtonType guardar = new ButtonType("Guardar", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(guardar, ButtonType.CANCEL);
+
+        //create labels and fields
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        TextField archivoField = new TextField(doc.getNombreArchivo());
+        archivoField.setPrefColumnCount(50);
+        Button selectButton = new Button("Seleccionar archivo");
+        selectButton.setOnAction((event) -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Elige un Documento");
+            chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
+            if (file != null) {
+                archivoField.setText(file.getPath());
+            }
+        });
+
+        //combo box
+        ObservableList<String> list = FXCollections.observableArrayList(tipoDocumentoAsegurado());
+        ComboBox tipoDocumentoBox = new ComboBox(list);
+        tipoDocumentoBox.getSelectionModel().select(list.indexOf(doc.getTipoDocumentoAsegurado().getTipodocumento()));
+
+        grid.add(archivoField, 0, 0);
+        grid.add(selectButton, 1, 0);
+        grid.add(new Label("Tipo de documento"), 0, 1);
+        grid.add(tipoDocumentoBox, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == guardar) {
+                doc.getDocumentoAseguradoPK().setNombre(archivoField.getText());
+                doc.getTipoDocumentoAsegurado().setTipodocumento(tipoDocumentoBox.getValue().toString());
+                return doc;
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    private String[] tipoDocumentoAsegurado() {
+        return new String[]{Globals.DOCUMENTO_ASEGURADO_TIPO_DOMICILIO, Globals.DOCUMENTO_ASEGURADO_TIPO_IDENTIFICACION,
+            Globals.DOCUMENTO_ASEGURADO_TIPO_RFC, Globals.DOCUMENTO_ASEGURADO_TIPO_DOMICILIO};
     }
 
     private void fillTipoDocumentoComboBox() {
@@ -500,8 +595,11 @@ public class AseguradoHomeController implements Initializable, Controller {
         //TODO: crear DocumentoAsegurado 
         //agregar el documento al asegurado
         //persist el documento
-        ObservableArchivo obs = new ObservableArchivo(archivoTextField.getText(), tipoArchivoComboBox.getValue().toString());
-        documentoTableView.getItems().add(obs);
+        DocumentoAsegurado nuevoDoc = new DocumentoAsegurado();
+        nuevoDoc.getDocumentoAseguradoPK().setIdcliente(asegurado.getId());
+        nuevoDoc.getDocumentoAseguradoPK().setNombre(archivoTextField.getText());
+        nuevoDoc.getTipoDocumentoAsegurado().setTipodocumento(tipoArchivoComboBox.getValue().toString());
+        documentoTableView.getItems().add(nuevoDoc);
         archivoTextField.setText("");
     }
 
@@ -515,7 +613,7 @@ public class AseguradoHomeController implements Initializable, Controller {
     }
 
     private void llenarTablaPoliza() {
-        polizasTableView.setItems(createObservablePolizaList());
+        polizasTableView.setItems(FXCollections.observableArrayList(asegurado.getPolizaList()));
         polizaTableColumn.setCellValueFactory(new PropertyValueFactory("poliza"));
         aseguradoraTableColumn.setCellValueFactory(new PropertyValueFactory("aseguradora"));
         ramoTableColumn.setCellValueFactory(new PropertyValueFactory("ramo"));
@@ -524,69 +622,80 @@ public class AseguradoHomeController implements Initializable, Controller {
         primaTableColumn.setCellValueFactory(new PropertyValueFactory("prima"));
         estadoTableColumn.setCellValueFactory(new PropertyValueFactory("estado"));
 
-        polizasTableView.setRowFactory((TableView<ObservableTreeItem> tableView) -> {
-            final TableRow<ObservableTreeItem> row = new TableRow<>();
+        polizasTableView.setRowFactory((TableView<Poliza> tableView) -> {
+            final TableRow<Poliza> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/PolizaHome.fxml"), null, new JavaFXBuilderFactory());
-                        Parent parent = loader.load();
-                        PolizaHomeController controller = loader.<PolizaHomeController>getController();
-                        controller.setPoliza((Poliza) row.getItem());
-//            controller.setAseguradoId(id);
-//        loader.setController(controller);
-                        MainApp.getInstance().changeSceneContent(this, location, parent, loader);
-//mandar el id y que el controlador de AsegurdoHome lo tome de la base
-                    } catch (IOException ex) {
-                        Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    goPolizaHomeScene(row.getItem());
+                } else if (event.getButton() == MouseButton.SECONDARY) {
+                    Poliza selected = polizasTableView.getSelectionModel().getSelectedItem();
+                    System.out.println(selected);
+                    if (selected != null) {
+                        final ContextMenu rowMenu = createContextMenu(selected);
+                        row.contextMenuProperty().bind(
+                                Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                                        .then(rowMenu)
+                                        .otherwise((ContextMenu) null));
                     }
                 }
             });
-
             return row;
         });
     }
 
-    private ObservableList<ObservableTreeItem> createObservablePolizaList() {
-        return FXCollections.observableArrayList(asegurado.getPolizaList());
-//        List<ObservablePoliza> obsList = new ArrayList<>();
-//        for (Poliza poliza : asegurado.getPolizaList()) {
-//            ObservablePoliza obs = new ObservablePoliza(poliza);
-//            obsList.add(obs);
-//        }
+    private ContextMenu createContextMenu(Poliza poliza) {
+        ContextMenu menu = new ContextMenu();
+        MenuItem verItem = new MenuItem("Ver");
+        verItem.setOnAction((event) -> {
+            goPolizaHomeScene(polizasTableView.getSelectionModel().getSelectedItem());
+        });
+        menu.getItems().add(verItem);
+
+        if (poliza.getEstado().getEstado().equalsIgnoreCase(Globals.POLIZA_ESTADO_VIGENTE)) {
+            MenuItem cancelarItem = new MenuItem("Cancelar");
+            cancelarItem.setOnAction((event) -> {
+                poliza.getEstado().setEstado(Globals.POLIZA_ESTADO_CANCELADA);
+                //TODO:
+                //update en base de datos
+                refreshPolizaList();
+            });
+            MenuItem renovarItem = new MenuItem("Renovar");
+            renovarItem.setOnAction((event) -> {
+                poliza.getEstado().setEstado(Globals.POLIZA_ESTADO_RENOVADA);
+                refreshPolizaList();
+                //TODO: abrir ventana para renovar poliza
+                //update en base de datos
+            });
+            menu.getItems().add(cancelarItem);
+            menu.getItems().add(renovarItem);
+        }
+
+        MenuItem borrarItem = new MenuItem("Eliminar");
+        borrarItem.setOnAction((event) -> {
+            asegurado.getPolizaList().remove(polizasTableView.getSelectionModel().getSelectedItem());
+            refreshPolizaList();
+            //TODO: eliminar poliza de base de datos
+        });
+        menu.getItems().add(borrarItem);
+
+        return menu;
     }
 
-    private <T> Callback<TableView<T>, TableRow<T>> createContextMenu(TableView<T> table) {
-        return new Callback<TableView<T>, TableRow<T>>() {
-            @Override
-            public TableRow<T> call(TableView<T> tableView) {
-                final TableRow<T> row = new TableRow<>();
-                final ContextMenu rowMenu = new ContextMenu();
-                MenuItem removeItem = new MenuItem("Borrar");
-                removeItem.setOnAction(new EventHandler<ActionEvent>() {
+    private void goPolizaHomeScene(Poliza poliza) {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/PolizaHome.fxml"), null, new JavaFXBuilderFactory());
+            Parent parent = loader.load();
+            PolizaHomeController controller = loader.<PolizaHomeController>getController();
+            controller.setPoliza((Poliza) poliza);
+            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
+        } catch (IOException ex) {
+            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
-                    @Override
-                    public void handle(ActionEvent event) {
-                        T item = row.getItem();
-                        if (item instanceof ObservableArchivo) {
-                            //borrar archivo
-                            //asegurado.getDocumentoAseguradoList().remove((DocumentoAsegurado)item);
-                            //esta seguro que quiere borrar
-                            //TODO: remove de base de datos
-                        }
-                        table.getItems().remove(row.getItem());
-                    }
-                });
-                rowMenu.getItems().addAll(removeItem);
-
-                // only display context menu for non-null items:
-                row.contextMenuProperty().bind(
-                        Bindings.when(Bindings.isNotNull(row.itemProperty()))
-                                .then(rowMenu)
-                                .otherwise((ContextMenu) null));
-                return row;
-            }
-        };
+    private void refreshPolizaList() {
+        polizasTableView.getItems().clear();
+        polizasTableView.setItems(FXCollections.observableArrayList(asegurado.getPolizaList()));
     }
 
     @FXML
@@ -768,6 +877,43 @@ public class AseguradoHomeController implements Initializable, Controller {
 
     @FXML
     private void editarNota(ActionEvent event) {
+        Optional<String> nuevaNota = createEditNotaDialog(asegurado).showAndWait();
+        nuevaNota.ifPresent((present) -> {
+            notaTextArea.setText(present);
+            //TODO: persistir nota
+        });
+    }
+
+    private Dialog<String> createEditNotaDialog(Asegurado asegurado) {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Editar nota");
+        //set the button types
+        ButtonType guardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(guardar, ButtonType.CANCEL);
+
+        //create labels and fields
+        VBox grid = new VBox();
+        grid.setSpacing(10);
+
+        TextArea notaArea = new TextArea(asegurado.getNota());
+
+        grid.getChildren().addAll(new Label("Nota"), notaArea);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == guardar) {
+                asegurado.setNota(notaArea.getText());
+                return asegurado.getNota();
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    @FXML
+    private void nuevaPolizaScene(ActionEvent event) {
+        //TODO: cambiar scene a ventana nueva poliza
     }
 
     @Override

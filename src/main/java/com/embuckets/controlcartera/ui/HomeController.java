@@ -319,7 +319,7 @@ public class HomeController implements Initializable, Controller {
         poliza3.setEstado(new EstadoPoliza("No vigente"));
         poliza3.setConductocobro(new ConductoCobro("agente"));
         poliza3.setFormapago(new FormaPago(Globals.FORMA_PAGO_TRIMESTRAL));
-        poliza3.setPolizaGmm(new PolizaGmm(3, BigDecimal.valueOf(789654.12), "100,000,000", (short) 10));
+        poliza3.setPolizaGmm(new PolizaGmm(3, BigDecimal.valueOf(79654.12), "100000000", (short) 10));
         poliza3.getPolizaGmm().setDeduciblemoneda(new Moneda("PESOS"));
         poliza3.getPolizaGmm().setSumaaseguradamondeda(new Moneda("PESOS"));
         Cliente depend = new Cliente("beneficiario1", "hijo", "hijo");

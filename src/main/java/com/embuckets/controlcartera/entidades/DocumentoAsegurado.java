@@ -6,7 +6,6 @@
 package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
-import com.embuckets.controlcartera.ui.observable.ObservableDocumentoAsegurado;
 import java.io.Serializable;
 import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
@@ -25,6 +24,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
 
 /**
  *
@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "DocumentoAsegurado.findByExtension", query = "SELECT d FROM DocumentoAsegurado d WHERE d.extension = :extension"),
     @NamedQuery(name = "DocumentoAsegurado.findByTipodocumento", query = "SELECT d FROM DocumentoAsegurado d WHERE d.documentoAseguradoPK.tipodocumento = :tipodocumento"),
     @NamedQuery(name = "DocumentoAsegurado.findByActualizado", query = "SELECT d FROM DocumentoAsegurado d WHERE d.actualizado = :actualizado")})
-public class DocumentoAsegurado implements Serializable, ObservableDocumentoAsegurado {
+public class DocumentoAsegurado implements Serializable, ObservableDocumento {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -64,6 +64,8 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumentoAseg
     private String path;
 
     public DocumentoAsegurado() {
+        this.documentoAseguradoPK = new DocumentoAseguradoPK();
+        this.tipoDocumentoAsegurado = new TipoDocumentoAsegurado();
     }
 
     public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK) {
@@ -146,6 +148,10 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumentoAseg
             return false;
         }
         return true;
+    }
+
+    public String getNombreArchivo() {
+        return documentoAseguradoPK.getNombre() + extension;
     }
 
     @Override

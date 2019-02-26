@@ -8,18 +8,18 @@ package com.embuckets.controlcartera.ui;
 import com.embuckets.controlcartera.entidades.Auto;
 import com.embuckets.controlcartera.entidades.Caratula;
 import com.embuckets.controlcartera.entidades.Cliente;
-import com.embuckets.controlcartera.entidades.Email;
+import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.PolizaGmm;
 import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Year;
-import java.time.ZoneId;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
@@ -27,15 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -46,19 +45,17 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.PopupControl;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
@@ -70,7 +67,16 @@ import javafx.util.Callback;
  */
 public class PolizaHomeController implements Initializable {
 
+    @FXML
+    private Label numeroPolizaLabel;
     private String location = "fxml/PolizaHome.fxml";
+
+    @FXML
+    private Button eliminarPolizaButton;
+    @FXML
+    private Button cancelarPolizaButton;
+    @FXML
+    private Button renovarPolizaButton;
     @FXML
     private TextField polizaTextField;
     @FXML
@@ -123,6 +129,9 @@ public class PolizaHomeController implements Initializable {
     private TableColumn notificacionTableColumn;
     @FXML
     private Button regresarButton1;
+    //Nota
+    @FXML
+    private TextArea notaTextArea;
 
     //campos de poliza de auto
     private TextField sumaAseguradaAutoTextField;
@@ -161,6 +170,7 @@ public class PolizaHomeController implements Initializable {
     }
 
     private void llenarDatosPoliza() {
+        numeroPolizaLabel.setText(poliza.getNumero());
         polizaTextField.setText(poliza.getNumero());
         contratanteTextField.setText(poliza.getContratante().nombreProperty().get());
         titularTextField.setText(poliza.getTitular().nombreProperty().get());
@@ -175,7 +185,7 @@ public class PolizaHomeController implements Initializable {
         finVigenciaTextField.setText(poliza.finVigenciaProperty().get());
         conductoTextField.setText(poliza.getConductocobro().getConductocobro());
         formaPagoTextField.setText(poliza.getFormapago().getFormapago());
-        primaTextField.setText(poliza.primaProperty().get() + " " + poliza.getPrimamoneda().getMoneda());
+        primaTextField.setText(poliza.primaProperty().get());
 
         llenarCamposEspeciales();
     }
@@ -429,11 +439,11 @@ public class PolizaHomeController implements Initializable {
         datosGastosMedicosPane.getColumnConstraints().add(firstColumnConstraints);
         datosGastosMedicosPane.getColumnConstraints().add(secondColumnConstraints);
 
-        TextField deducibleField = new TextField(polizaGmm.getDeducible().toPlainString() + " " + polizaGmm.getDeduciblemoneda().getMoneda());
+        TextField deducibleField = new TextField(Globals.formatCantidad(polizaGmm.getDeducible()) + " " + polizaGmm.getDeduciblemoneda().getMoneda());
         deducibleField.setEditable(false);
-        TextField sumaAseguradaField = new TextField(polizaGmm.getSumaasegurada() + " " + polizaGmm.getSumaaseguradamondeda().getMoneda());
+        TextField sumaAseguradaField = new TextField(Globals.formatCantidad(polizaGmm.getSumaasegurada()) + " " + polizaGmm.getSumaaseguradamondeda().getMoneda());
         sumaAseguradaField.setEditable(false);
-        TextField coaseguroField = new TextField("" + polizaGmm.getCoaseguro());
+        TextField coaseguroField = new TextField("" + polizaGmm.getCoaseguro() + "%");
         coaseguroField.setEditable(false);
 
         datosGastosMedicosPane.add(new Label("Suma asegurada"), 0, 0);
@@ -512,7 +522,7 @@ public class PolizaHomeController implements Initializable {
         sumaAseguradPane.getColumnConstraints().add(firstColumnConstraints);
         sumaAseguradPane.getColumnConstraints().add(secondColumnConstraints);
 
-        sumaAseguradaVidaTextField = new TextField("$" + polizaVida.getSumaasegurada().toPlainString() + " " + polizaVida.getSumaaseguradamoneda().getMoneda());
+        sumaAseguradaVidaTextField = new TextField(Globals.formatCantidad(polizaVida.getSumaasegurada()) + " " + polizaVida.getSumaaseguradamoneda().getMoneda());
         sumaAseguradaVidaTextField.setEditable(false);
         sumaAseguradPane.add(new Label("Suma asegurada"), 0, 0);
         sumaAseguradPane.add(sumaAseguradaVidaTextField, 1, 0);
@@ -667,7 +677,99 @@ public class PolizaHomeController implements Initializable {
     }
 
     private void llenarCaratula() {
-        //TODO
+
+        if (poliza.getCaratula() != null) {
+            caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));
+        }
+//        BooleanBinding agregarCaratulaBinding = Bindings.isNotEmpty(caratulaTableView.getItems());
+//        agregarCaratulaButton.disableProperty().bind(agregarCaratulaBinding);
+
+        archivoTableColumn.setCellValueFactory(new PropertyValueFactory("archivo"));
+
+        caratulaTableView.setRowFactory((TableView<Caratula> table) -> {
+            final TableRow<Caratula> row = new TableRow<>();
+            final ContextMenu menu = new ContextMenu();
+            MenuItem verItem = new MenuItem("Ver");
+            verItem.setOnAction((event) -> {
+                Caratula caratula = row.getItem();
+                File file = new File(caratula.getNombre());
+                if (!Desktop.isDesktopSupported()) {
+                    System.out.println("Desktop not supported");
+                }
+                if (file.exists()) {
+                    try {
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException ex) {
+                        Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+            MenuItem editarItem = new MenuItem("Editar");
+            editarItem.setOnAction((event) -> {
+                Optional<Caratula> documentoEditado = createDialogEditarDocumento(row.getItem()).showAndWait();
+                documentoEditado.ifPresent((present) -> {
+                    //TODO: update documento en base de datos
+                    //refresh tabla documentos
+                    caratulaTableView.getItems().clear();
+                    caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));
+                });
+            });
+            MenuItem eliminarItem = new MenuItem("Eliminar");
+            eliminarItem.setOnAction((event) -> {
+                //TODO: eliminar de base de datos
+                poliza.setCaratula(null);
+                caratulaTableView.getItems().clear();
+                agregarCaratulaButton.setDisable(false);
+//                caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));// esta por demar
+            });
+            menu.getItems().addAll(verItem, editarItem, eliminarItem);
+            row.contextMenuProperty().bind(
+                    Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                            .then(menu)
+                            .otherwise((ContextMenu) null));
+            return row; //To change body of generated lambdas, choose Tools | Templates.
+        });
+    }
+
+    private Dialog<Caratula> createDialogEditarDocumento(Caratula caratula) {
+        Dialog<Caratula> dialog = new Dialog<>();
+        dialog.setTitle("Editar caratula");
+        //set the button types
+        ButtonType guardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(guardar, ButtonType.CANCEL);
+
+        //create labels and fields
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        TextField archivoField = new TextField(caratula.getNombre());
+        archivoField.setEditable(false);
+        archivoField.setPrefColumnCount(50);
+        Button selectButton = new Button("Seleccionar archivo");
+        selectButton.setOnAction((event) -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Elige un Documento");
+            chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
+            if (file != null) {
+                archivoField.setText(file.getPath());
+            }
+        });
+
+        grid.add(archivoField, 0, 0);
+        grid.add(selectButton, 1, 0);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == guardar) {
+                caratula.setNombre(archivoField.getText());
+                return caratula;
+            }
+            return null;
+        });
+
+        return dialog;
     }
 
     private void llenarTablaRecibos() {
@@ -792,6 +894,69 @@ public class PolizaHomeController implements Initializable {
 
     @FXML
     private void agregarCaratula(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Elige un Documento");
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
+        if (file != null) {
+            Caratula caratula = new Caratula(poliza.getId());
+            caratula.setNombre(file.getPath());
+            caratula.setPoliza(poliza);
+//                caratula.setArchivo(file);
+            poliza.setCaratula(caratula);
+            //TODO: leer archivo, persistir caratula
+            caratulaTableView.setItems(FXCollections.observableArrayList(caratula));
+            agregarCaratulaButton.setDisable(true);
+        }
+
+    }
+
+    @FXML
+    private void renovarPoliza(ActionEvent event) {
+    }
+
+    @FXML
+    private void cancelarPoliza(ActionEvent event) {
+    }
+
+    @FXML
+    private void eliminarPoliza(ActionEvent event) {
+    }
+
+    @FXML
+    private void editarNota(ActionEvent event) {
+        Optional<String> nuevaNota = createEditNotaDialog(poliza).showAndWait();
+        nuevaNota.ifPresent((present) -> {
+            notaTextArea.setText(present);
+            //TODO: persistir nota
+        });
+    }
+
+    private Dialog<String> createEditNotaDialog(Poliza poliza) {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Editar nota");
+        //set the button types
+        ButtonType guardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(guardar, ButtonType.CANCEL);
+
+        //create labels and fields
+        VBox grid = new VBox();
+        grid.setSpacing(10);
+
+        TextArea notaArea = new TextArea(poliza.getNota());
+
+        grid.getChildren().addAll(new Label("Nota"), notaArea);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == guardar) {
+                poliza.setNota(notaArea.getText());
+                return poliza.getNota();
+            }
+            return null;
+        });
+
+        return dialog;
     }
 
     @FXML

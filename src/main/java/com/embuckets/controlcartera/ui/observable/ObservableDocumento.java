@@ -11,7 +11,7 @@ import javafx.beans.property.StringProperty;
  *
  * @author emilio
  */
-public interface ObservableDocumentoAsegurado {
+public interface ObservableDocumento {
 
     StringProperty archivoProperty();
 

@@ -785,7 +785,7 @@ INSERT INTO MONEDA (Moneda) VALUES ('UDIS');
 -- -----------------------------------------------------
 
 INSERT INTO ESTADO_POLIZA (Estado) VALUES ('Vigente');
-INSERT INTO ESTADO_POLIZA (Estado) VALUES ('No Vigente');
+INSERT INTO ESTADO_POLIZA (Estado) VALUES ('Renovada');
 INSERT INTO ESTADO_POLIZA (Estado) VALUES ('Cancelada');
 
 

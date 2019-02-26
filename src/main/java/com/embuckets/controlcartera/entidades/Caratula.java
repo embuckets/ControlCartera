@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
 import java.io.Serializable;
 import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
@@ -37,7 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Caratula.findByNombre", query = "SELECT c FROM Caratula c WHERE c.nombre = :nombre"),
     @NamedQuery(name = "Caratula.findByExtension", query = "SELECT c FROM Caratula c WHERE c.extension = :extension"),
     @NamedQuery(name = "Caratula.findByActualizado", query = "SELECT c FROM Caratula c WHERE c.actualizado = :actualizado")})
-public class Caratula implements Serializable {
+public class Caratula implements Serializable, ObservableDocumento {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -148,8 +149,14 @@ public class Caratula implements Serializable {
         return "com.embuckets.controlcartera.entidades.Caratula[ idpoliza=" + idpoliza + " ]";
     }
 
-    public StringProperty nombreProperty() {
+    @Override
+    public StringProperty archivoProperty() {
         return new SimpleStringProperty(nombre + extension);
+    }
+
+    @Override
+    public StringProperty tipoProperty() {
+        return new SimpleStringProperty("");
     }
 
 }

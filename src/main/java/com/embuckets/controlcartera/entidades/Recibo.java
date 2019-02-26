@@ -215,7 +215,7 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
 
     @Override
     public StringProperty importeProperty() {
-        return new SimpleStringProperty("$" + importe);
+        return new SimpleStringProperty(Globals.formatCantidad(importe));
     }
 
     @Override

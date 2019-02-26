@@ -5,6 +5,8 @@
  */
 package utilities;
 
+import com.embuckets.controlcartera.entidades.globals.Globals;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.regex.Pattern;
 import org.junit.After;
@@ -50,9 +52,18 @@ public class UitilityTest {
         System.out.println(phone);
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
+    @Test
+    public void testNumberFormatter() {
+        DecimalFormat formatter = new DecimalFormat("$###,###,###.###");
+//        System.out.println(formatter.format(Float.valueOf("1000000")));
+//        System.out.println(formatter.format(456789));
+//        System.out.println(formatter.format("SIN LIMITE"));
+
+        System.out.println(Globals.formatCantidad(Float.valueOf("1000000")));
+        System.out.println(Globals.formatCantidad(456789));
+        System.out.println(Globals.formatCantidad(new BigDecimal(123456.45646)));
+        System.out.println(Globals.formatCantidad("SIN LIMITE"));
+
+    }
+
 }

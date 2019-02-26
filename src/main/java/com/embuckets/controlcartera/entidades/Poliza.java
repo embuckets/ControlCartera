@@ -368,7 +368,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 
     @Override
     public StringProperty primaProperty() {
-        return new SimpleStringProperty("$" + prima);
+        return new SimpleStringProperty(Globals.formatCantidad(prima) + " " + primamoneda.getMoneda());
     }
 
     @Override
