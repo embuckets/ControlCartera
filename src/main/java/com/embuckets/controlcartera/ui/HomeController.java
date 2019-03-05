@@ -420,30 +420,10 @@ public class HomeController implements Initializable, Controller {
 //    }
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevoAsegurado.fxml");
-//        try {
-//            Parent parent = FXMLLoader.load(getClass().getResource("NuevoAsegurado.fxml"));
-//            
-////            VBox page = (VBox) FXMLLoader.load(getClass().getResource("NuevoAsegurado.fxml"));
-//            Scene newScene = new Scene(parent);
-//            
-//            Stage mainWindow = (Stage) ((Node)event.getSource()).getScene().getWindow();
-//            mainWindow.getScene().getRoot().setEffect(new GaussianBlur());
-//            
-//            Stage popUpStage = new Stage(StageStyle.DECORATED);
-//            popUpStage.initOwner(mainWindow);
-//            popUpStage.initModality(Modality.APPLICATION_MODAL);
-//            popUpStage.setScene(newScene);
-////            popUpStage.setMaximized(true);
-//            popUpStage.show();
-//            
-////            mainWindow.setScene(newScene);
-////            mainWindow.setMaximized(true);
-////            mainWindow.show();
-//            
-//        } catch (IOException ex) {
-//            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        
+    }
+    
+    public void abrirSceneNuevaPoliza(ActionEvent event) throws IOException {
+        MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevaPoliza.fxml");
     }
 
     private void fillTablaCumple() {
