@@ -177,12 +177,20 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         this.iniciovigencia = iniciovigencia;
     }
 
+    public void setIniciovigencia(LocalDate iniciovigencia) {
+        this.iniciovigencia = Date.from(iniciovigencia.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
     public Date getFinvigencia() {
         return finvigencia;
     }
 
     public void setFinvigencia(Date finvigencia) {
         this.finvigencia = finvigencia;
+    }
+
+    public void setFinvigencia(LocalDate finvigencia) {
+        this.finvigencia = Date.from(finvigencia.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     public BigDecimal getPrima() {
@@ -279,6 +287,27 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 
     public void setRamo(Ramo ramo) {
         this.ramo = ramo;
+        crearSubPoliza();
+    }
+
+    private void crearSubPoliza() {
+        if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_AUTOS) || this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_FLOTILLA)) {
+            this.polizaAuto = new PolizaAuto(idpoliza);
+            polizaVida = null;
+            polizaGmm = null;
+        }
+        if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_VIDA)) {
+            this.polizaVida = new PolizaVida(idpoliza);
+            polizaAuto = null;
+            polizaGmm = null;
+
+        }
+        if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_GM)) {
+            this.polizaGmm = new PolizaGmm(idpoliza);
+            polizaVida = null;
+            polizaAuto = null;
+
+        }
     }
 
     public PolizaVida getPolizaVida() {
@@ -420,7 +449,10 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         if (recibosPagados > 0) {
             recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PAGADO));
             recibosPagados--;
+        } else {
+            recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PENDIENTE));
         }
+
         this.reciboList.add(recibo);
         for (int i = 1; i < recibos; i++) {
             inicioVigenciaAnterior = finVigenciaAnterior;

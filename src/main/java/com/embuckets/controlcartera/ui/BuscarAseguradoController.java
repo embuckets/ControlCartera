@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.binding.Binding;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -48,10 +50,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 
 /**
+ * FXML Controller class
  *
  * @author emilio
  */
-public class BuscarClienteController implements Initializable {
+public class BuscarAseguradoController implements Initializable {
 
     @FXML
     private DialogPane dialogPane;
@@ -62,7 +65,7 @@ public class BuscarClienteController implements Initializable {
     @FXML
     private TextField maternoField;
     @FXML
-    private TableView<Cliente> clienteTableView;
+    private TableView<Asegurado> clienteTableView;
     @FXML
     private TableColumn nombreColumn;
     @FXML
@@ -72,8 +75,8 @@ public class BuscarClienteController implements Initializable {
     @FXML
     private TextField clienteSelectedField;
 
-    private Cliente cliente;
-    private Dialog<Cliente> dialog;
+    private Asegurado asegurado;
+    private Dialog<Asegurado> dialog;
 
     /**
      * Initializes the controller class.
@@ -86,17 +89,17 @@ public class BuscarClienteController implements Initializable {
     }
 
     private void llenarTablaAsegurados() {
-        clienteTableView.setItems(FXCollections.observableArrayList(getAllClientes()));
+        clienteTableView.setItems(FXCollections.observableArrayList(getAllAsegurados()));
 
         nombreColumn.setCellValueFactory(new PropertyValueFactory("nombre"));
         paternoColumn.setCellValueFactory(new PropertyValueFactory("paterno"));
         maternoColumn.setCellValueFactory(new PropertyValueFactory("materno"));
 
-        clienteTableView.setRowFactory((TableView<Cliente> param) -> {
-            final TableRow<Cliente> row = new TableRow<>();
+        clienteTableView.setRowFactory((TableView<Asegurado> param) -> {
+            final TableRow<Asegurado> row = new TableRow<>();
             row.setOnMouseClicked((event) -> {
-                cliente = row.getItem();
-                clienteSelectedField.setText(cliente.nombreProperty().get());
+                asegurado = row.getItem();
+                clienteSelectedField.setText(asegurado.nombreProperty().get());
             });
 //            row.onMouseClickedProperty().bind(Bindings.when(Bindings.isNotNull(row.itemProperty())));
 
@@ -106,26 +109,22 @@ public class BuscarClienteController implements Initializable {
 
     private void crearDialog() {
         dialog = new Dialog<>();
-        dialog.setTitle("Buscar Cliente");
+        dialog.setTitle("Buscar Asegurado");
         ButtonType seleccionarButtonType = new ButtonType("Seleccionar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(seleccionarButtonType, ButtonType.CANCEL);
 
         dialog.getDialogPane().setContent(dialogPane);
         dialog.setResultConverter((dialogButton) -> {
             if (dialogButton == seleccionarButtonType) {
-                return cliente;
+                return asegurado;
             }
             return null;
         });
     }
 
-    private List<Cliente> getAllClientes() {
+    private List<Asegurado> getAllAsegurados() {
         //TODO: leer asegurados de base de datos
-        List<Cliente> clientes = new ArrayList<>();
-        createClientesFalsos().forEach((asegurado) -> {
-            clientes.add(asegurado.getCliente());
-        });
-        return clientes;
+        return createAseguradosFalsos();
     }
 
     @FXML
@@ -133,7 +132,7 @@ public class BuscarClienteController implements Initializable {
     }
 
     @FXML
-    private void buscarCliente(KeyEvent event) {
+    private void buscarAsegurado(KeyEvent event) {
         //TODO: buscar asegurado con campos del nombre incomplentos
     }
 
@@ -141,17 +140,12 @@ public class BuscarClienteController implements Initializable {
     private void seleccionar(ActionEvent event) {
 
     }
-
-    @FXML
-    private void buscarAsegurado(KeyEvent event) {
-        //TODO: buscar asegurado con campos del nombre incomplentos
-    }
-
-    public Dialog<Cliente> getDialog() {
+    
+    public Dialog<Asegurado> getDialog(){
         return dialog;
     }
 
-    private List<Asegurado> createClientesFalsos() {
+    private List<Asegurado> createAseguradosFalsos() {
         Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
         asegurado1.setIdcliente(1);
         asegurado1.getCliente().setIdcliente(1);

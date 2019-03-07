@@ -186,16 +186,17 @@ public class PolizaHomeController implements Initializable {
         conductoTextField.setText(poliza.getConductocobro().getConductocobro());
         formaPagoTextField.setText(poliza.getFormapago().getFormapago());
         primaTextField.setText(poliza.primaProperty().get());
+        notaTextArea.setText(poliza.getNota());
 
         llenarCamposEspeciales();
     }
 
     private void llenarCamposEspeciales() {
-        if (poliza.getRamo().getRamo().equalsIgnoreCase("autos") || poliza.getRamo().getRamo().equalsIgnoreCase("flotilla")) {
+        if (poliza.getRamo().getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_AUTOS) || poliza.getRamo().getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_FLOTILLA)) {
             llenarCamposAuto(poliza.getPolizaAuto());
-        } else if (poliza.getRamo().getRamo().equalsIgnoreCase("gastos medicos")) {
+        } else if (poliza.getRamo().getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_GM)) {
             llenarCamposGastosMedicos(poliza.getPolizaGmm());
-        } else if (poliza.getRamo().getRamo().equalsIgnoreCase("vida")) {
+        } else if (poliza.getRamo().getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_VIDA)) {
             llenarCamposVida(poliza.getPolizaVida());
         }
     }
@@ -963,6 +964,15 @@ public class PolizaHomeController implements Initializable {
     private void regresar(ActionEvent event) {
         try {
             MainApp.getInstance().goBack();
+        } catch (IOException ex) {
+            Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @FXML
+    private void goHome(ActionEvent event) {
+        try {
+            MainApp.getInstance().goHome();
         } catch (IOException ex) {
             Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
         }

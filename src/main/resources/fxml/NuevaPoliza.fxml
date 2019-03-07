@@ -10,6 +10,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
@@ -73,7 +74,7 @@
                               <Label text="Contratante" GridPane.rowIndex="1" />
                               <Button mnemonicParsing="false" onAction="#buscarContratante" text="Buscar" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                               <Button mnemonicParsing="false" onAction="#buscarTitular" text="Buscar" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <CheckBox mnemonicParsing="false" onAction="#esContratante" text="Es el contratante" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                              <CheckBox fx:id="esContratanteCheckBox" mnemonicParsing="false" onAction="#esContratante" text="Es el contratante" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                               <TextField fx:id="titularField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <Label text="Contratante" GridPane.columnSpan="2147483647" />
                            </children>
@@ -141,8 +142,8 @@
                                        </children>
                                     </HBox>
                                     <Label text="Prima" GridPane.rowIndex="5" />
-                                    <DatePicker fx:id="inicioVigenciaPicker" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <DatePicker fx:id="finVigenciaPicker" layoutX="319.0" layoutY="12.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <DatePicker fx:id="inicioVigenciaPicker" onAction="#setFinVigenciaOnDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <DatePicker fx:id="finVigenciaPicker" disable="true" editable="false" layoutX="319.0" layoutY="12.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                     <ComboBox fx:id="formaPagoCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                  </children>
                               </GridPane>
@@ -150,6 +151,30 @@
                         </VBox>
                      </children>
                   </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Recibos" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="10.0">
+                     <children>
+                        <Label text="Importe primer recibo" />
+                        <TextField fx:id="importePrimerReciboField" />
+                        <Label text="Importe recibos subsecuentes">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="importeSubsecuentesField" />
+                        <Label text="Recibos pagados">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Spinner fx:id="recibosPagadosSpinner" />
+                     </children>
+                  </HBox>
+                  <VBox fx:id="camposExtraVBox" spacing="15.0" />
                   <VBox spacing="10.0">
                      <children>
                         <GridPane>

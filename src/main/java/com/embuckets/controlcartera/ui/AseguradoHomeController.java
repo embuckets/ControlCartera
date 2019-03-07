@@ -10,30 +10,19 @@ import com.embuckets.controlcartera.entidades.Delegacion;
 import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.Email;
-import com.embuckets.controlcartera.entidades.EmailPK;
 import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.Poliza;
-import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.Telefono;
-import com.embuckets.controlcartera.entidades.TelefonoPK;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
 import com.embuckets.controlcartera.entidades.globals.Globals;
-import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
-import com.embuckets.controlcartera.ui.observable.ObservableEmail;
-import com.embuckets.controlcartera.ui.observable.ObservablePoliza;
-import com.embuckets.controlcartera.ui.observable.ObservableTelefono;
-import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -50,7 +39,6 @@ import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -74,8 +62,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
@@ -913,7 +899,16 @@ public class AseguradoHomeController implements Initializable, Controller {
 
     @FXML
     private void nuevaPolizaScene(ActionEvent event) {
-        //TODO: cambiar scene a ventana nueva poliza
+        try {
+            //TODO: guardar poliza en base de datos
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/NuevaPoliza.fxml"), null, new JavaFXBuilderFactory());
+            Parent parent = loader.load();
+            NuevaPolizaController controller = loader.<NuevaPolizaController>getController();
+            controller.setContratante(this.asegurado);
+            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
+        } catch (IOException ex) {
+            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

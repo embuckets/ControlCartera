@@ -114,22 +114,11 @@ public class MainApp extends Application {
     }
 
     public void goBack() throws IOException {
-//        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AseguradoHome.fxml"), null, new JavaFXBuilderFactory());
-//                            Parent parent = loader.load();
-//                            AseguradoHomeController controller = loader.<AseguradoHomeController>getController();
-//                            controller.setAsegurado((Asegurado) obs);
-////            controller.setAseguradoId(id);
-////        loader.setController(controller);
-//                            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
-        
-        
         Pair pair = windowStack.getLast();
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource((String) pair.getValue()));
         Parent page = (Parent) loader.load();
         Controller controller = loader.<Controller>getController();
         controller.setData(((Controller)pair.getKey()).getData());
-//        loader.setController(((Controller)pair.getKey()).getData());
-//        Parent page = (Parent) loader.load(MainApp.class.getResource((String)pair.getValue()), null, new JavaFXBuilderFactory());
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);

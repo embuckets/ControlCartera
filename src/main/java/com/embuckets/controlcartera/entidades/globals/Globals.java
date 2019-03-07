@@ -64,6 +64,100 @@ public class Globals {
     public static String POLIZA_AUTO_SUMA_FACTURA = "Factura";
     public static String POLIZA_AUTO_SUMA_COMERCIAL = "Comercial";
 
+    public static String[] getAllTelefonoTipos() {
+        return new String[]{
+            TELEFONO_TIPO_CASA,
+            TELEFONO_TIPO_MOVIL,
+            TELEFONO_TIPO_TRABAJO
+        };
+    }
+
+    public static String[] getAllEmailTipos() {
+        return new String[]{
+            EMAIL_TIPO_PERSONAL,
+            EMAIL_TIPO_TRABAJO
+        };
+    }
+
+    public static String[] getAllMonedas() {
+        return new String[]{
+            MONEDA_PESOS,
+            MONEDA_DOLARES,
+            MONEDA_UMAM,
+            MONEDA_UDIS
+        };
+    }
+
+    public static String[] getAllDocumentoAseguradoTipos() {
+        return new String[]{
+            DOCUMENTO_ASEGURADO_TIPO_IDENTIFICACION,
+            DOCUMENTO_ASEGURADO_TIPO_DOMICILIO,
+            DOCUMENTO_ASEGURADO_TIPO_RFC,
+            DOCUMENTO_ASEGURADO_TIPO_OTRO
+        };
+    }
+
+    public static String[] getAllReciboCobranzas() {
+        return new String[]{
+            RECIBO_COBRANZA_PENDIENTE,
+            RECIBO_COBRANZA_PAGADO
+        };
+    }
+
+    public static String[] getAllConductoCobro() {
+        return new String[]{
+            CONDUCTO_COBRO_AGENTE,
+            CONDUCTO_COBRO_CAT,
+            CONDUCTO_COBRO_CASH
+        };
+    }
+
+    public static String[] getAllFormaPago() {
+        return new String[]{
+            FORMA_PAGO_ANUAL,
+            FORMA_PAGO_SEMESTRAL,
+            FORMA_PAGO_TRIMESTRAL,
+            FORMA_PAGO_MENSUAL
+        };
+    }
+
+    public static String[] getAllRamos() {
+        return new String[]{
+            POLIZA_RAMO_AUTOS,
+            POLIZA_RAMO_ACC_PER,
+            POLIZA_RAMO_EMPRESARIAL,
+            POLIZA_RAMO_GM,
+            POLIZA_RAMO_HOGAR,
+            POLIZA_RAMO_INVERSION,
+            POLIZA_RAMO_RC,
+            POLIZA_RAMO_TRANSPORTE,
+            POLIZA_RAMO_VIDA,
+            POLIZA_RAMO_FLOTILLA
+        };
+    }
+
+    public static String[] getAllPolizaEstados() {
+        return new String[]{
+            POLIZA_ESTADO_VIGENTE,
+            POLIZA_ESTADO_RENOVADA,
+            POLIZA_ESTADO_CANCELADA
+        };
+    }
+
+    public static String[] getAllNotificacionEstados() {
+        return new String[]{
+            NOTIFICACION_ESTADO_PENDIENTE,
+            NOTIFICACION_ESTADO_ENVIADO
+        };
+    }
+
+    public static String[] getAllPolizaAutoSumas() {
+        return new String[]{
+            POLIZA_AUTO_SUMA_FACTURA,
+            POLIZA_AUTO_SUMA_COMERCIAL
+        };
+    }
+
     public static String formatCantidad(Object cantidad) {
         DecimalFormat formatter = new DecimalFormat("$###,###,###.##");
         if (cantidad instanceof String) {
