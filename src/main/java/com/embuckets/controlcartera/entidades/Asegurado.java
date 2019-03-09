@@ -19,8 +19,12 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -33,6 +37,41 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "ASEGURADO")
+@NamedEntityGraphs({
+    @NamedEntityGraph(
+            name = "asegurado-graph-full-noDoc-noDom",
+            attributeNodes = {
+                @NamedAttributeNode("cliente"),
+                @NamedAttributeNode("tipopersona"),
+                @NamedAttributeNode("polizaList"),
+                @NamedAttributeNode(value = "telefonoList", subgraph = "telef-subgraph"),
+                @NamedAttributeNode(value = "emailList", subgraph = "email-subgraph"),},
+            subgraphs = {
+                @NamedSubgraph(
+                        name = "telef-subgraph",
+                        attributeNodes = {
+                            @NamedAttributeNode("tipotelefono")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "email-subgraph",
+                        attributeNodes = {
+                            @NamedAttributeNode("tipoemail")
+                        }
+                )
+            }
+    ),
+    @NamedEntityGraph(
+            name = "asegurado-graph-cliente",
+            attributeNodes = {
+                @NamedAttributeNode("cliente")
+            }
+    ),
+    @NamedEntityGraph(
+            name = "asegurado-IncludeAll",
+            includeAllAttributes = true)
+})
+
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Asegurado.findAll", query = "SELECT a FROM Asegurado a"),
@@ -59,7 +98,7 @@ public class Asegurado implements Serializable, ObservableTreeItem {
     @ManyToOne(fetch = FetchType.LAZY)
     private Domicilio iddomicilio;
     @JoinColumn(name = "TIPOPERSONA", referencedColumnName = "TIPOPERSONA")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private TipoPersona tipopersona;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "contratante", fetch = FetchType.LAZY)
     private List<Poliza> polizaList;

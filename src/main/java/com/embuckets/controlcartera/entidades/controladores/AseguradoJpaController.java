@@ -23,8 +23,12 @@ import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -96,26 +100,24 @@ public class AseguradoJpaController implements Serializable {
         }
     }
 
-        
-    public void edit(Asegurado asegurado) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public Asegurado edit(Asegurado asegurado) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
+        Asegurado merged = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-             Asegurado persistentAsegurado = em.find(Asegurado.class, asegurado.getIdcliente());
-             //cambio el nombre
-             persistentAsegurado.getCliente().setNombre(asegurado.getCliente().getNombre());
-             persistentAsegurado.getCliente().setApellidopaterno(asegurado.getCliente().getApellidopaterno());
-             persistentAsegurado.setRfc(asegurado.getRfc());
-             
-             //cambio el asegurado
-             
-             //cambio del domicilio
-             
-             //cambio el telefono
-             
-             //cambio el email
-             
+
+            merged = em.merge(asegurado);
+//             Asegurado persistentAsegurado = em.find(Asegurado.class, asegurado.getIdcliente());
+//             //cambio el nombre
+//             persistentAsegurado.getCliente().setNombre(asegurado.getCliente().getNombre());
+//             persistentAsegurado.getCliente().setApellidopaterno(asegurado.getCliente().getApellidopaterno());
+//             persistentAsegurado.setRfc(asegurado.getRfc());
+
+            //cambio el asegurado
+            //cambio del domicilio
+            //cambio el telefono
+            //cambio el email
 //            em.merge(asegurado);
 //            Cliente clienteOld = persistentAsegurado.getCliente();
 //            Cliente clienteNew = asegurado.getCliente();
@@ -300,9 +302,9 @@ public class AseguradoJpaController implements Serializable {
                 em.close();
             }
         }
+        return merged;
     }
 
-    
 //    public void create(Asegurado asegurado) throws IllegalOrphanException, PreexistingEntityException, Exception {
 //        if (asegurado.getEmailList() == null) {
 //            asegurado.setEmailList(new ArrayList<Email>());
@@ -449,7 +451,6 @@ public class AseguradoJpaController implements Serializable {
 //            }
 //        }
 //    }
-    
 //    public void edit(Asegurado asegurado) throws IllegalOrphanException, NonexistentEntityException, Exception {
 //        EntityManager em = null;
 //        try {
@@ -640,7 +641,6 @@ public class AseguradoJpaController implements Serializable {
 //            }
 //        }
 //    }
-
     public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
@@ -750,6 +750,59 @@ public class AseguradoJpaController implements Serializable {
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
+        } finally {
+            em.close();
+        }
+    }
+
+    public Asegurado findAseguradoCompleto(int idcliente) {
+        EntityManager em = getEntityManager();
+        try {
+            EntityGraph graph = em.getEntityGraph("asegurado-graph-full-noDoc-noDom");
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("javax.pesistence.loadgraph", graph);
+            return em.find(Asegurado.class, idcliente, properties);
+        } finally {
+            em.close();
+        }
+    }
+
+    public Asegurado findAseguradoCompletoConApi(int idcliente) {
+        EntityManager em = getEntityManager();
+        try {
+            EntityGraph graph = em.getEntityGraph("asegurado-IncludeAll");
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("javax.pesistence.loadgraph", graph);
+            return em.find(Asegurado.class, idcliente, properties);
+        } finally {
+            em.close();
+        }
+    }
+
+    public Asegurado findAseguradoCompletoConQuery(int idcliente) {
+        EntityManager em = getEntityManager();
+        try {
+//            TypedQuery<Asegurado> createQuery = em.createQuery("SELECT a FROM Asegurado a JOIN FETCH a.cliente WHERE a.idcliente = :idcliente", Asegurado.class);
+            TypedQuery<Asegurado> createQuery = em.createQuery("SELECT a FROM Asegurado a JOIN FETCH a.cliente c JOIN FETCH a.tipopersona t JOIN FETCH a.emailList e JOIN FETCH e.tipoemail WHERE a.idcliente = :idcliente", Asegurado.class);
+            createQuery.setParameter("idcliente", idcliente);
+            return createQuery.getSingleResult();
+//            EntityGraph graph = em.getEntityGraph("asegurado-IncludeAll");
+//            Map<String, Object> properties = new HashMap<>();
+//            properties.put("javax.pesistence.loadgraph", graph);
+//            return em.find(Asegurado.class, idcliente, properties);
+        } finally {
+            em.close();
+        }
+    }
+
+    public Asegurado findAseguradoConCliente(int idcliente) {
+        EntityManager em = getEntityManager();
+        try {
+            EntityGraph graph = em.createEntityGraph(Asegurado.class);
+            graph.addSubgraph("cliente").addAttributeNodes("idcliente", "nombre","apellidopaterno","apellidomaterno","nacimiento","polizaGmmList","polizaVidaList","asegurado","notificacionCumple","polizaList");
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("javax.pesistence.loadgraph", graph);
+            return em.find(Asegurado.class, idcliente, properties);
         } finally {
             em.close();
         }

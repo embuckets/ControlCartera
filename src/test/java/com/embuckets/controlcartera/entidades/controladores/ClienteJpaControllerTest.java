@@ -174,8 +174,8 @@ public class ClienteJpaControllerTest {
 //        } catch (NoResultException ex) {
 //            fail("Cliente " + nombre + " " + apellidopaterno + " " + apellidomaterno + " no existe");
 //        }
-
-        // TODO review the generated test code and remove the default call to fail.
+//
+//      // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
 

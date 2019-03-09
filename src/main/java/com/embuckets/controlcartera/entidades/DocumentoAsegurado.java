@@ -61,7 +61,6 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
     @JoinColumn(name = "TIPODOCUMENTO", referencedColumnName = "TIPODOCUMENTO", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private TipoDocumentoAsegurado tipoDocumentoAsegurado;
-    private String path;
 
     public DocumentoAsegurado() {
         this.documentoAseguradoPK = new DocumentoAseguradoPK();
