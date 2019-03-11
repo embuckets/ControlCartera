@@ -49,7 +49,7 @@ public class PolizaVida implements Serializable {
     @ManyToMany(mappedBy = "polizaVidaList", fetch = FetchType.LAZY)
     private List<Cliente> clienteList;
     @JoinColumn(name = "SUMAASEGURADAMONEDA", referencedColumnName = "MONEDA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Moneda sumaaseguradamoneda;
     @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA", insertable = false, updatable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)

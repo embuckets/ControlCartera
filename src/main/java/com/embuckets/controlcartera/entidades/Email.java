@@ -39,7 +39,7 @@ public class Email implements Serializable, ObservableEmail {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado asegurado;
     @JoinColumn(name = "TIPOEMAIL", referencedColumnName = "TIPOEMAIL")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private TipoEmail tipoemail;
 
     public Email() {

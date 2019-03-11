@@ -92,13 +92,13 @@ public class Asegurado implements Serializable, ObservableTreeItem {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
     private List<Email> emailList;
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = true, updatable = true)
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.EAGER)
     private Cliente cliente;
     @JoinColumn(name = "IDDOMICILIO", referencedColumnName = "IDDOMICILIO")
     @ManyToOne(fetch = FetchType.LAZY)
     private Domicilio iddomicilio;
     @JoinColumn(name = "TIPOPERSONA", referencedColumnName = "TIPOPERSONA")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private TipoPersona tipopersona;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "contratante", fetch = FetchType.LAZY)
     private List<Poliza> polizaList;

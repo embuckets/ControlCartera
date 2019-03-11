@@ -43,7 +43,7 @@ public class Telefono implements Serializable, ObservableTelefono {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado asegurado;
     @JoinColumn(name = "TIPOTELEFONO", referencedColumnName = "TIPOTELEFONO")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private TipoTelefono tipotelefono;
 
     public Telefono() {

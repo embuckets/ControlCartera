@@ -6,6 +6,7 @@
 package com.embuckets.controlcartera.entidades.controladores;
 
 import com.embuckets.controlcartera.entidades.Asegurado;
+import com.embuckets.controlcartera.entidades.Auto;
 import java.io.Serializable;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
@@ -23,6 +24,7 @@ import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.EntityGraph;
@@ -34,21 +36,26 @@ import javax.persistence.TypedQuery;
  *
  * @author emilio
  */
-public class AseguradoJpaController implements Serializable {
+public class AseguradoJpaController implements Serializable, JpaController {
 
-    public AseguradoJpaController(EntityManagerFactory emf) {
-        this.emf = emf;
+//    public AseguradoJpaController(EntityManagerFactory emf) {
+//        this.emf = emf;
+//    }
+    public AseguradoJpaController() {
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
 
-    public void create(Asegurado asegurado) throws PreexistingEntityException, Exception {
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        Asegurado asegurado = (Asegurado) object;
         EntityManager em = null;
         try {
-            em = getEntityManager();
+            em = BaseDeDatos.getInstance().getEntityManager();
             em.getTransaction().begin();
             Cliente cliente = asegurado.getCliente();
             //save cliente
@@ -93,10 +100,139 @@ public class AseguradoJpaController implements Serializable {
                 em.getTransaction().rollback();
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
+        }
+//        finally {
+//            if (em != null) {
+//                em.close();
+//            }
+//        }
+    }
+
+//    @Override
+//    public <T> List<T> getAll() {
+//        EntityManager em = null;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            return em.createNamedQuery("Asegurado.findAll").getResultList();
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
+//    @Override
+//    public <T> T getById(int id) throws Exception {
+//        EntityManager em = null;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            Query query = em.createNamedQuery("Asegurado.findByIdcliente");
+//            query.setParameter("idcliente", id);
+//            return (T) query.getSingleResult();
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
+//    @Override
+//    public <T> List<T> getAllById(int id) throws Exception {
+//        EntityManager em = null;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            Query query = em.createNamedQuery("Asegurado.findByIdcliente");
+//            query.setParameter("idcliente", id);
+//            return query.getResultList();
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
+//    @Override
+//    public <T> T edit(Object object) {
+//        EntityManager em = null;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            em.getTransaction().begin();
+//            T merged = em.merge((T) object);
+//            em.getTransaction().commit();
+//            return merged;
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
+    @Override
+    public void remove(Object object) {
+        EntityManager em = null;
+        Asegurado asegurado = (Asegurado) object;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+
+            //
+            if (asegurado.getIddomicilio() != null) {
+                em.remove(asegurado.getIddomicilio());
             }
+            for (Email email : asegurado.getEmailList()) {
+                em.remove(email);
+            }
+            for (Telefono telefono : asegurado.getTelefonoList()) {
+                em.remove(telefono);
+            }
+            for (DocumentoAsegurado doc : asegurado.getDocumentoAseguradoList()) {
+                em.remove(doc);
+            }
+            for (Poliza poliza : asegurado.getPolizaList()) {
+                //TODO: llamar PolizaJpaController para que elimine la poliza con sus hijos
+                removePoliza(poliza);
+            }
+//            em.remove(asegurado.getTipopersona());
+            em.remove(asegurado.getCliente());
+            em.remove(asegurado);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    private void removePoliza(Poliza poliza) {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+//            em.getTransaction().begin();//if active throws exception
+            if (poliza.getPolizaVida() != null) {
+                for (Cliente benef : poliza.getPolizaVida().getClienteList()) {
+                    em.remove(benef);
+                }
+                em.remove(poliza.getPolizaVida());
+            }
+            if (poliza.getPolizaGmm() != null) {
+                for (Cliente benef : poliza.getPolizaVida().getClienteList()) {
+                    em.remove(benef);
+                }
+                em.remove(poliza.getPolizaGmm());
+            }
+            if (poliza.getPolizaAuto() != null) {
+                for (Auto auto : poliza.getPolizaAuto().getAutoList()) {
+                    em.remove(auto);
+                }
+                em.remove(poliza.getPolizaAuto());
+            }
+            //TODO: Aparentemente si elimina todos los recibos
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
         }
     }
 
@@ -799,13 +935,28 @@ public class AseguradoJpaController implements Serializable {
         EntityManager em = getEntityManager();
         try {
             EntityGraph graph = em.createEntityGraph(Asegurado.class);
-            graph.addSubgraph("cliente").addAttributeNodes("idcliente", "nombre","apellidopaterno","apellidomaterno","nacimiento","polizaGmmList","polizaVidaList","asegurado","notificacionCumple","polizaList");
+            graph.addSubgraph("cliente").addAttributeNodes("idcliente", "nombre", "apellidopaterno", "apellidomaterno", "nacimiento", "polizaGmmList", "polizaVidaList", "asegurado", "notificacionCumple", "polizaList");
             Map<String, Object> properties = new HashMap<>();
             properties.put("javax.pesistence.loadgraph", graph);
             return em.find(Asegurado.class, idcliente, properties);
         } finally {
             em.close();
         }
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return Asegurado.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdcliente";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idcliente";
     }
 
 }

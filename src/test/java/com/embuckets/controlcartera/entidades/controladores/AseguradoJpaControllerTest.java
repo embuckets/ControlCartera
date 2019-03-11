@@ -12,6 +12,7 @@ import com.embuckets.controlcartera.entidades.Email;
 import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -42,6 +43,7 @@ public class AseguradoJpaControllerTest {
 
     EntityManagerFactory entityManagerFactory;
     EntityManager em;
+    BaseDeDatos bd;
 
     public AseguradoJpaControllerTest() {
     }
@@ -56,36 +58,13 @@ public class AseguradoJpaControllerTest {
 
     @Before
     public void setUp() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("cartera");
+        bd = BaseDeDatos.getInstance();
+//        entityManagerFactory = Persistence.createEntityManagerFactory("cartera");
     }
 
     @After
     public void tearDown() {
-        if (em != null) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().commit();
-            }
-            em.close();
-        }
-        if (entityManagerFactory != null) {
-            entityManagerFactory.close();//java.sql.SQLException: Cannot close a connection while a transaction is still active.
-        }
-        try {
-            DriverManager.getConnection("jdbc:derby:;shutdown=true");
-        } catch (SQLException ex) {
-            if (((ex.getErrorCode() == 50000)
-                    && ("XJ015".equals(ex.getSQLState())))) {
-                // we got the expected exception
-//                System.out.println("Derby shut down normally");
-                // Note that for single database shutdown, the expected
-                // SQL state is "08006", and the error code is 45000.
-            } else {
-                // if the error code or SQLState is different, we have
-                // an unexpected exception (shutdown failed)
-//                System.err.println("Derby did not shut down normally");
-                Logger.getLogger(AseguradoJpaControllerTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        bd.close();
     }
 
     /**
@@ -128,7 +107,7 @@ public class AseguradoJpaControllerTest {
 //        clienteJpaController.create(asegurado.getCliente());
 //        clienteJpaController.getEntityManager().createNamedQuery("")
 
-        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+        AseguradoJpaController instance = new AseguradoJpaController();
         instance.create(asegurado);
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
@@ -160,7 +139,7 @@ public class AseguradoJpaControllerTest {
 //        clienteJpaController.create(asegurado.getCliente());
 //        clienteJpaController.getEntityManager().createNamedQuery("")
 
-        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+        AseguradoJpaController instance = new AseguradoJpaController();
         instance.create(asegurado);
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
@@ -193,7 +172,7 @@ public class AseguradoJpaControllerTest {
 //        clienteJpaController.create(asegurado.getCliente());
 //        clienteJpaController.getEntityManager().createNamedQuery("")
 
-        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+        AseguradoJpaController instance = new AseguradoJpaController();
         instance.create(asegurado);
         asegurado.getCliente().setApellidopaterno("OtroAppellido");
         asegurado.setRfc("RFC" + random);
@@ -218,7 +197,7 @@ public class AseguradoJpaControllerTest {
         asegurado.getCliente().setApellidomaterno("Materno" + random);
         asegurado.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 22));
         asegurado.setTipopersona(new TipoPersona("Fisica"));
-        AseguradoJpaController controller = new AseguradoJpaController(entityManagerFactory);
+        AseguradoJpaController controller = new AseguradoJpaController();
         controller.create(asegurado);
         Asegurado retrieved = controller.findAsegurado(asegurado.getId());
         retrieved.setNota("nueva nota");
@@ -233,7 +212,7 @@ public class AseguradoJpaControllerTest {
     @Test
     public void testRetrieveAndEdit() throws Exception {
         System.out.println("edit");
-        AseguradoJpaController controller = new AseguradoJpaController(entityManagerFactory);
+        AseguradoJpaController controller = new AseguradoJpaController();
         Asegurado retrieved = controller.findAsegurado(1504);
         System.out.println(retrieved.nombreProperty());
         System.out.println(retrieved.getTipopersona().getTipopersona());
@@ -280,7 +259,7 @@ public class AseguradoJpaControllerTest {
         System.out.println("findAseguradoEntities");
         int maxResults = 10;
         int firstResult = 0;
-//        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+//        AseguradoJpaController instance = new AseguradoJpaController();
 //        List<Asegurado> expResult = null;
 //        List<Asegurado> result = instance.findAllAsegurados();
 //        for (Asegurado asegurado : result) {
@@ -317,7 +296,7 @@ public class AseguradoJpaControllerTest {
     @Test
     public void testfindAseguradoCompleto() {
         System.out.println("findAseguradoCompleto");
-        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+        AseguradoJpaController instance = new AseguradoJpaController();
 //        em = instance.getEntityManager();
         Asegurado expResult = instance.findAseguradoCompleto(1504);
 //        Asegurado expResult = instance.findAseguradoCompletoConApi(1504);
@@ -342,7 +321,7 @@ public class AseguradoJpaControllerTest {
     @Test
     public void testfindAseguradoCompletoConEntityManager() {
         System.out.println("findAseguradoCompleto");
-        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+        AseguradoJpaController instance = new AseguradoJpaController();
         em = instance.getEntityManager();
 //        Asegurado expResult = instance.findAseguradoCompleto(1504);
 //        Asegurado expResult = instance.findAseguradoCompletoConApi(1504);
@@ -367,7 +346,7 @@ public class AseguradoJpaControllerTest {
     @Test
     public void testfindAseguradoConCliente() {
         System.out.println("findAseguradoConCliente");
-        AseguradoJpaController instance = new AseguradoJpaController(entityManagerFactory);
+        AseguradoJpaController instance = new AseguradoJpaController();
         Asegurado expResult = instance.findAseguradoConCliente(1504);
 //        Asegurado expResult = instance.findAseguradoCompletoConApi(1504);
         assertNotNull(expResult.getCliente().nombreProperty());

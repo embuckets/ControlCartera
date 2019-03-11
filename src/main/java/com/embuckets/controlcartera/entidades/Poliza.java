@@ -92,7 +92,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado contratante;
     @JoinColumn(name = "ASEGURADORA", referencedColumnName = "ASEGURADORA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Aseguradora aseguradora;
     @JoinColumn(name = "TITULAR", referencedColumnName = "IDCLIENTE")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -107,10 +107,10 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private FormaPago formapago;
     @JoinColumn(name = "PRIMAMONEDA", referencedColumnName = "MONEDA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Moneda primamoneda;
     @JoinColumn(name = "RAMO", referencedColumnName = "RAMO")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Ramo ramo;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaVida polizaVida;

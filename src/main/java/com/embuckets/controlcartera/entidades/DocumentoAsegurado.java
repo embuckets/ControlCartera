@@ -59,7 +59,7 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado asegurado;
     @JoinColumn(name = "TIPODOCUMENTO", referencedColumnName = "TIPODOCUMENTO", insertable = false, updatable = false)
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private TipoDocumentoAsegurado tipoDocumentoAsegurado;
 
     public DocumentoAsegurado() {

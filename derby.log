@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Sat Mar 09 11:32:24 CST 2019:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0169-6383-51c3-00000590b950 
+Mon Mar 11 13:50:57 CST 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0169-6e4e-e2a4-0000059011e8 
 on database directory C:\Users\emilio\Documents\NetBeansProjects\ControlCartera\cartera with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
 Loaded from file:/C:/Users/emilio/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
 java.vendor=Oracle Corporation
@@ -12,8 +12,8 @@ os.version=10.0
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
 ----------------------------------------------------------------
-Sat Mar 09 11:33:10 CST 2019: Shutting down Derby engine
+Mon Mar 11 13:52:33 CST 2019: Shutting down Derby engine
 ----------------------------------------------------------------
-Sat Mar 09 11:33:10 CST 2019:
-Shutting down instance a816c00e-0169-6383-51c3-00000590b950 on database directory C:\Users\emilio\Documents\NetBeansProjects\ControlCartera\cartera with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
+Mon Mar 11 13:52:33 CST 2019:
+Shutting down instance a816c00e-0169-6e4e-e2a4-0000059011e8 on database directory C:\Users\emilio\Documents\NetBeansProjects\ControlCartera\cartera with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
 ----------------------------------------------------------------

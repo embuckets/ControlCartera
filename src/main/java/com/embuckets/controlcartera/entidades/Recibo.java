@@ -71,7 +71,7 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "recibo", fetch = FetchType.LAZY)
     private NotificacionRecibo notificacionRecibo;
     @JoinColumn(name = "COBRANZA", referencedColumnName = "COBRANZA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Cobranza cobranza;
     @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
