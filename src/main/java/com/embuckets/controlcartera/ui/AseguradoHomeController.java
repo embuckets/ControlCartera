@@ -22,7 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZoneId;
-import java.util.Date;
+import java.sql.Date;
+//import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -207,7 +208,7 @@ public class AseguradoHomeController implements Initializable, Controller {
         nombreTextField.setText(asegurado.getCliente().getNombre());
         paternoteTextField.setText(asegurado.getCliente().getApellidopaterno());
         maternoTextField.setText(asegurado.getCliente().getApellidomaterno());
-        nacimientoTextField.setText((asegurado.getCliente().getNacimiento() != null) ? asegurado.getCliente().getNacimiento().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString() : "");
+        nacimientoTextField.setText((asegurado.getCliente().getNacimiento() != null) ? asegurado.getCliente().getNacimiento().toString() : "");
         tipoPersonaTextField.setText(asegurado.getTipopersona().getTipopersona());
         rfcTextField.setText(asegurado.getRfc());
     }
@@ -771,7 +772,7 @@ public class AseguradoHomeController implements Initializable, Controller {
                 asegurado.getCliente().setNombre(nombreField.getText());
                 asegurado.getCliente().setApellidopaterno(paternoField.getText());
                 asegurado.getCliente().setApellidomaterno(maternoField.getText());
-                asegurado.getCliente().setNacimiento(Date.from(nacimientoPicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                asegurado.getCliente().setNacimiento(nacimientoPicker.getValue());
                 asegurado.setRfc(rfcField.getText());
                 return asegurado;
             }

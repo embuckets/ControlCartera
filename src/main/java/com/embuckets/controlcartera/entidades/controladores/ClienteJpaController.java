@@ -27,12 +27,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class ClienteJpaController implements Serializable {
+public class ClienteJpaController implements Serializable, JpaController {
 
     public ClienteJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public ClienteJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -365,5 +368,20 @@ public class ClienteJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return Cliente.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdcliente";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idcliente";
+    }
+
 }

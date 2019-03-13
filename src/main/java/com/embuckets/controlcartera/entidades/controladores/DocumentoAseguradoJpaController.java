@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class DocumentoAseguradoJpaController implements Serializable {
+public class DocumentoAseguradoJpaController implements Serializable, JpaController {
 
     public DocumentoAseguradoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public DocumentoAseguradoJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -207,5 +210,20 @@ public class DocumentoAseguradoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return DocumentoAsegurado.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdcliente";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idcliente";
+    }
+
 }

@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class EmailJpaController implements Serializable {
+public class EmailJpaController implements Serializable, JpaController {
 
     public EmailJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public EmailJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -205,5 +208,20 @@ public class EmailJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return Email.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdcliente";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idcliente";
+    }
+
 }

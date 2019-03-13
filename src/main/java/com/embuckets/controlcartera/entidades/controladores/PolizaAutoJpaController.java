@@ -26,12 +26,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class PolizaAutoJpaController implements Serializable {
+public class PolizaAutoJpaController implements Serializable, JpaController {
 
     public PolizaAutoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public PolizaAutoJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -286,5 +289,20 @@ public class PolizaAutoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return PolizaAuto.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdpoliza";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idpoliza";
+    }
+
 }

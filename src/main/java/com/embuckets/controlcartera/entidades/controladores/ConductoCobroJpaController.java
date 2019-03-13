@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class ConductoCobroJpaController implements Serializable {
+public class ConductoCobroJpaController implements Serializable, JpaController {
 
     public ConductoCobroJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public ConductoCobroJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -205,5 +208,35 @@ public class ConductoCobroJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        //DO NOTHING
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        return null;
+    }
+
+    @Override
+    public void remove(Object object) {
+        //DO NOTHING
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return ConductoCobro.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByConductocobro";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "conductocobro";
+    }
+
 }

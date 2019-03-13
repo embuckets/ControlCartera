@@ -24,9 +24,9 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class CaratulaJpaController implements Serializable {
+public class CaratulaJpaController implements Serializable, JpaController {
 
-    public CaratulaJpaController(EntityManagerFactory emf) {
+    public CaratulaJpaController() {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
@@ -199,5 +199,20 @@ public class CaratulaJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return Caratula.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdpoliza";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idpoliza";
+    }
+
 }

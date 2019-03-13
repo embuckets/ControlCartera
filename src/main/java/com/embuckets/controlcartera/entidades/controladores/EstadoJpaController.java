@@ -7,15 +7,10 @@ package com.embuckets.controlcartera.entidades.controladores;
 
 import java.io.Serializable;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.Estado;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
-import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -262,11 +257,7 @@ public class EstadoJpaController implements Serializable, JpaController {
 //            throw ex;
 //        }
     }
-
-//    @Override
-//    public <T> List<T> getAllById(int id) throws Exception {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
+    
     @Override
     public String getControlledClassName() {
         return Estado.class.getSimpleName();

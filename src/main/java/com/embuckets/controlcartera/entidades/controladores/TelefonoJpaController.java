@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class TelefonoJpaController implements Serializable {
+public class TelefonoJpaController implements Serializable, JpaController {
 
     public TelefonoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public TelefonoJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -205,5 +208,20 @@ public class TelefonoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return Telefono.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdcliente";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idcliente";
+    }
+
 }

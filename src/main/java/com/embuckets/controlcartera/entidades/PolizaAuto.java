@@ -47,7 +47,7 @@ public class PolizaAuto implements Serializable {
     @JoinColumn(name = "SUMAASEGURADAAUTO", referencedColumnName = "SUMAASEGURADAAUTO")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private SumaAseguradaAuto sumaaseguradaauto;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idpoliza", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "idpoliza", fetch = FetchType.LAZY)
     private List<Auto> autoList;
 
     public PolizaAuto() {

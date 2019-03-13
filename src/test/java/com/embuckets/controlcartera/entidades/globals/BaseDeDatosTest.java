@@ -6,16 +6,30 @@
 package com.embuckets.controlcartera.entidades.globals;
 
 import com.embuckets.controlcartera.entidades.Asegurado;
+import com.embuckets.controlcartera.entidades.Aseguradora;
+import com.embuckets.controlcartera.entidades.Auto;
 import com.embuckets.controlcartera.entidades.Cliente;
+import com.embuckets.controlcartera.entidades.ConductoCobro;
 import com.embuckets.controlcartera.entidades.Delegacion;
 import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.Estado;
+import com.embuckets.controlcartera.entidades.EstadoPoliza;
+import com.embuckets.controlcartera.entidades.FormaPago;
+import com.embuckets.controlcartera.entidades.Moneda;
+import com.embuckets.controlcartera.entidades.Poliza;
+import com.embuckets.controlcartera.entidades.PolizaAuto;
+import com.embuckets.controlcartera.entidades.PolizaVida;
+import com.embuckets.controlcartera.entidades.Ramo;
+import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.controladores.AseguradoJpaController;
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -115,7 +129,7 @@ public class BaseDeDatosTest {
     @Test
     public void testgetById() {
         System.out.println("getById");
-        Asegurado asegurado = bd.getById(Asegurado.class, 1509);
+        Asegurado asegurado = bd.getById(Asegurado.class, 1513);
         assertNotNull(asegurado.getCliente());
         assertNotNull(asegurado.getIddomicilio());
         assertNotNull(asegurado.getIddomicilio().getDelegacion());
@@ -162,6 +176,164 @@ public class BaseDeDatosTest {
         assertNotNull(asegurado);
         bd.remove(asegurado);
         assertNull(bd.getById(Asegurado.class, id));
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testCreatePolizaVida() {
+        System.out.println("testCreatePoliza");
+        Asegurado asegurado = bd.getById(Asegurado.class, 1513);
+        assertNotNull(asegurado);
+
+        Poliza poliza1 = new Poliza();
+        poliza1.setNumero("numeor1");
+        poliza1.setAseguradora(new Aseguradora("GNP"));
+        poliza1.setRamo(new Ramo("vida"));
+        poliza1.setProducto("producto");
+        poliza1.setPlan("plan");
+        poliza1.setPrima(new BigDecimal(21456));
+        poliza1.setPrimamoneda(new Moneda("pesos"));
+        poliza1.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(15))));
+        poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        poliza1.setEstado(new EstadoPoliza("Vigente"));
+        poliza1.setConductocobro(new ConductoCobro("agente"));
+        poliza1.setFormapago(new FormaPago("semestral"));
+        Cliente benef = new Cliente("beneficiario1", "hijo", "hijo");
+        benef.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
+        poliza1.setPolizaVida(new PolizaVida());
+        poliza1.getPolizaVida().setPoliza(poliza1);
+        poliza1.getPolizaVida().setSumaasegurada(BigDecimal.valueOf(50000));
+        poliza1.getPolizaVida().setSumaaseguradamoneda(new Moneda("Dolares"));
+        poliza1.getPolizaVida().getClienteList().add(benef);
+        poliza1.generarRecibos(3, new BigDecimal(10123.12), new BigDecimal(9123.12));
+
+        poliza1.setTitular(asegurado.getCliente());
+        poliza1.setContratante(asegurado);
+
+        asegurado.getPolizaList().add(poliza1);
+        bd.create(poliza1);
+        Poliza retrieved = bd.getById(Poliza.class, poliza1.getIdpoliza());
+        assertNotNull(retrieved);
+        assertNotNull(retrieved.getPolizaVida());
+        assertNotNull(retrieved.getPolizaVida().getClienteList());
+        assertTrue(retrieved.getPolizaVida().getClienteList().size() > 0);
+        assertNotNull(benef.getIdcliente());
+
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testCreatePolizaAuto() {
+        System.out.println("testCreatePoliza");
+        Asegurado asegurado = bd.getById(Asegurado.class, 1513);
+        assertNotNull(asegurado);
+
+        Poliza poliza2 = new Poliza();
+        poliza2.setNumero("numeor2");
+        poliza2.setAseguradora(new Aseguradora("GNP"));
+        poliza2.setRamo(new Ramo("autos"));
+        poliza2.setProducto("producto");
+        poliza2.setPlan("plan");
+        poliza2.setPrima(new BigDecimal(54789));
+        poliza2.setPrimamoneda(new Moneda("pesos"));
+        poliza2.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(20))));
+        poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        poliza2.setEstado(new EstadoPoliza("Cancelada"));
+        poliza2.setPolizaAuto(new PolizaAuto());
+        poliza2.getPolizaAuto().setPoliza(poliza2);//changed
+        poliza2.getPolizaAuto().setSumaaseguradaauto(new SumaAseguradaAuto("Factura"));
+        Auto auto = new Auto();
+        auto.setDescripcion("STD 4PT RL");
+        auto.setMarca("VW");
+        auto.setSubmarca("Jetta");
+        auto.setModelo(Year.of(2016));
+        auto.setIdpoliza(poliza2.getPolizaAuto());
+        poliza2.getPolizaAuto().getAutoList().add(auto);
+        poliza2.setConductocobro(new ConductoCobro("agente"));
+        poliza2.setFormapago(new FormaPago("Semestral"));
+        poliza2.generarRecibos(4, new BigDecimal(10123.12), new BigDecimal(9123.12));
+
+        poliza2.setTitular(asegurado.getCliente());
+        poliza2.setContratante(asegurado);
+
+        asegurado.getPolizaList().add(poliza2);
+        bd.create(poliza2);
+        Poliza retrieved = bd.getById(Poliza.class, poliza2.getIdpoliza());
+        assertNotNull(retrieved);
+        assertNotNull(retrieved.getPolizaAuto());
+        assertNotNull(retrieved.getPolizaAuto().getAutoList());
+        assertTrue(retrieved.getPolizaAuto().getAutoList().size() > 0);
+        assertNotNull(auto.getIdauto());
+
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testGetPolizaVida() {
+        System.out.println("testGetPolizaVida");
+        Poliza retrieved = bd.getById(Poliza.class, 13);
+        assertNotNull(retrieved);
+        assertNotNull(retrieved.getPolizaVida());
+        assertNotNull(retrieved.getPolizaVida().getClienteList());
+        assertTrue(retrieved.getPolizaVida().getClienteList().size() > 0);
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testGetPolizaAutoAndRemove() {
+        System.out.println("testGetPolizaAutoAndRemove");
+        int id = 16;
+        Poliza retrieved = bd.getById(Poliza.class, id);
+        assertNotNull(retrieved);
+        bd.remove(retrieved);
+        assertNull(bd.getById(Poliza.class, id));
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testCreateAuto() {
+        System.out.println("testCreateAuto");
+        int id = 5;
+        Poliza poliza = bd.getById(Poliza.class, id);
+        assertNotNull(poliza);
+        Auto nuevoAuto = new Auto();
+        nuevoAuto.setDescripcion("NUEVO AUTO");
+        nuevoAuto.setMarca("NUEVO AUTO");
+        nuevoAuto.setSubmarca("NUEVO AUTO");
+        nuevoAuto.setModelo(Year.parse("2017"));
+        nuevoAuto.setIdpoliza(poliza.getPolizaAuto());
+        bd.create(nuevoAuto);
+        assertNotNull(nuevoAuto.getIdauto());
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testRemoveAuto() {
+        System.out.println("testRemoveAuto");
+        int id = 5;
+        Poliza poliza = bd.getById(Poliza.class, id);
+        assertNotNull(poliza);
+        Auto auto = poliza.getPolizaAuto().getAutoList().get(0);
+        bd.remove(auto);
+        assertNull(bd.getById(Auto.class, auto.getIdauto()));
 //        assertNull(asegurado);
     }
 

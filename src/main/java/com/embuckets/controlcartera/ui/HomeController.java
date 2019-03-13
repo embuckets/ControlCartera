@@ -242,17 +242,17 @@ public class HomeController implements Initializable, Controller {
      */
     private List<? extends ObservableTreeItem> getAsegurados() {
         //TODO: pedir al sistema ControlCartera todos los asegurados
-        return createAseguradosFalsos();
+        return MainApp.getInstance().getBaseDeDatos().getAll(Asegurado.class);
     }
 
     private List<Asegurado> createAseguradosFalsos() {
         Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
         asegurado1.setIdcliente(1);
         asegurado1.getCliente().setIdcliente(1);
-        asegurado1.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:01.00Z")));
+        asegurado1.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
         asegurado1.setTipopersona(new TipoPersona("Fisica"));
         Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
-        asegurado2.getCliente().setNacimiento(Date.from(Instant.parse("1994-09-23T00:00:01.00Z")));
+        asegurado2.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
         asegurado2.setIdcliente(2);
         asegurado2.getCliente().setIdcliente(2);
         asegurado2.setTipopersona(new TipoPersona("Fisica"));
@@ -351,7 +351,8 @@ public class HomeController implements Initializable, Controller {
 //    }
     private List<? extends Cliente> getClientes() {
         //TODO: pedir clientes que cumplan
-        return createClientesFalsos();
+        return MainApp.getInstance().getBaseDeDatos().getAll(Cliente.class);
+//        return createClientesFalsos();
     }
 
     private List<Cliente> createClientesFalsos() {
@@ -421,7 +422,7 @@ public class HomeController implements Initializable, Controller {
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevoAsegurado.fxml");
     }
-    
+
     public void abrirSceneNuevaPoliza(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevaPoliza.fxml");
     }

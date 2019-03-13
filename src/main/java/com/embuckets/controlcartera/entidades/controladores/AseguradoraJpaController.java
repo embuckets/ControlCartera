@@ -24,11 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class AseguradoraJpaController implements Serializable {
+public class AseguradoraJpaController implements Serializable, JpaController {
 
     public AseguradoraJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
+
+    public AseguradoraJpaController() {
+    }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
@@ -205,5 +209,30 @@ public class AseguradoraJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        //DO NOTHING
+    }
+
+    @Override
+    public void remove(Object object) {
+        //DO NOTHING
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return Aseguradora.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByAseguradora";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "aseguradora";
+    }
+
 }

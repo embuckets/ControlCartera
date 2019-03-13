@@ -9,7 +9,8 @@ import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
+import java.sql.Date;
+//import java.util.Date;
 import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -137,16 +138,21 @@ public class Cliente implements Serializable, ObservableCliente {
         return nacimiento;
     }
 
-    public LocalDate getNacimientoLocalDate() {
-        return nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    }
+//    public String getNacimientoString() {
+//        return getNacimientoLocalDate().toString();
+//    }
+
+//    public LocalDate getNacimientoLocalDate() {
+//        return nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//    }
 
     public void setNacimiento(Date nacimiento) {
         this.nacimiento = nacimiento;
     }
 
     public void setNacimiento(LocalDate nacimiento) {
-        this.nacimiento = Date.from(nacimiento.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.nacimiento = Date.valueOf(nacimiento);
+//        this.nacimiento = Date.from(nacimiento.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     @XmlTransient

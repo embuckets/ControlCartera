@@ -25,12 +25,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class NotificacionCumpleJpaController implements Serializable {
+public class NotificacionCumpleJpaController implements Serializable, JpaController {
 
     public NotificacionCumpleJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public NotificacionCumpleJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -228,5 +231,20 @@ public class NotificacionCumpleJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return NotificacionCumple.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdcliente";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idcliente";
+    }
+
 }

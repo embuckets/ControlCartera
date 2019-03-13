@@ -11,6 +11,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import com.embuckets.controlcartera.entidades.Telefono;
+import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
@@ -23,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class TipoTelefonoJpaController implements Serializable {
+public class TipoTelefonoJpaController implements Serializable, JpaController {
 
     public TipoTelefonoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public TipoTelefonoJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -192,5 +196,36 @@ public class TipoTelefonoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        //DO NOTHING
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        //DO NOTHING
+        return null;
+    }
+
+    @Override
+    public void remove(Object object) {
+        //DO NOTHING
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return TipoTelefono.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByTipotelefono";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "tipotelefono";
+    }
+
 }

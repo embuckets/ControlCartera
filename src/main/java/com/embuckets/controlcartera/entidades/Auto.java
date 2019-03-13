@@ -7,7 +7,6 @@ package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.ui.observable.ObservableAuto;
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;

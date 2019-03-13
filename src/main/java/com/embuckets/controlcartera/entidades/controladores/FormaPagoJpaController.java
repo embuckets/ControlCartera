@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class FormaPagoJpaController implements Serializable {
+public class FormaPagoJpaController implements Serializable, JpaController {
 
     public FormaPagoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public FormaPagoJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -205,5 +208,36 @@ public class FormaPagoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        //DO NOTHING
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        //DO NOTHING
+        return null;
+    }
+
+    @Override
+    public void remove(Object object) {
+        //DO NOTHING
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return FormaPago.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByFormapago";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "formapago";
+    }
+
 }

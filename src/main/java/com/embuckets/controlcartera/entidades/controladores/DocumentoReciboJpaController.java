@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class DocumentoReciboJpaController implements Serializable {
+public class DocumentoReciboJpaController implements Serializable, JpaController {
 
     public DocumentoReciboJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public DocumentoReciboJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -198,6 +201,21 @@ public class DocumentoReciboJpaController implements Serializable {
         } finally {
             em.close();
         }
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return DocumentoRecibo.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdrecibo";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idrecibo";
     }
     
 }

@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class RamoJpaController implements Serializable {
+public class RamoJpaController implements Serializable, JpaController {
 
     public RamoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public RamoJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -205,5 +208,36 @@ public class RamoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        //DO NOTHING
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        //DO NOTHING
+        return null;
+    }
+
+    @Override
+    public void remove(Object object) {
+        //DO NOTHING
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return Ramo.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByRamo";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "ramo";
+    }
+
 }

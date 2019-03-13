@@ -8,7 +8,6 @@ package com.embuckets.controlcartera.entidades.controladores;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -18,7 +17,20 @@ import javax.persistence.Query;
  */
 public interface JpaController {
 
-    void create(Object object) throws PreexistingEntityException, Exception;
+    default void create(Object object) throws PreexistingEntityException, Exception {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+            em.persist(object);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
 
     default <T> List<T> getAll() {
         EntityManager em = null;
@@ -79,8 +91,21 @@ public interface JpaController {
         }
     }
 
-    void remove(Object object);
-
+    default void remove(Object object) {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+            em.remove(object);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+    
     String getControlledClassName();
 
     String getFindByIdNamedQuery();

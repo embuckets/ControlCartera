@@ -14,6 +14,7 @@ import com.embuckets.controlcartera.entidades.Caratula;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Aseguradora;
+import com.embuckets.controlcartera.entidades.Auto;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.ConductoCobro;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
@@ -26,6 +27,8 @@ import com.embuckets.controlcartera.entidades.PolizaGmm;
 import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -35,9 +38,9 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class PolizaJpaController implements Serializable {
+public class PolizaJpaController implements Serializable, JpaController {
 
-    public PolizaJpaController(EntityManagerFactory emf) {
+    public PolizaJpaController() {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
@@ -603,5 +606,88 @@ public class PolizaJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        EntityManager em = null;
+        Poliza poliza = (Poliza) object;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+
+            em.persist(poliza);
+
+            if (poliza.getPolizaAuto() != null) {
+                poliza.getPolizaAuto().setPoliza(poliza);
+                poliza.getPolizaAuto().setIdpoliza(poliza.getIdpoliza());
+                em.persist(poliza.getPolizaAuto());
+                for (Auto auto : poliza.getPolizaAuto().getAutoList()) {
+                    em.persist(auto);
+                }
+            }
+            if (poliza.getPolizaGmm() != null) {
+                poliza.getPolizaGmm().setPoliza(poliza);
+                poliza.getPolizaGmm().setIdpoliza(poliza.getIdpoliza());
+                em.persist(poliza.getPolizaGmm());
+                for (Cliente cliente : poliza.getPolizaGmm().getClienteList()) {
+                    em.persist(cliente);
+                    Query query = em.createNativeQuery("INSERT INTO APP.DEPENDIENTE (IDCLIENTE, IDPOLIZA) VALUES (:idcliente, :idpoliza)");
+                    query.setParameter("idcliente", cliente.getIdcliente());
+                    query.setParameter("idpoliza", poliza.getIdpoliza());
+                    query.executeUpdate();
+                }
+            }
+            if (poliza.getPolizaVida() != null) {
+                poliza.getPolizaVida().setPoliza(poliza);
+                poliza.getPolizaVida().setIdpoliza(poliza.getIdpoliza());
+                em.persist(poliza.getPolizaVida());
+                for (Cliente cliente : poliza.getPolizaVida().getClienteList()) {
+                    em.persist(cliente);
+                    Query query = em.createNativeQuery("INSERT INTO APP.BENEFICIARIO (IDCLIENTE, IDPOLIZA) VALUES (:idcliente, :idpoliza)");
+                    query.setParameter("idcliente", cliente.getIdcliente());
+                    query.setParameter("idpoliza", poliza.getIdpoliza());
+                    query.executeUpdate();
+
+                    //TODOñ persistit benef
+                }
+            }
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+//    @Override
+//    public void remove(Object object) {
+//        EntityManager em = getEntityManager();
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            em.getTransaction().begin();
+//            em.remove(object);
+//            em.getReference(entityClass, object)
+//            
+//            
+//        } finally {
+//            em.close();
+//        }
+//    }
+
+    @Override
+    public String getControlledClassName() {
+        return Poliza.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdpoliza";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idpoliza";
+    }
+
 }

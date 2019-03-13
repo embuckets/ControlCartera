@@ -13,6 +13,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -21,9 +23,9 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class AutoJpaController implements Serializable {
+public class AutoJpaController implements Serializable, JpaController {
 
-    public AutoJpaController(EntityManagerFactory emf) {
+    public AutoJpaController() {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
@@ -164,5 +166,58 @@ public class AutoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+//    @Override
+//    public void create(Object object) throws PreexistingEntityException, Exception {
+//        EntityManager em = null;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            em.getTransaction().begin();
+//            em.persist(object);
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
+//    @Override
+//    public void remove(Object object) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
+    @Override
+    public void remove(Object object) {
+        EntityManager em = null;
+        Auto auto = (Auto) object;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+            auto.getIdpoliza().getAutoList().remove(auto);
+            em.merge(auto.getIdpoliza());
+            em.remove(auto);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return Auto.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdauto";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idauto";
+    }
+
 }

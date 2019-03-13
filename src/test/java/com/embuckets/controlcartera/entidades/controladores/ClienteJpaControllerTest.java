@@ -77,7 +77,7 @@ public class ClienteJpaControllerTest {
         cliente.setNombre("Daniel");
         cliente.setApellidopaterno("Hernandez");
         cliente.setApellidomaterno("Segovia");
-        cliente.setNacimiento(Date.from(Instant.now()));
+        cliente.setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
         ClienteJpaController instance = new ClienteJpaController(entityManagerFactory);
         instance.create(cliente);
         System.out.println("ID: " + cliente.getIdcliente());

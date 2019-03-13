@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class SumaAseguradaAutoJpaController implements Serializable {
+public class SumaAseguradaAutoJpaController implements Serializable, JpaController {
 
     public SumaAseguradaAutoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public SumaAseguradaAutoJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -205,5 +208,36 @@ public class SumaAseguradaAutoJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        //DO NOTHING
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        //DO NOTHING
+        return null;
+    }
+
+    @Override
+    public void remove(Object object) {
+        //DO NOTHING
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return SumaAseguradaAuto.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findBySumaaseguradaauto";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "sumaaseguradaauto";
+    }
+
 }

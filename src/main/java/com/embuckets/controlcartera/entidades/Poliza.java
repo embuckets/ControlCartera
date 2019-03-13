@@ -86,7 +86,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     private String nota;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
     private Caratula caratula;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaAuto polizaAuto;
     @JoinColumn(name = "CONTRATANTE", referencedColumnName = "IDCLIENTE")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -112,9 +112,9 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     @JoinColumn(name = "RAMO", referencedColumnName = "RAMO")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Ramo ramo;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaVida polizaVida;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaGmm polizaGmm;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idpoliza", fetch = FetchType.LAZY)
     private List<Recibo> reciboList;

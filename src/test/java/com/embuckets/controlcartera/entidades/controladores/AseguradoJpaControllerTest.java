@@ -93,7 +93,7 @@ public class AseguradoJpaControllerTest {
         asegurado.getCliente().setNombre("Cliente" + random);
         asegurado.getCliente().setApellidopaterno("Paterno" + random);
         asegurado.getCliente().setApellidomaterno("Materno" + random);
-        asegurado.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:00.00Z")));
+        asegurado.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
         asegurado.setTipopersona(new TipoPersona("Fisica"));
         asegurado.setIddomicilio(new Domicilio());
         asegurado.getIddomicilio().setCalle("Calle" + random);
@@ -125,7 +125,7 @@ public class AseguradoJpaControllerTest {
         asegurado.getCliente().setNombre("Cliente" + random);
         asegurado.getCliente().setApellidopaterno("Paterno" + random);
         asegurado.getCliente().setApellidomaterno("Materno" + random);
-        asegurado.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:00.00Z")));
+        asegurado.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
         asegurado.setTipopersona(new TipoPersona("Fisica"));
         asegurado.setIddomicilio(new Domicilio());
         asegurado.getIddomicilio().setCalle("Calle" + random);
@@ -157,7 +157,7 @@ public class AseguradoJpaControllerTest {
         asegurado.getCliente().setNombre("Cliente" + random);
         asegurado.getCliente().setApellidopaterno("Paterno" + random);
         asegurado.getCliente().setApellidomaterno("Materno" + random);
-        asegurado.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:00.00Z")));
+        asegurado.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
         asegurado.setTipopersona(new TipoPersona("Fisica"));
         asegurado.setIddomicilio(new Domicilio());
         asegurado.getIddomicilio().setCalle("Calle" + random);

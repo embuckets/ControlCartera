@@ -32,6 +32,7 @@
 package com.embuckets.controlcartera.ui;
 
 //import dominio.ControlCartera;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -50,11 +51,13 @@ public class MainApp extends Application {
     private Stage mainStage;
     private static MainApp instance;
     private Deque<Pair<Object, String>> windowStack;
+    private BaseDeDatos bd;
 //    private ControlCartera controlCartera;
 
     public MainApp() {
         instance = this;
         windowStack = new ArrayDeque<>();
+        this.bd = BaseDeDatos.getInstance();
     }
 
     public static MainApp getInstance() {
@@ -118,7 +121,7 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource((String) pair.getValue()));
         Parent page = (Parent) loader.load();
         Controller controller = loader.<Controller>getController();
-        controller.setData(((Controller)pair.getKey()).getData());
+        controller.setData(((Controller) pair.getKey()).getData());
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -145,12 +148,16 @@ public class MainApp extends Application {
     @Override
     public void stop() throws Exception {
         System.out.println("Closing control cartera");
-//        ControlCartera.getInstance().detenerBaseDeDatos();
+        bd.close();
         super.stop(); //To change body of generated methods, choose Tools | Templates.
     }
 
     public Stage getStage() {
         return mainStage;
+    }
+
+    public BaseDeDatos getBaseDeDatos() {
+        return this.bd;
     }
 
 }

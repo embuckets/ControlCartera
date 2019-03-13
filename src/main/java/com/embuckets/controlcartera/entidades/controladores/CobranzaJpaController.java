@@ -24,7 +24,25 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class CobranzaJpaController implements Serializable {
+public class CobranzaJpaController implements Serializable, JpaController {
+
+    public CobranzaJpaController() {
+    }
+
+    @Override
+    public void remove(Object object) {
+        //DO NOTHING
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        return null;
+    }
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        //DO NOTHING
+    }
 
     public CobranzaJpaController(EntityManagerFactory emf) {
         this.emf = emf;
@@ -205,5 +223,20 @@ public class CobranzaJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return Cobranza.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByCobranza";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "cobranza";
+    }
+
 }
