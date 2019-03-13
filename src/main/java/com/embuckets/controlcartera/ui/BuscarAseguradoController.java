@@ -124,7 +124,8 @@ public class BuscarAseguradoController implements Initializable {
 
     private List<Asegurado> getAllAsegurados() {
         //TODO: leer asegurados de base de datos
-        return createAseguradosFalsos();
+        return MainApp.getInstance().getBaseDeDatos().getAll(Asegurado.class);
+//        return createAseguradosFalsos();
     }
 
     @FXML
@@ -166,8 +167,8 @@ public class BuscarAseguradoController implements Initializable {
         poliza1.setPlan("plan");
         poliza1.setPrima(new BigDecimal(21456));
         poliza1.setPrimamoneda(new Moneda("pesos"));
-        poliza1.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(15))));
-        poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        poliza1.setIniciovigencia(LocalDate.now());
+        poliza1.setFinvigencia(LocalDate.now().plusMonths(12));
         poliza1.setEstado(new EstadoPoliza("Vigente"));
         poliza1.setConductocobro(new ConductoCobro("agente"));
         poliza1.setFormapago(new FormaPago("mensual"));
@@ -188,8 +189,8 @@ public class BuscarAseguradoController implements Initializable {
         poliza2.setPlan("plan");
         poliza2.setPrima(new BigDecimal(54789));
         poliza2.setPrimamoneda(new Moneda("pesos"));
-        poliza2.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(20))));
-        poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        poliza2.setIniciovigencia(LocalDate.now());
+        poliza2.setFinvigencia(LocalDate.now().plusMonths(12));
         poliza2.setEstado(new EstadoPoliza("Cancelada"));
         poliza2.setPolizaAuto(new PolizaAuto(2));
         poliza2.getPolizaAuto().setSumaaseguradaauto(new SumaAseguradaAuto("Factura"));
@@ -214,8 +215,8 @@ public class BuscarAseguradoController implements Initializable {
         poliza3.setPlan("plan");
         poliza3.setPrima(new BigDecimal(12456));
         poliza3.setPrimamoneda(new Moneda("PESOS"));
-        poliza3.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(5))));
-        poliza3.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        poliza3.setIniciovigencia(LocalDate.now());
+        poliza3.setFinvigencia(LocalDate.now().plusMonths(12));
         poliza3.setEstado(new EstadoPoliza("No vigente"));
         poliza3.setConductocobro(new ConductoCobro("agente"));
         poliza3.setFormapago(new FormaPago(Globals.FORMA_PAGO_TRIMESTRAL));

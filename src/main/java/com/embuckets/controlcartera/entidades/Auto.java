@@ -63,8 +63,8 @@ public class Auto implements Serializable, ObservableAuto {
     private String submarca;
     @Basic(optional = false)
     @Column(name = "MODELO")
-    @Temporal(TemporalType.DATE)
-    private Date modelo;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate modelo;
     @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PolizaAuto idpoliza;
@@ -81,7 +81,7 @@ public class Auto implements Serializable, ObservableAuto {
         this.descripcion = descripcion;
         this.marca = marca;
         this.submarca = submarca;
-        this.modelo = Date.from(LocalDate.of(modelo.getValue(), Month.JANUARY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.modelo = LocalDate.of(modelo.getValue(), Month.JANUARY, 1);
     }
 
     public Integer getIdauto() {
@@ -116,12 +116,12 @@ public class Auto implements Serializable, ObservableAuto {
         this.submarca = submarca;
     }
 
-    public Date getModelo() {
+    public LocalDate getModelo() {
         return modelo;
     }
 
     public void setModelo(Year modelo) {
-        this.modelo = Date.from(LocalDate.of(modelo.getValue(), Month.JANUARY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.modelo = LocalDate.of(modelo.getValue(), Month.JANUARY, 1);
     }
 
     public PolizaAuto getIdpoliza() {
@@ -174,7 +174,7 @@ public class Auto implements Serializable, ObservableAuto {
 
     @Override
     public StringProperty modeloProperty() {
-        return new SimpleStringProperty("" + modelo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getYear());
+        return new SimpleStringProperty("" + modelo.getYear());
     }
 
 }

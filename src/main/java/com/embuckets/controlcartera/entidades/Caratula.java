@@ -7,6 +7,7 @@ package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -56,8 +57,8 @@ public class Caratula implements Serializable, ObservableDocumento {
     @Column(name = "ARCHIVO")
     private Serializable archivo;
     @Column(name = "ACTUALIZADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualizado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime actualizado;
     @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA", insertable = false, updatable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Poliza poliza;
@@ -108,11 +109,11 @@ public class Caratula implements Serializable, ObservableDocumento {
         this.archivo = archivo;
     }
 
-    public Date getActualizado() {
+    public LocalDateTime getActualizado() {
         return actualizado;
     }
 
-    public void setActualizado(Date actualizado) {
+    public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 

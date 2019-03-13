@@ -713,7 +713,7 @@ public class AseguradoHomeController implements Initializable, Controller {
         paternoField.setText(asegurado.getCliente().getApellidopaterno());
         TextField maternoField = new TextField();
         maternoField.setText(asegurado.getCliente().getApellidomaterno());
-        DatePicker nacimientoPicker = new DatePicker(asegurado.getCliente().getNacimiento().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        DatePicker nacimientoPicker = new DatePicker(asegurado.getCliente().getNacimiento());
 
         RadioButton personaFisicaRadioButton = new RadioButton("Física");
         RadioButton personaMoralRadioButton = new RadioButton("Moral");

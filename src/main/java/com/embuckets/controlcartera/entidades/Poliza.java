@@ -72,12 +72,12 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     private String plan;
     @Basic(optional = false)
     @Column(name = "INICIOVIGENCIA")
-    @Temporal(TemporalType.DATE)
-    private Date iniciovigencia;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate iniciovigencia;
     @Basic(optional = false)
     @Column(name = "FINVIGENCIA")
-    @Temporal(TemporalType.DATE)
-    private Date finvigencia;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate finvigencia;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @Column(name = "PRIMA")
@@ -128,7 +128,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         this.reciboList = new ArrayList<>();
     }
 
-    public Poliza(Integer idpoliza, String numero, Date iniciovigencia, Date finvigencia, BigDecimal prima) {
+    public Poliza(Integer idpoliza, String numero, LocalDate iniciovigencia, LocalDate finvigencia, BigDecimal prima) {
         this.idpoliza = idpoliza;
         this.numero = numero;
         this.iniciovigencia = iniciovigencia;
@@ -169,30 +169,28 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         this.plan = plan;
     }
 
-    public Date getIniciovigencia() {
+    public LocalDate getIniciovigencia() {
         return iniciovigencia;
     }
 
-    public void setIniciovigencia(Date iniciovigencia) {
+    public void setIniciovigencia(LocalDate iniciovigencia) {
         this.iniciovigencia = iniciovigencia;
     }
 
-    public void setIniciovigencia(LocalDate iniciovigencia) {
-        this.iniciovigencia = Date.from(iniciovigencia.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    }
-
-    public Date getFinvigencia() {
+//    public void setIniciovigencia(LocalDate iniciovigencia) {
+//        this.iniciovigencia = iniciovigencia;
+//    }
+    public LocalDate getFinvigencia() {
         return finvigencia;
     }
 
-    public void setFinvigencia(Date finvigencia) {
+    public void setFinvigencia(LocalDate finvigencia) {
         this.finvigencia = finvigencia;
     }
 
-    public void setFinvigencia(LocalDate finvigencia) {
-        this.finvigencia = Date.from(finvigencia.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    }
-
+//    public void setFinvigencia(LocalDate finvigencia) {
+//        this.finvigencia = Date.from(finvigencia.atStartOfDay(ZoneId.systemDefault()).toInstant());
+//    }
     public BigDecimal getPrima() {
         return prima;
     }
@@ -417,17 +415,16 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 
     @Override
     public StringProperty finVigenciaProperty() {
-        return new SimpleStringProperty(this.finvigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(this.finvigencia.toString());
     }
 
     public StringProperty inicioVigenciaProperty() {
-        return new SimpleStringProperty(this.iniciovigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(this.iniciovigencia.toString());
     }
 
     @Override
     public StringProperty faltanProperty() {
-        LocalDate fin = finvigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return new SimpleStringProperty("" + (fin.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
+        return new SimpleStringProperty("" + (finvigencia.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
     }
 
     @Override
@@ -438,7 +435,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     public void generarRecibos(int recibosPagados, BigDecimal importeConDerechoDePoliza, BigDecimal importeSubsecuente) {
         int recibos = cuantosRecibos();
         int siguienteMes = siguienteMes();
-        LocalDate inicioVigenciaAnterior = this.iniciovigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate inicioVigenciaAnterior = this.iniciovigencia;
         LocalDate finVigenciaAnterior = inicioVigenciaAnterior.plusMonths(siguienteMes);
         Recibo recibo = new Recibo();
         recibo.setIdpoliza(this);

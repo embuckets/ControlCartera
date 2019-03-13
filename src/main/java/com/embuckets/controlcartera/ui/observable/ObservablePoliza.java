@@ -30,7 +30,7 @@ public class ObservablePoliza {
     private StringProperty primaProperty;
     private StringProperty finVigenciaProperty;
     private ObservableAsegurado contratanteProperty;
-    private Date finVigenciaDate;
+    private LocalDate finVigenciaDate;
 
     public ObservablePoliza(Poliza poliza) {
         this.idPoliza = poliza.getIdpoliza();
@@ -42,7 +42,6 @@ public class ObservablePoliza {
         this.primaProperty = new SimpleStringProperty(poliza.getPrima().toString());
         this.contratanteProperty = new ObservableAsegurado(poliza.getContratante());
         this.finVigenciaDate = poliza.getFinvigencia();
-        this.finVigenciaProperty = new SimpleStringProperty(formatDate(poliza.getFinvigencia()));
     }
 
     public StringProperty aseguradoProperty() {
@@ -91,8 +90,7 @@ public class ObservablePoliza {
     }
 
     public StringProperty faltanProperty() {
-        LocalDate fin = finVigenciaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return new SimpleStringProperty("" + (fin.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
+        return new SimpleStringProperty("" + (finVigenciaDate.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
     }
 
     public void setNumeroProperty(StringProperty numeroProperty) {

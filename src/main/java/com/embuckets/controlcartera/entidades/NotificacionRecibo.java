@@ -7,6 +7,7 @@ package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
@@ -45,8 +46,8 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
     @Column(name = "IDRECIBO")
     private Integer idrecibo;
     @Column(name = "ENVIADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date enviado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime enviado;
     @JoinColumn(name = "ESTADONOTIFICACION", referencedColumnName = "ESTADONOTIFICACION")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private EstadoNotificacion estadonotificacion;
@@ -69,11 +70,11 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         this.idrecibo = idrecibo;
     }
 
-    public Date getEnviado() {
+    public LocalDateTime getEnviado() {
         return enviado;
     }
 
-    public void setEnviado(Date enviado) {
+    public void setEnviado(LocalDateTime enviado) {
         this.enviado = enviado;
     }
 
@@ -135,13 +136,13 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
 
     @Override
     public StringProperty cubreDesdeProperty() {
-        return new SimpleStringProperty(this.recibo.getCubredesde().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(this.recibo.getCubredesde().toString());
 
     }
 
     @Override
     public StringProperty cubreHastaProperty() {
-        return new SimpleStringProperty(this.recibo.getCubrehasta().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(this.recibo.getCubrehasta().toString());
     }
 
     @Override
@@ -151,7 +152,7 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
 
     @Override
     public StringProperty enviadoProperty() {
-        return new SimpleStringProperty(this.enviado.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().toString());
+        return new SimpleStringProperty(this.enviado.toString());
     }
 
     @Override

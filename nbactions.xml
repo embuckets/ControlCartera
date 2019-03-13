@@ -12,7 +12,6 @@
             <properties>
                 <exec.args>-classpath %classpath com.embuckets.controlcartera.ui.MainApp</exec.args>
                 <exec.executable>java</exec.executable>
-                
             </properties>
         </action>
         <action>

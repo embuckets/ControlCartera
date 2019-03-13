@@ -6,6 +6,7 @@
 package com.embuckets.controlcartera.entidades;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -41,8 +42,8 @@ public class NotificacionCumple implements Serializable {
     @Column(name = "IDCLIENTE")
     private Integer idcliente;
     @Column(name = "ENVIADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date enviado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime enviado;
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = false, updatable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Cliente cliente;
@@ -65,11 +66,11 @@ public class NotificacionCumple implements Serializable {
         this.idcliente = idcliente;
     }
 
-    public Date getEnviado() {
+    public LocalDateTime getEnviado() {
         return enviado;
     }
 
-    public void setEnviado(Date enviado) {
+    public void setEnviado(LocalDateTime enviado) {
         this.enviado = enviado;
     }
 

@@ -21,16 +21,13 @@ import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
-import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
-import com.embuckets.controlcartera.entidades.controladores.AseguradoJpaController;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import javax.persistence.EntityManager;
@@ -196,8 +193,8 @@ public class BaseDeDatosTest {
         poliza1.setPlan("plan");
         poliza1.setPrima(new BigDecimal(21456));
         poliza1.setPrimamoneda(new Moneda("pesos"));
-        poliza1.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(15))));
-        poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        poliza1.setIniciovigencia(LocalDate.now());
+        poliza1.setFinvigencia(LocalDate.now().plusMonths(12));
         poliza1.setEstado(new EstadoPoliza("Vigente"));
         poliza1.setConductocobro(new ConductoCobro("agente"));
         poliza1.setFormapago(new FormaPago("semestral"));
@@ -242,8 +239,8 @@ public class BaseDeDatosTest {
         poliza2.setPlan("plan");
         poliza2.setPrima(new BigDecimal(54789));
         poliza2.setPrimamoneda(new Moneda("pesos"));
-        poliza2.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(20))));
-        poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+        poliza2.setIniciovigencia(LocalDate.now());
+        poliza2.setFinvigencia(LocalDate.now().plusMonths(12));
         poliza2.setEstado(new EstadoPoliza("Cancelada"));
         poliza2.setPolizaAuto(new PolizaAuto());
         poliza2.getPolizaAuto().setPoliza(poliza2);//changed

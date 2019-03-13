@@ -651,7 +651,7 @@ public class PolizaHomeController implements Initializable {
         TextField nombreField = new TextField(cliente.getNombre());
         TextField paternoField = new TextField(cliente.getApellidopaterno());
         TextField maternoField = new TextField(cliente.getApellidomaterno());
-        DatePicker naciminetoDatePicker = new DatePicker(cliente.getNacimiento().toLocalDate());
+        DatePicker naciminetoDatePicker = new DatePicker(cliente.getNacimiento());
 
         grid.add(new Label("Nombre"), 0, 0);
         grid.add(nombreField, 1, 0);

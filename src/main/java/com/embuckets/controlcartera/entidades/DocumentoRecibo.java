@@ -6,6 +6,7 @@
 package com.embuckets.controlcartera.entidades;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -53,8 +54,8 @@ public class DocumentoRecibo implements Serializable {
     @Column(name = "ARCHIVO")
     private Serializable archivo;
     @Column(name = "ACTUALIZADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualizado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime actualizado;
     @JoinColumn(name = "IDRECIBO", referencedColumnName = "IDRECIBO", insertable = false, updatable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Recibo recibo;
@@ -105,11 +106,11 @@ public class DocumentoRecibo implements Serializable {
         this.archivo = archivo;
     }
 
-    public Date getActualizado() {
+    public LocalDateTime getActualizado() {
         return actualizado;
     }
 
-    public void setActualizado(Date actualizado) {
+    public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 

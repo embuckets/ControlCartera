@@ -65,8 +65,8 @@ public class Cliente implements Serializable, ObservableCliente {
     @Column(name = "APELLIDOMATERNO")
     private String apellidomaterno;
     @Column(name = "NACIMIENTO")
-    @Temporal(TemporalType.DATE)
-    private Date nacimiento;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate nacimiento;
     @JoinTable(name = "DEPENDIENTE", joinColumns = {
         @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE")}, inverseJoinColumns = {
         @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA")})
@@ -134,24 +134,21 @@ public class Cliente implements Serializable, ObservableCliente {
         this.apellidomaterno = apellidomaterno;
     }
 
-    public Date getNacimiento() {
+    public LocalDate getNacimiento() {
         return nacimiento;
     }
 
 //    public String getNacimientoString() {
 //        return getNacimientoLocalDate().toString();
 //    }
-
 //    public LocalDate getNacimientoLocalDate() {
 //        return nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 //    }
-
-    public void setNacimiento(Date nacimiento) {
-        this.nacimiento = nacimiento;
-    }
-
+//    public void setNacimiento(Date nacimiento) {
+//        this.nacimiento = nacimiento;
+//    }
     public void setNacimiento(LocalDate nacimiento) {
-        this.nacimiento = Date.valueOf(nacimiento);
+        this.nacimiento = nacimiento;
 //        this.nacimiento = Date.from(nacimiento.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
@@ -230,7 +227,7 @@ public class Cliente implements Serializable, ObservableCliente {
 
     @Override
     public StringProperty nacimientoProperty() {
-        return new SimpleStringProperty(nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(nacimiento.toString());
     }
 
 }

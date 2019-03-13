@@ -245,98 +245,97 @@ public class HomeController implements Initializable, Controller {
         return MainApp.getInstance().getBaseDeDatos().getAll(Asegurado.class);
     }
 
-    private List<Asegurado> createAseguradosFalsos() {
-        Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
-        asegurado1.setIdcliente(1);
-        asegurado1.getCliente().setIdcliente(1);
-        asegurado1.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
-        asegurado1.setTipopersona(new TipoPersona("Fisica"));
-        Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
-        asegurado2.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
-        asegurado2.setIdcliente(2);
-        asegurado2.getCliente().setIdcliente(2);
-        asegurado2.setTipopersona(new TipoPersona("Fisica"));
-
-        Poliza poliza1 = new Poliza();
-        poliza1.setIdpoliza(1);
-        poliza1.setNumero("numeor1");
-        poliza1.setAseguradora(new Aseguradora("GNP"));
-        poliza1.setRamo(new Ramo("vida"));
-        poliza1.setProducto("producto");
-        poliza1.setPlan("plan");
-        poliza1.setPrima(new BigDecimal(21456));
-        poliza1.setPrimamoneda(new Moneda("pesos"));
-        poliza1.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(15))));
-        poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-        poliza1.setEstado(new EstadoPoliza("Vigente"));
-        poliza1.setConductocobro(new ConductoCobro("agente"));
-        poliza1.setFormapago(new FormaPago("mensual"));
-        Cliente benef = new Cliente("beneficiario1", "hijo", "hijo");
-        benef.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
-        poliza1.setPolizaVida(new PolizaVida(1));
-        poliza1.getPolizaVida().setSumaasegurada(BigDecimal.valueOf(50000));
-        poliza1.getPolizaVida().setSumaaseguradamoneda(new Moneda("Dolares"));
-        poliza1.getPolizaVida().getClienteList().add(benef);
-        poliza1.generarRecibos(3, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        Poliza poliza2 = new Poliza();
-        poliza2.setIdpoliza(2);
-        poliza2.setNumero("numeor2");
-        poliza2.setAseguradora(new Aseguradora("GNP"));
-        poliza2.setRamo(new Ramo("autos"));
-        poliza2.setProducto("producto");
-        poliza2.setPlan("plan");
-        poliza2.setPrima(new BigDecimal(54789));
-        poliza2.setPrimamoneda(new Moneda("pesos"));
-        poliza2.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(20))));
-        poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-        poliza2.setEstado(new EstadoPoliza("Cancelada"));
-        poliza2.setPolizaAuto(new PolizaAuto(2));
-        poliza2.getPolizaAuto().setSumaaseguradaauto(new SumaAseguradaAuto("Factura"));
-        poliza2.getPolizaAuto().getAutoList().add(new Auto(2, "STD 4PT RL", "VW", "Jetta", Year.of(2016)));
-        poliza2.setConductocobro(new ConductoCobro("agente"));
-        poliza2.setFormapago(new FormaPago("mensual"));
-        poliza2.generarRecibos(4, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        poliza1.setContratante(asegurado1);
-        poliza1.setTitular(asegurado1.getCliente());
-        poliza2.setContratante(asegurado1);
-        poliza2.setTitular(asegurado1.getCliente());
-        asegurado1.getPolizaList().add(poliza1);
-        asegurado1.getPolizaList().add(poliza2);
-
-        Poliza poliza3 = new Poliza();
-        poliza3.setIdpoliza(3);
-        poliza3.setNumero("numeor3");
-        poliza3.setAseguradora(new Aseguradora("PLAN SEGURO"));
-        poliza3.setRamo(new Ramo("gastos medicos"));
-        poliza3.setProducto("producto");
-        poliza3.setPlan("plan");
-        poliza3.setPrima(new BigDecimal(12456));
-        poliza3.setPrimamoneda(new Moneda("PESOS"));
-        poliza3.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(5))));
-        poliza3.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-        poliza3.setEstado(new EstadoPoliza("No vigente"));
-        poliza3.setConductocobro(new ConductoCobro("agente"));
-        poliza3.setFormapago(new FormaPago(Globals.FORMA_PAGO_TRIMESTRAL));
-        poliza3.setPolizaGmm(new PolizaGmm(3, BigDecimal.valueOf(79654.12), "100000000", (short) 10));
-        poliza3.getPolizaGmm().setDeduciblemoneda(new Moneda("PESOS"));
-        poliza3.getPolizaGmm().setSumaaseguradamondeda(new Moneda("PESOS"));
-        Cliente depend = new Cliente("beneficiario1", "hijo", "hijo");
-        depend.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
-        poliza3.getPolizaGmm().getClienteList().add(depend);
-        poliza3.generarRecibos(2, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        poliza3.setContratante(asegurado2);
-        poliza3.setTitular(asegurado2.getCliente());
-        asegurado2.getPolizaList().add(poliza3);
-
-        List<Asegurado> list = new ArrayList<>();
-        list.add(asegurado1);
-        list.add(asegurado2);
-        return list;
-    }
-
+//    private List<Asegurado> createAseguradosFalsos() {
+//        Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
+//        asegurado1.setIdcliente(1);
+//        asegurado1.getCliente().setIdcliente(1);
+//        asegurado1.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
+//        asegurado1.setTipopersona(new TipoPersona("Fisica"));
+//        Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
+//        asegurado2.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
+//        asegurado2.setIdcliente(2);
+//        asegurado2.getCliente().setIdcliente(2);
+//        asegurado2.setTipopersona(new TipoPersona("Fisica"));
+//
+//        Poliza poliza1 = new Poliza();
+//        poliza1.setIdpoliza(1);
+//        poliza1.setNumero("numeor1");
+//        poliza1.setAseguradora(new Aseguradora("GNP"));
+//        poliza1.setRamo(new Ramo("vida"));
+//        poliza1.setProducto("producto");
+//        poliza1.setPlan("plan");
+//        poliza1.setPrima(new BigDecimal(21456));
+//        poliza1.setPrimamoneda(new Moneda("pesos"));
+//        poliza1.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(15))));
+//        poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+//        poliza1.setEstado(new EstadoPoliza("Vigente"));
+//        poliza1.setConductocobro(new ConductoCobro("agente"));
+//        poliza1.setFormapago(new FormaPago("mensual"));
+//        Cliente benef = new Cliente("beneficiario1", "hijo", "hijo");
+//        benef.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
+//        poliza1.setPolizaVida(new PolizaVida(1));
+//        poliza1.getPolizaVida().setSumaasegurada(BigDecimal.valueOf(50000));
+//        poliza1.getPolizaVida().setSumaaseguradamoneda(new Moneda("Dolares"));
+//        poliza1.getPolizaVida().getClienteList().add(benef);
+//        poliza1.generarRecibos(3, new BigDecimal(10123.12), new BigDecimal(9123.12));
+//
+//        Poliza poliza2 = new Poliza();
+//        poliza2.setIdpoliza(2);
+//        poliza2.setNumero("numeor2");
+//        poliza2.setAseguradora(new Aseguradora("GNP"));
+//        poliza2.setRamo(new Ramo("autos"));
+//        poliza2.setProducto("producto");
+//        poliza2.setPlan("plan");
+//        poliza2.setPrima(new BigDecimal(54789));
+//        poliza2.setPrimamoneda(new Moneda("pesos"));
+//        poliza2.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(20))));
+//        poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+//        poliza2.setEstado(new EstadoPoliza("Cancelada"));
+//        poliza2.setPolizaAuto(new PolizaAuto(2));
+//        poliza2.getPolizaAuto().setSumaaseguradaauto(new SumaAseguradaAuto("Factura"));
+//        poliza2.getPolizaAuto().getAutoList().add(new Auto(2, "STD 4PT RL", "VW", "Jetta", Year.of(2016)));
+//        poliza2.setConductocobro(new ConductoCobro("agente"));
+//        poliza2.setFormapago(new FormaPago("mensual"));
+//        poliza2.generarRecibos(4, new BigDecimal(10123.12), new BigDecimal(9123.12));
+//
+//        poliza1.setContratante(asegurado1);
+//        poliza1.setTitular(asegurado1.getCliente());
+//        poliza2.setContratante(asegurado1);
+//        poliza2.setTitular(asegurado1.getCliente());
+//        asegurado1.getPolizaList().add(poliza1);
+//        asegurado1.getPolizaList().add(poliza2);
+//
+//        Poliza poliza3 = new Poliza();
+//        poliza3.setIdpoliza(3);
+//        poliza3.setNumero("numeor3");
+//        poliza3.setAseguradora(new Aseguradora("PLAN SEGURO"));
+//        poliza3.setRamo(new Ramo("gastos medicos"));
+//        poliza3.setProducto("producto");
+//        poliza3.setPlan("plan");
+//        poliza3.setPrima(new BigDecimal(12456));
+//        poliza3.setPrimamoneda(new Moneda("PESOS"));
+//        poliza3.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(5))));
+//        poliza3.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
+//        poliza3.setEstado(new EstadoPoliza("No vigente"));
+//        poliza3.setConductocobro(new ConductoCobro("agente"));
+//        poliza3.setFormapago(new FormaPago(Globals.FORMA_PAGO_TRIMESTRAL));
+//        poliza3.setPolizaGmm(new PolizaGmm(3, BigDecimal.valueOf(79654.12), "100000000", (short) 10));
+//        poliza3.getPolizaGmm().setDeduciblemoneda(new Moneda("PESOS"));
+//        poliza3.getPolizaGmm().setSumaaseguradamondeda(new Moneda("PESOS"));
+//        Cliente depend = new Cliente("beneficiario1", "hijo", "hijo");
+//        depend.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
+//        poliza3.getPolizaGmm().getClienteList().add(depend);
+//        poliza3.generarRecibos(2, new BigDecimal(10123.12), new BigDecimal(9123.12));
+//
+//        poliza3.setContratante(asegurado2);
+//        poliza3.setTitular(asegurado2.getCliente());
+//        asegurado2.getPolizaList().add(poliza3);
+//
+//        List<Asegurado> list = new ArrayList<>();
+//        list.add(asegurado1);
+//        list.add(asegurado2);
+//        return list;
+//    }
     private ObservableList<ObservableCliente> createCumple() {
         return FXCollections.observableArrayList(getClientes());
 //        return createObservableClientes(getClientes());
@@ -355,15 +354,14 @@ public class HomeController implements Initializable, Controller {
 //        return createClientesFalsos();
     }
 
-    private List<Cliente> createClientesFalsos() {
-        List<Asegurado> asegurados = createAseguradosFalsos();
-        List<Cliente> clientes = new ArrayList<>();
-        asegurados.forEach((asegurado) -> {
-            clientes.add(asegurado.getCliente());
-        });
-        return clientes;
-    }
-
+//    private List<Cliente> createClientesFalsos() {
+//        List<Asegurado> asegurados = createAseguradosFalsos();
+//        List<Cliente> clientes = new ArrayList<>();
+//        asegurados.forEach((asegurado) -> {
+//            clientes.add(asegurado.getCliente());
+//        });
+//        return clientes;
+//    }
     private void fillTablaRenovaciones() {
         tableViewRenovaciones.setItems(createRenovaciones());
 
@@ -461,7 +459,8 @@ public class HomeController implements Initializable, Controller {
 //    }
     private List<? extends ObservableRenovacion> getRenovaciones() {
         //TODO: get renovaciones de la base de datos
-        return createRenovacionesFalsas();
+        return MainApp.getInstance().getBaseDeDatos().getAll(Poliza.class);
+//        return createRenovacionesFalsas();
     }
 
     private List<Poliza> createRenovacionesFalsas() {
@@ -480,7 +479,8 @@ public class HomeController implements Initializable, Controller {
 
     private List<? extends NotificacionRecibo> getNotificacionesRecibos() {
         //TODO: getNotifacaciones de la base de dato
-        return createNotificacionesRecibosFalsos();
+        return MainApp.getInstance().getBaseDeDatos().getAll(NotificacionRecibo.class);
+//        return createNotificacionesRecibosFalsos();
     }
 
 //    private ObservableList<ObservableNotificacionRecibo> createObservableNotificacionesRecibo(List<NotificacionRecibo> notificacionesRecibos) {
@@ -490,30 +490,29 @@ public class HomeController implements Initializable, Controller {
 //        });
 //        return FXCollections.observableArrayList(result);
 //    }
-    private List<NotificacionRecibo> createNotificacionesRecibosFalsos() {
-        NotificacionRecibo notificacion1 = new NotificacionRecibo();
-        notificacion1.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(2))));
-        notificacion1.setIdrecibo(1);
-        notificacion1.setRecibo(new Recibo(1, Date.from(Instant.parse("2018-12-01T00:00:01.00Z")), Date.from(Instant.parse("2018-12-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
-        notificacion1.getRecibo().setIdpoliza(new Poliza());
-        notificacion1.getRecibo().getIdpoliza().setNumero("numero1");
-        notificacion1.getRecibo().getIdpoliza().setContratante(new Asegurado("Emilio", "Hernandez", "Segovia"));
-
-        NotificacionRecibo notificacion2 = new NotificacionRecibo();
-        notificacion2.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(26))));
-        notificacion2.setIdrecibo(2);
-        notificacion2.setRecibo(new Recibo(2, Date.from(Instant.parse("2019-01-01T00:00:01.00Z")), Date.from(Instant.parse("2019-01-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
-        notificacion2.getRecibo().setIdpoliza(new Poliza());
-        notificacion2.getRecibo().getIdpoliza().setNumero("numero1");
-        notificacion2.getRecibo().getIdpoliza().setContratante(new Asegurado("Daniel", "Hernandez", "Segovia"));
-
-        List<NotificacionRecibo> result = new ArrayList<>();
-        result.add(notificacion1);
-        result.add(notificacion2);
-        return result;
-
-    }
-
+//    private List<NotificacionRecibo> createNotificacionesRecibosFalsos() {
+//        NotificacionRecibo notificacion1 = new NotificacionRecibo();
+//        notificacion1.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(2))));
+//        notificacion1.setIdrecibo(1);
+//        notificacion1.setRecibo(new Recibo(1, Date.from(Instant.parse("2018-12-01T00:00:01.00Z")), Date.from(Instant.parse("2018-12-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
+//        notificacion1.getRecibo().setIdpoliza(new Poliza());
+//        notificacion1.getRecibo().getIdpoliza().setNumero("numero1");
+//        notificacion1.getRecibo().getIdpoliza().setContratante(new Asegurado("Emilio", "Hernandez", "Segovia"));
+//
+//        NotificacionRecibo notificacion2 = new NotificacionRecibo();
+//        notificacion2.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(26))));
+//        notificacion2.setIdrecibo(2);
+//        notificacion2.setRecibo(new Recibo(2, Date.from(Instant.parse("2019-01-01T00:00:01.00Z")), Date.from(Instant.parse("2019-01-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
+//        notificacion2.getRecibo().setIdpoliza(new Poliza());
+//        notificacion2.getRecibo().getIdpoliza().setNumero("numero1");
+//        notificacion2.getRecibo().getIdpoliza().setContratante(new Asegurado("Daniel", "Hernandez", "Segovia"));
+//
+//        List<NotificacionRecibo> result = new ArrayList<>();
+//        result.add(notificacion1);
+//        result.add(notificacion2);
+//        return result;
+//
+//    }
     @Override
     public void setData(Object obj) {
         //do nothing

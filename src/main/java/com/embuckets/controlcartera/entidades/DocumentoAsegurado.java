@@ -7,7 +7,6 @@ package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
 import java.io.Serializable;
-import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -25,6 +24,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -53,8 +53,8 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
     @Column(name = "ARCHIVO")
     private Serializable archivo;
     @Column(name = "ACTUALIZADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualizado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime actualizado;
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado asegurado;
@@ -105,11 +105,11 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
         this.archivo = archivo;
     }
 
-    public Date getActualizado() {
+    public LocalDateTime getActualizado() {
         return actualizado;
     }
 
-    public void setActualizado(Date actualizado) {
+    public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 

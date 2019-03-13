@@ -56,12 +56,12 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     private Integer idrecibo;
     @Basic(optional = false)
     @Column(name = "CUBREDESDE")
-    @Temporal(TemporalType.DATE)
-    private Date cubredesde;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate cubredesde;
     @Basic(optional = false)
     @Column(name = "CUBREHASTA")
-    @Temporal(TemporalType.DATE)
-    private Date cubrehasta;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate cubrehasta;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @Column(name = "IMPORTE")
@@ -84,7 +84,7 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
         this.idrecibo = idrecibo;
     }
 
-    public Recibo(Integer idrecibo, Date cubredesde, Date cubrehasta, BigDecimal importe) {
+    public Recibo(Integer idrecibo, LocalDate cubredesde, LocalDate cubrehasta, BigDecimal importe) {
         this.idrecibo = idrecibo;
         this.cubredesde = cubredesde;
         this.cubrehasta = cubrehasta;
@@ -99,29 +99,29 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
         this.idrecibo = idrecibo;
     }
 
-    public Date getCubredesde() {
+    public LocalDate getCubredesde() {
         return cubredesde;
     }
 
-    public void setCubredesde(Date cubredesde) {
+    public void setCubredesde(LocalDate cubredesde) {
         this.cubredesde = cubredesde;
     }
 
-    public void setCubredesde(LocalDate cubredesde) {
-        this.cubredesde = Date.from(cubredesde.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-    }
+//    public void setCubredesde(LocalDate cubredesde) {
+//        this.cubredesde = Date.from(cubredesde.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+//    }
 
-    public Date getCubrehasta() {
+    public LocalDate getCubrehasta() {
         return cubrehasta;
     }
 
-    public void setCubrehasta(Date cubrehasta) {
+    public void setCubrehasta(LocalDate cubrehasta) {
         this.cubrehasta = cubrehasta;
     }
 
-    public void setCubrehasta(LocalDate cubrehasta) {
-        this.cubrehasta = Date.from(cubrehasta.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-    }
+//    public void setCubrehasta(LocalDate cubrehasta) {
+//        this.cubrehasta = Date.from(cubrehasta.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+//    }
 
     public BigDecimal getImporte() {
         return importe;
@@ -205,12 +205,12 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
 
     @Override
     public StringProperty cubreDesdeProperty() {
-        return new SimpleStringProperty(cubredesde.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(cubredesde.toString());
     }
 
     @Override
     public StringProperty cubreHastaProperty() {
-        return new SimpleStringProperty(cubrehasta.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(cubrehasta.toString());
     }
 
     @Override
