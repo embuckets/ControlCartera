@@ -349,7 +349,7 @@ public class HomeController implements Initializable, Controller {
 //        return FXCollections.observableArrayList(observableClientes);
 //    }
     private List<? extends Cliente> getClientes() {
-        //TODO: pedir clientes que cumplan
+        //TODO: pedir clientes que cumplan EN LOS PROXIMOS DIAS
         return MainApp.getInstance().getBaseDeDatos().getAll(Cliente.class);
 //        return createClientesFalsos();
     }
@@ -458,27 +458,27 @@ public class HomeController implements Initializable, Controller {
 //        return FXCollections.observableArrayList(result);
 //    }
     private List<? extends ObservableRenovacion> getRenovaciones() {
-        //TODO: get renovaciones de la base de datos
+        //TODO: get renovaciones de la base de datos DEL MES
         return MainApp.getInstance().getBaseDeDatos().getAll(Poliza.class);
 //        return createRenovacionesFalsas();
     }
 
-    private List<Poliza> createRenovacionesFalsas() {
-        List<Poliza> result = new ArrayList<>();
-        List<Asegurado> asegurados = (List<Asegurado>) getAsegurados();
-        for (Asegurado asegurado : asegurados) {
-            List<Poliza> polizas = asegurado.getPolizaList();
-            polizas.stream().forEach((p) -> result.add(p));
-        }
-        return result;
-    }
+//    private List<Poliza> createRenovacionesFalsas() {
+//        List<Poliza> result = new ArrayList<>();
+//        List<Asegurado> asegurados = (List<Asegurado>) getAsegurados();
+//        for (Asegurado asegurado : asegurados) {
+//            List<Poliza> polizas = asegurado.getPolizaList();
+//            polizas.stream().forEach((p) -> result.add(p));
+//        }
+//        return result;
+//    }
 
     private ObservableList<ObservableNotificacionRecibo> createRecibos() {
         return FXCollections.observableArrayList(getNotificacionesRecibos());
     }
 
     private List<? extends NotificacionRecibo> getNotificacionesRecibos() {
-        //TODO: getNotifacaciones de la base de dato
+        //TODO: getNotifacaciones de la base de datos DEL MES
         return MainApp.getInstance().getBaseDeDatos().getAll(NotificacionRecibo.class);
 //        return createNotificacionesRecibosFalsos();
     }

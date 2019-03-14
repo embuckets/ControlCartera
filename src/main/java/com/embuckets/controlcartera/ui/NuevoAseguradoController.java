@@ -14,6 +14,7 @@ import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
+import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
 import com.embuckets.controlcartera.ui.observable.ObservableEmail;
 import com.embuckets.controlcartera.ui.observable.ObservableTelefono;
@@ -22,10 +23,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,6 +41,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -87,7 +93,7 @@ public class NuevoAseguradoController implements Initializable {
 
     //Telefono TableView
     @FXML
-    private TableView telefonoTableView;
+    private TableView<Telefono> telefonoTableView;
     @FXML
     private TableColumn telefonoTableColumn;
     @FXML
@@ -105,7 +111,7 @@ public class NuevoAseguradoController implements Initializable {
 
     //Email TableView
     @FXML
-    private TableView emailTableView;
+    private TableView<Email> emailTableView;
     @FXML
     private TableColumn emailTableColumn;
     @FXML
@@ -187,50 +193,67 @@ public class NuevoAseguradoController implements Initializable {
 
     private void fillTipoTelefonoComboBox() {
         //pedir los estados a la base de datos
-        String[] tipoTelefono = {"Casa", "Movil", "Trabajo"};
-        ObservableList<String> list = FXCollections.observableArrayList(tipoTelefono);
-        tipoTelefonoComboBox.getItems().addAll(list);
+//        String[] tipoTelefono = {"Casa", "Movil", "Trabajo"};
+//        ObservableList<String> list = FXCollections.observableArrayList(tipoTelefono);
+
+        tipoTelefonoComboBox.setItems(FXCollections.observableArrayList(Globals.getAllTelefonoTipos()));
+//        tipoTelefonoComboBox.getItems().addAll(list);
         tipoTelefonoComboBox.getSelectionModel().select(0);
     }
 
     private void fillTipoEmailComboBox() {
         //pedir los estados a la base de datos
-        String[] values = {"Personal", "Trabajo"};
-        ObservableList<String> list = FXCollections.observableArrayList(values);
-        tipoEmailComboBox.getItems().addAll(list);
+//        String[] values = {"Personal", "Trabajo"};
+//        ObservableList<String> list = FXCollections.observableArrayList(values);
+        tipoEmailComboBox.setItems(FXCollections.observableArrayList(Globals.getAllEmailTipos()));
+//        tipoEmailComboBox.getItems().addAll(list);
         tipoEmailComboBox.getSelectionModel().select(0);
     }
 
     private void fillEstadosComboBox() {
 
         //pedir los estados a la base de datos
-        String[] estados = {"Aguascalientes", " Baja California", " Baja California Sur",
-            " Campeche", " Chiapas", " Chihuahua", " Ciudad de México",
-            " Coahuila", " Colima", " Durango", " Estado de México", " Guanajuato",
-            " Guerrero", " Hidalgo", " Jalisco", " Michoacán", " Morelos",
-            " Nayarit", " Nuevo León", " Oaxaca", " Puebla", " Querétaro",
-            " Quintana Roo", " San Luis Potosí", " Sinaloa", " Sonora",
-            " Tabasco", " Tamaulipas", " Tlaxcala", " Veracruz", " Yucatán", " Zacatecas"};
-        ObservableList<String> estadosList = FXCollections.observableArrayList(estados);
-        estadoComboBox.getItems().addAll(estadosList);
+//        String[] estados = {"Aguascalientes", " Baja California", " Baja California Sur",
+//            " Campeche", " Chiapas", " Chihuahua", " Ciudad de México",
+//            " Coahuila", " Colima", " Durango", " Estado de México", " Guanajuato",
+//            " Guerrero", " Hidalgo", " Jalisco", " Michoacán", " Morelos",
+//            " Nayarit", " Nuevo León", " Oaxaca", " Puebla", " Querétaro",
+//            " Quintana Roo", " San Luis Potosí", " Sinaloa", " Sonora",
+//            " Tabasco", " Tamaulipas", " Tlaxcala", " Veracruz", " Yucatán", " Zacatecas"};
+//        ObservableList<String> estadosList = FXCollections.observableArrayList(estados);
+        estadoComboBox.setItems(FXCollections.observableArrayList(getAllEstados()));
+//        estadoComboBox.getItems().addAll(estadosList);
         estadoComboBox.getSelectionModel().select(6);
+    }
+
+    private List<String> getAllEstados() {
+        List<Estado> estados = MainApp.getInstance().getBaseDeDatos().getAll(Estado.class);
+//        List<String> estadosString = new ArrayList<>();
+        return estados.stream().map(e -> e.getEstado()).collect(Collectors.toList());
     }
 
     private void fillDelegacionComboBox() {
         //pedir los estados a la base de datos
-        String[] estados = {"Álvaro Obregón", " Azcapotzalco", " Benito Juárez",
-            " Coyoacán", " Cuajimalpa de Morelos", " Cuauhtémoc", "Gustavo A. Madero",
-            " Iztacalco", " Iztapalapa", " La Magdalena Contreras", "Miguel Hidalgo", " Milpa Alta",
-            " Tláhuac", " Tlalpan", " Venustiano Carranza", " Xochimilco"};
-        ObservableList<String> estadosList = FXCollections.observableArrayList(estados);
-        delegacionComboBox.getItems().addAll(estadosList);
+//        String[] estados = {"Álvaro Obregón", " Azcapotzalco", " Benito Juárez",
+//            " Coyoacán", " Cuajimalpa de Morelos", " Cuauhtémoc", "Gustavo A. Madero",
+//            " Iztacalco", " Iztapalapa", " La Magdalena Contreras", "Miguel Hidalgo", " Milpa Alta",
+//            " Tláhuac", " Tlalpan", " Venustiano Carranza", " Xochimilco"};
+//        ObservableList<String> estadosList = FXCollections.observableArrayList(estados);
+        delegacionComboBox.setItems(FXCollections.observableArrayList(getAllDelegaciones()));
+//        delegacionComboBox.getItems().addAll(estadosList);
         delegacionComboBox.getSelectionModel().select(0);
     }
 
+    private List<String> getAllDelegaciones() {
+        List<Delegacion> estados = MainApp.getInstance().getBaseDeDatos().getAll(Delegacion.class);
+//        List<String> estadosString = new ArrayList<>();
+        return estados.stream().map(e -> e.getDelegacion()).collect(Collectors.toList());
+    }
+
     private void fillTipoDocumentoComboBox() {
-        String[] documentos = {"Identificacion", "Domicilio", "RFC", "Otro"};
-        ObservableList<String> estadosList = FXCollections.observableArrayList(documentos);
-        tipoArchivoComboBox.getItems().addAll(estadosList);
+//        String[] documentos = {"Identificacion", "Domicilio", "RFC", "Otro"};
+//        ObservableList<String> estadosList = FXCollections.observableArrayList(Globals.getAllDocumentoAseguradoTipos());
+        tipoArchivoComboBox.setItems(FXCollections.observableArrayList(Globals.getAllDocumentoAseguradoTipos()));
         tipoArchivoComboBox.getSelectionModel().select(0);
     }
 
@@ -315,8 +338,8 @@ public class NuevoAseguradoController implements Initializable {
     }
 
     private ObservableList<ObservableArchivo> createObservableArchivoList() {
-        List<ObservableArchivo> list = new ArrayList<>();
-        return FXCollections.observableArrayList(list);
+//        List<ObservableArchivo> list = new ArrayList<>();
+        return FXCollections.observableArrayList(new ArrayList<ObservableArchivo>());
     }
 
     private ObservableList<Telefono> createObservableTelefonoList() {
@@ -389,41 +412,51 @@ public class NuevoAseguradoController implements Initializable {
     }
 
     public void guardar(ActionEvent event) throws IOException {
-        if (validarForm()) {
+        List<String> errores = new ArrayList<>();
+        if (validarForm(errores)) {
             //construir asegurado
 
             Asegurado asegurado = new Asegurado(nombreTextField.getText(), paternoTextField.getText(), maternoTextField.getText());
             asegurado.setRfc(rfcTextField.getText());
             RadioButton tipoPersona = (RadioButton) tipoPersonaGroup.getSelectedToggle();
             asegurado.setTipopersona(new TipoPersona(tipoPersona.getText()));
-            ObservableList<ObservableTelefono> telefonoList = telefonoTableView.getItems();
-            for (ObservableTelefono obsTel : telefonoList) {
-                Telefono telefono = new Telefono(obsTel.telefonoProperty().get());
-                telefono.setExtension(obsTel.extensionProperty().get());
-                telefono.setTipotelefono(new TipoTelefono(obsTel.tipoProperty().get()));
+            asegurado.getCliente().setNacimiento(nacimientoDatePicker.getValue());
+//            ObservableList<ObservableTelefono> telefonoList = telefonoTableView.getItems();
+            for (Telefono telefono : telefonoTableView.getItems()) {
+                telefono.setAsegurado(asegurado);
                 asegurado.agregarTelefono(telefono);
             }
 
-            ObservableList<ObservableEmail> emailList = emailTableView.getItems();
-            for (ObservableEmail observableEmail : emailList) {
-                Email email = new Email(observableEmail.emailProperty().get());
-                email.setTipoemail(new TipoEmail(observableEmail.tipoProperty().get()));
+//            ObservableList<ObservableEmail> emailList = emailTableView.getItems();
+            for (Email email : emailTableView.getItems()) {
+                email.setAsegurado(asegurado);
                 asegurado.agregarEmail(email);
             }
 
-            Domicilio domicilio = new Domicilio();
-            domicilio.setCalle(calleTextField.getText());
-            domicilio.setExterior(exteriorTextField.getText());
-            domicilio.setInterior(interiorTextField.getText());
-            domicilio.setCodigopostal(codigoPostaTextField.getText());
-            domicilio.setColonia(coloniaTextField.getText());
-            domicilio.setDelegacion(new Delegacion(delegacionComboBox.getValue().toString()));
-            domicilio.setEstado(new Estado(estadoComboBox.getValue().toString()));
-            asegurado.setIddomicilio(domicilio);
+            if (!domicilioVacio()) {
+                Domicilio domicilio = new Domicilio();
+                domicilio.setCalle(calleTextField.getText());
+                domicilio.setExterior(exteriorTextField.getText());
+                domicilio.setInterior(interiorTextField.getText());
+                domicilio.setCodigopostal(codigoPostaTextField.getText());
+                domicilio.setColonia(coloniaTextField.getText());
+                domicilio.setDelegacion(new Delegacion(delegacionComboBox.getValue().toString()));
+                domicilio.setEstado(new Estado(estadoComboBox.getValue().toString()));
+                asegurado.setIddomicilio(domicilio);
+            }
 
+            //TODO: crear DocumentosAsegurado
             asegurado.setNota(notaTextArea.getText());
-            //guardar asegurado
-            persistAsegurado(asegurado);
+            try {
+                //guardar asegurado
+                MainApp.getInstance().getBaseDeDatos().create(asegurado);
+            } catch (Exception ex) {
+                Logger.getLogger(NuevoAseguradoController.class.getName()).log(Level.SEVERE, null, ex);
+                Alert alertDialog = Utilities.makeAlert(ex, "Error al guardar asegurado");
+                alertDialog.showAndWait();
+                return;
+            }
+//            persistAsegurado(asegurado);
             //ir a Asegurado Home
             FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AseguradoHome.fxml"), null, new JavaFXBuilderFactory());
             Parent parent = loader.load();
@@ -432,26 +465,52 @@ public class NuevoAseguradoController implements Initializable {
 //            controller.setAseguradoId(id);
 //        loader.setController(controller);
             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error al guardar asegurado");
+            String mensaje = "";
+            mensaje = errores.stream().map((error) -> error + "\n").reduce(mensaje, String::concat);
+            alert.setContentText(mensaje);
+            alert.showAndWait();
         }
 
 //        MainApp.getInstance().changeSceneContent("AseguradoHome.fxml");
     }
 
-    private boolean validarForm() {
+    private boolean validarForm(List<String> errores) {
         //validar nombre
         if (personaFisicaRadioButton.isSelected() && ((nombreTextField.getText().isEmpty()) || (apellidoPaternoLabel.getText().isEmpty()))) {
+            errores.add("Persona Física requiere nombre y apellido paterno");
             return false;
         } else if (personaMoralRadionButton.isSelected() && nombreTextField.getText().isEmpty()) {
+            errores.add("Persona Moral requiere nombre");
             return false;
         }
-        if (!calleTextField.getText().isEmpty() && exteriorTextField.getText().isEmpty()) {
-            return false;
-        }
-        if (calleTextField.getText().isEmpty() && !exteriorTextField.getText().isEmpty()) {
+        if (!domicilioValido(errores)) {
             return false;
         }
         return true;
 
+    }
+
+    private boolean domicilioValido(List<String> errores) {
+        if (calleTextField.getText().isEmpty() && !exteriorTextField.getText().isEmpty()) {
+            errores.add("Domicilio requiere calle y numero exterior");
+            return false;
+        }
+        if (!calleTextField.getText().isEmpty() && exteriorTextField.getText().isEmpty()) {
+            errores.add("Domicilio requiere calle y numero exterior");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean domicilioVacio() {
+        if (calleTextField.getText().isEmpty() && exteriorTextField.getText().isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     private void persistAsegurado(Asegurado asegurado) {

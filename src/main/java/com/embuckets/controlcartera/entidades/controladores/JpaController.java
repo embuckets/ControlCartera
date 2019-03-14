@@ -8,6 +8,7 @@ package com.embuckets.controlcartera.entidades.controladores;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.List;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -17,7 +18,7 @@ import javax.persistence.Query;
  */
 public interface JpaController {
 
-    default void create(Object object) throws PreexistingEntityException, Exception {
+    default void create(Object object) throws EntityExistsException, Exception {
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();

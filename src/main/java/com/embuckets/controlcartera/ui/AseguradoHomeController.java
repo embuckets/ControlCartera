@@ -21,9 +21,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.time.ZoneId;
-import java.sql.Date;
-//import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -40,6 +37,7 @@ import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -64,6 +62,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import org.hibernate.Hibernate;
 
 /**
  * FXML Controller class
@@ -545,25 +544,35 @@ public class AseguradoHomeController implements Initializable, Controller {
 
     @FXML
     private void agregarTelefono(ActionEvent event) {
-        Telefono telefono = new Telefono(asegurado.getIdcliente(), telefonoTextField.getText());
-        telefono.setExtension(extensionTextField.getText());
-        telefono.setTipotelefono(new TipoTelefono(tipoTelefonoComboBox.getValue().toString()));
-        telefonoTableView.getItems().add(telefono);
-        //
-        asegurado.agregarTelefono(telefono);
-        telefonoTextField.setText("");
-        extensionTextField.setText("");
-        //TODO: persist telefono
+        try {
+            Telefono telefono = new Telefono(asegurado.getIdcliente(), telefonoTextField.getText());
+            telefono.setExtension(extensionTextField.getText());
+            telefono.setTipotelefono(new TipoTelefono(tipoTelefonoComboBox.getValue().toString()));
+            telefono.setAsegurado(asegurado);
+            MainApp.getInstance().getBaseDeDatos().create(telefono);
+            asegurado.agregarTelefono(telefono);
+            telefonoTableView.getItems().add(telefono);
+            telefonoTextField.setText("");
+            extensionTextField.setText("");
+        } catch (Exception ex) {
+            showAlert(ex, "Error al guardar telefono");
+        }
     }
 
     @FXML
     private void agregarEmail(ActionEvent event) {
-        Email email = new Email(asegurado.getIdcliente(), emailTextField.getText());
-        email.setTipoemail(new TipoEmail(tipoEmailComboBox.getValue().toString()));
-        emailTableView.getItems().add(email);
-        asegurado.agregarEmail(email);
-        emailTextField.setText("");
-        //TODO: persist email
+        try {
+            Email email = new Email(asegurado.getIdcliente(), emailTextField.getText());
+            email.setTipoemail(new TipoEmail(tipoEmailComboBox.getValue().toString()));
+            email.setAsegurado(asegurado);
+            MainApp.getInstance().getBaseDeDatos().create(email);
+            asegurado.agregarEmail(email);
+            emailTableView.getItems().add(email);
+            emailTextField.setText("");
+
+        } catch (Exception ex) {
+            showAlert(ex, "Error al guardar email");
+        }
     }
 
     @FXML
@@ -688,8 +697,25 @@ public class AseguradoHomeController implements Initializable, Controller {
     @FXML
     private void editarDatosPersonales(ActionEvent event) {
         Optional<Asegurado> editedAsegurado = createEditDatosPersonalesDialog(asegurado).showAndWait();
+        //OLD VALUES??
+        Asegurado edited = editedAsegurado.get();
+        if (edited != null){
+            try {
+                asegurado.setTipopersona(new TipoPersona(edited.getTipopersona().getTipopersona()));
+                asegurado.getCliente().setNombre(edited.getCliente().getNombre());
+                asegurado.getCliente().setApellidopaterno(edited.getCliente().getApellidopaterno());
+                asegurado.getCliente().setApellidomaterno(edited.getCliente().getApellidomaterno());
+                asegurado.getCliente().setNacimiento(edited.getCliente().getNacimiento());
+                asegurado.setRfc(edited.getRfc());
+//                Hibernate.initialize(asegurado);
+                Asegurado unproxy = Utilities.initializeAndUnproxy(asegurado);
+                MainApp.getInstance().getBaseDeDatos().edit(unproxy);
+                llenarDatosPersonales();
+            } catch (Exception e) {
+                showAlert(e, "Error al editar asegurado");
+            }
+        }
         //TODO: update asegurado
-        llenarDatosPersonales();
     }
 
     private Dialog<Asegurado> createEditDatosPersonalesDialog(Asegurado asegurado) {
@@ -768,13 +794,14 @@ public class AseguradoHomeController implements Initializable, Controller {
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
-                asegurado.setTipopersona(new TipoPersona(((RadioButton) group.getSelectedToggle()).getText()));
-                asegurado.getCliente().setNombre(nombreField.getText());
-                asegurado.getCliente().setApellidopaterno(paternoField.getText());
-                asegurado.getCliente().setApellidomaterno(maternoField.getText());
-                asegurado.getCliente().setNacimiento(nacimientoPicker.getValue());
-                asegurado.setRfc(rfcField.getText());
-                return asegurado;
+                Asegurado nuevoAsegurado = new Asegurado();
+                nuevoAsegurado.setTipopersona(new TipoPersona(((RadioButton) group.getSelectedToggle()).getText()));
+                nuevoAsegurado.getCliente().setNombre(nombreField.getText());
+                nuevoAsegurado.getCliente().setApellidopaterno(paternoField.getText());
+                nuevoAsegurado.getCliente().setApellidomaterno(maternoField.getText());
+                nuevoAsegurado.getCliente().setNacimiento(nacimientoPicker.getValue());
+                nuevoAsegurado.setRfc(rfcField.getText());
+                return nuevoAsegurado;
             }
             return null;
         });
@@ -910,6 +937,11 @@ public class AseguradoHomeController implements Initializable, Controller {
         } catch (IOException ex) {
             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void showAlert(Exception ex, String header) {
+        Alert alert = Utilities.makeAlert(ex, header);
+        alert.showAndWait();
     }
 
     @Override

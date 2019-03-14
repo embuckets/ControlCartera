@@ -27,6 +27,7 @@ import com.embuckets.controlcartera.entidades.controladores.exceptions.Preexisti
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -51,7 +52,7 @@ public class AseguradoJpaController implements Serializable, JpaController {
     }
 
     @Override
-    public void create(Object object) throws PreexistingEntityException, Exception {
+    public void create(Object object) throws EntityExistsException, Exception {
         Asegurado asegurado = (Asegurado) object;
         EntityManager em = null;
         try {
@@ -106,6 +107,38 @@ public class AseguradoJpaController implements Serializable, JpaController {
 //                em.close();
 //            }
 //        }
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        Asegurado asegurado = (Asegurado) object;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+
+//            if (asegurado.getIddomicilio() != null) {
+//                em.merge(asegurado.getIddomicilio());
+//            }
+            for (Telefono tel : asegurado.getTelefonoList()) {
+                em.merge(tel);
+            }
+            for (Email tel : asegurado.getEmailList()) {
+                em.merge(tel);
+            }
+            em.merge(asegurado.getCliente());
+            Asegurado merged = em.merge(asegurado);
+            em.getTransaction().commit();
+            return (T) merged;
+        } catch (Exception ex) {
+//            if (findAsegurado(asegurado.getIdcliente()) != null) {
+//                throw new PreexistingEntityException("Asegurado " + asegurado + " already exists.", ex);
+//            }
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
     }
 
 //    @Override

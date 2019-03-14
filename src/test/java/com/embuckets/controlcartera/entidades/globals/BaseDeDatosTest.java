@@ -115,7 +115,7 @@ public class BaseDeDatosTest {
         asegurado.getIddomicilio().setDelegacion(delegaciones.get(5));
         List<Estado> estados = bd.getAll(Estado.class);
         asegurado.getIddomicilio().setEstado(estados.get(5));
-        bd.create(asegurado);
+//        bd.create(asegurado);
         assertNotNull(asegurado.getId());
         assertNotNull(bd.getById(Asegurado.class, asegurado.getId()));
     }
@@ -211,7 +211,7 @@ public class BaseDeDatosTest {
         poliza1.setContratante(asegurado);
 
         asegurado.getPolizaList().add(poliza1);
-        bd.create(poliza1);
+//        bd.create(poliza1);
         Poliza retrieved = bd.getById(Poliza.class, poliza1.getIdpoliza());
         assertNotNull(retrieved);
         assertNotNull(retrieved.getPolizaVida());
@@ -260,7 +260,7 @@ public class BaseDeDatosTest {
         poliza2.setContratante(asegurado);
 
         asegurado.getPolizaList().add(poliza2);
-        bd.create(poliza2);
+//        bd.create(poliza2);
         Poliza retrieved = bd.getById(Poliza.class, poliza2.getIdpoliza());
         assertNotNull(retrieved);
         assertNotNull(retrieved.getPolizaAuto());
@@ -314,7 +314,7 @@ public class BaseDeDatosTest {
         nuevoAuto.setSubmarca("NUEVO AUTO");
         nuevoAuto.setModelo(Year.parse("2017"));
         nuevoAuto.setIdpoliza(poliza.getPolizaAuto());
-        bd.create(nuevoAuto);
+//        bd.create(nuevoAuto);
         assertNotNull(nuevoAuto.getIdauto());
 //        assertNull(asegurado);
     }

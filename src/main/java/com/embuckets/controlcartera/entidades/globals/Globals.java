@@ -27,7 +27,7 @@ public class Globals {
     public static String MONEDA_UDIS = "UDIS";
 
     public static String DOCUMENTO_ASEGURADO_TIPO_DOMICILIO = "Domicilio";
-    public static String DOCUMENTO_ASEGURADO_TIPO_IDENTIFICACION = "Identificacion";
+    public static String DOCUMENTO_ASEGURADO_TIPO_IDENTIFICACION = "Identificación";
     public static String DOCUMENTO_ASEGURADO_TIPO_RFC = "RFC";
     public static String DOCUMENTO_ASEGURADO_TIPO_OTRO = "Otro";
 

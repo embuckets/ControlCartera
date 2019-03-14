@@ -79,6 +79,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.RollbackException;
+import org.hibernate.HibernateException;
+import org.hibernate.JDBCException;
 
 /**
  *
@@ -108,11 +110,13 @@ public class BaseDeDatos {
         return em;
     }
 
-    public void create(Object object) {
+    public void create(Object object) throws Exception {
         try {
             controllers.get(object.getClass()).create(object);
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            String message = ex.getCause().getCause().getMessage();
+            throw ex;
         }
     }
 
@@ -134,13 +138,13 @@ public class BaseDeDatos {
         return null;
     }
 
-    public <T> T edit(Object object) {
+    public <T> T edit(Object object) throws Exception {
         try {
             return controllers.get(object.getClass()).edit(object);
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
         }
-        return null;
     }
 
     public void remove(Object object) {
