@@ -14,6 +14,9 @@ import java.text.DecimalFormat;
  */
 public class Globals {
 
+    public static String TIPO_PERSONA_MORAL = "Moral";
+    public static String TIPO_PERSONA_FISICA = "Física";
+
     public static String TELEFONO_TIPO_CASA = "Casa";
     public static String TELEFONO_TIPO_MOVIL = "Móvil";
     public static String TELEFONO_TIPO_TRABAJO = "Trabajo";
@@ -63,6 +66,13 @@ public class Globals {
 
     public static String POLIZA_AUTO_SUMA_FACTURA = "Factura";
     public static String POLIZA_AUTO_SUMA_COMERCIAL = "Comercial";
+
+    public static String[] getAllTipoPersona() {
+        return new String[]{
+            TIPO_PERSONA_MORAL,
+            TIPO_PERSONA_FISICA
+        };
+    }
 
     public static String[] getAllTelefonoTipos() {
         return new String[]{

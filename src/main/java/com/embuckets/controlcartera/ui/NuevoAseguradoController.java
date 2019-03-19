@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.ui;
 
+import com.embuckets.controlcartera.entidades.globals.Utilities;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Delegacion;
 import com.embuckets.controlcartera.entidades.Domicilio;

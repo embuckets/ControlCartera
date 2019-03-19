@@ -6,15 +6,20 @@
 package com.embuckets.controlcartera.ui;
 
 import com.embuckets.controlcartera.entidades.Auto;
+import com.embuckets.controlcartera.entidades.Beneficiario;
 import com.embuckets.controlcartera.entidades.Caratula;
 import com.embuckets.controlcartera.entidades.Cliente;
+import com.embuckets.controlcartera.entidades.Cobranza;
+import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
+import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.PolizaGmm;
 import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Utilities;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +40,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -456,12 +463,15 @@ public class PolizaHomeController implements Initializable {
 
         Button agregarDependienteButton = new Button("Agregar");
         agregarDependienteButton.setOnAction(event -> {
-            Optional<Cliente> auto = createAgregarClienteDialog().showAndWait();
-            auto.ifPresent(present -> {
-                polizaGmm.getClienteList().add(present);
-                clientesTableView.getItems().clear();
-                clientesTableView.setItems(FXCollections.observableArrayList(polizaGmm.getClienteList()));
-                //TDOD: agregar beneficiario a la base
+            Optional<Cliente> cliente = createAgregarClienteDialog().showAndWait();
+            cliente.ifPresent(present -> {
+                try {
+                    MainApp.getInstance().getBaseDeDatos().create(new Dependiente(present, polizaGmm));
+                    polizaGmm.getClienteList().add(present);
+                    clientesTableView.getItems().add(present);
+                } catch (Exception e) {
+                    Utilities.makeAlert(e, "Error al agregar dependiente").showAndWait();
+                }
             });
         });
 
@@ -495,13 +505,24 @@ public class PolizaHomeController implements Initializable {
             final ContextMenu menu = new ContextMenu();
             MenuItem borrarMenuItem = new MenuItem("Borrar");
             borrarMenuItem.setOnAction(event -> {
-                polizaGmm.getClienteList().remove(row.getItem());
-                clientesTableView.getItems().remove(row.getItem());
+                Cliente cliente = row.getItem();
+                try {
+                    MainApp.getInstance().getBaseDeDatos().remove(new Dependiente(cliente, polizaGmm));
+                    polizaGmm.getClienteList().remove(row.getItem());
+                    clientesTableView.getItems().remove(row.getItem());
+                } catch (Exception e) {
+                    Utilities.makeAlert(e, "Error al borrar dependiente").showAndWait();
+                }
             });
             MenuItem editarMenuItem = new MenuItem("Editar");
             editarMenuItem.setOnAction(event -> {
                 Optional<Cliente> cliente = createEditarBeneficiarioDialog(row.getItem()).showAndWait();
                 cliente.ifPresent(present -> {
+                    try {
+                        MainApp.getInstance().getBaseDeDatos().edit(new Dependiente(present, polizaGmm));
+                    } catch (Exception e) {
+                        Utilities.makeAlert(e, "Error al editar dependiente").showAndWait();
+                    }
                     clientesTableView.getItems().clear();
                     clientesTableView.setItems(FXCollections.observableArrayList(polizaGmm.getClienteList()));
                 });
@@ -530,12 +551,16 @@ public class PolizaHomeController implements Initializable {
 
         Button agregarBeneficiarioButton = new Button("Agregar");
         agregarBeneficiarioButton.setOnAction(event -> {
-            Optional<Cliente> auto = createAgregarClienteDialog().showAndWait();
-            auto.ifPresent(present -> {
-                polizaVida.getClienteList().add(present);
-                clientesTableView.getItems().clear();
-                clientesTableView.setItems(FXCollections.observableArrayList(polizaVida.getClienteList()));
-                //TDOD: agregar beneficiario a la base
+            Optional<Cliente> beneficiario = createAgregarClienteDialog().showAndWait();
+            beneficiario.ifPresent(present -> {
+                try {
+                    //TODO
+                    MainApp.getInstance().getBaseDeDatos().create(new Beneficiario(present, polizaVida));
+                    polizaVida.getClienteList().add(present);
+                    clientesTableView.getItems().add(present);
+                } catch (Exception e) {
+                    Utilities.makeAlert(e, "Error al agregar beneficiario").showAndWait();
+                }
             });
         });
 
@@ -566,7 +591,7 @@ public class PolizaHomeController implements Initializable {
         TextField paternoField = new TextField();
         TextField maternoField = new TextField();
         DatePicker naciminetoDatePicker = new DatePicker();
-        naciminetoDatePicker.setPromptText("dd/mm/aaaa");
+//        naciminetoDatePicker.setPromptText("");
 
         grid.add(new Label("Nombre"), 0, 0);
         grid.add(nombreField, 1, 0);
@@ -578,6 +603,10 @@ public class PolizaHomeController implements Initializable {
         grid.add(naciminetoDatePicker, 1, 3);
 
         dialog.getDialogPane().setContent(grid);
+        final Button btnOk = (Button) dialog.getDialogPane().lookupButton(guardar);
+        BooleanBinding predicate = nombreField.textProperty().isEmpty().or(paternoField.textProperty().isEmpty());
+        btnOk.disableProperty().bind(predicate);
+
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
                 Cliente cliente = new Cliente();
@@ -614,13 +643,24 @@ public class PolizaHomeController implements Initializable {
             final ContextMenu menu = new ContextMenu();
             MenuItem borrarMenuItem = new MenuItem("Borrar");
             borrarMenuItem.setOnAction(event -> {
-                polizaVida.getClienteList().remove(row.getItem());
-                clientesTableView.getItems().remove(row.getItem());
+                Cliente cliente = row.getItem();
+                try {
+                    MainApp.getInstance().getBaseDeDatos().remove(new Beneficiario(cliente, polizaVida));
+                    polizaVida.getClienteList().remove(row.getItem());
+                    clientesTableView.getItems().remove(row.getItem());
+                } catch (Exception e) {
+                    Utilities.makeAlert(e, "Error al borrar beneficiario").showAndWait();
+                }
             });
             MenuItem editarMenuItem = new MenuItem("Editar");
             editarMenuItem.setOnAction(event -> {
                 Optional<Cliente> cliente = createEditarBeneficiarioDialog(row.getItem()).showAndWait();
                 cliente.ifPresent(present -> {
+                    try {
+                        MainApp.getInstance().getBaseDeDatos().edit(new Beneficiario(present, polizaVida));
+                    } catch (Exception e) {
+                        Utilities.makeAlert(e, "Error al editar beneficiario").showAndWait();
+                    }
                     clientesTableView.getItems().clear();
                     clientesTableView.setItems(FXCollections.observableArrayList(polizaVida.getClienteList()));
                 });
@@ -808,7 +848,16 @@ public class PolizaHomeController implements Initializable {
         if (recibo.getCobranza().getCobranza().equalsIgnoreCase(Globals.RECIBO_COBRANZA_PENDIENTE)) {
             MenuItem pagarItem = new MenuItem("Pagar");
             pagarItem.setOnAction((event) -> {
-                recibo.getCobranza().setCobranza(Globals.RECIBO_COBRANZA_PAGADO);
+                try {
+                    recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PAGADO));
+                    MainApp.getInstance().getBaseDeDatos().edit(recibo);
+                } catch (Exception e) {
+                    recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PENDIENTE));
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error al cambiar a estatus de pago");
+                    alert.setContentText(e.getLocalizedMessage());
+                }
                 //TODO: refresh list
                 //guardar en base de datos
                 //refresh contex menu??
@@ -914,26 +963,72 @@ public class PolizaHomeController implements Initializable {
 
     @FXML
     private void renovarPoliza(ActionEvent event) {
+        //TODO: hacer ventana de renovar poliza
     }
 
     @FXML
     private void cancelarPoliza(ActionEvent event) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Cancelar poliza");
+        alert.setHeaderText("Seguro que quieres cancelar la poliza?");
+        alert.setContentText("Esta acción cambia el estatus de la poliza a cancelada y no se enviaran notificaciones.\n"
+                + "Podrás consultarla en cualquier momento.");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            EstadoPoliza anterior = poliza.getEstado();
+            try {
+                poliza.setEstado(new EstadoPoliza(Globals.POLIZA_ESTADO_CANCELADA));
+                MainApp.getInstance().getBaseDeDatos().edit(poliza);
+            } catch (Exception e) {
+                poliza.setEstado(new EstadoPoliza(anterior.getEstado()));
+                Alert error = Utilities.makeAlert(e, "Error al cancelar poliza");
+                error.showAndWait();
+            }
+            estadoTextField.setText(poliza.getEstado().getEstado());
+            // ... user chose OK
+        }
+//        else {
+//            // ... user chose CANCEL or closed the dialog
+//        }
     }
 
     @FXML
     private void eliminarPoliza(ActionEvent event) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Borrar poliza");
+        alert.setHeaderText("Seguro que quieres borrar la poliza?");
+        alert.setContentText("Esta acción eliminara la poliza permanentemente.\nQuiere continuar?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            EstadoPoliza anterior = poliza.getEstado();
+            try {
+                MainApp.getInstance().getBaseDeDatos().remove(poliza);
+            } catch (Exception e) {
+                Alert error = Utilities.makeAlert(e, "Error al borrar poliza");
+                error.showAndWait();
+            }
+            // ... user chose OK
+        }
     }
 
     @FXML
     private void editarNota(ActionEvent event) {
-        Optional<String> nuevaNota = createEditNotaDialog(poliza).showAndWait();
+        Optional<String> nuevaNota = createEditNotaDialog(poliza.getNota()).showAndWait();
         nuevaNota.ifPresent((present) -> {
-            notaTextArea.setText(present);
+            String old = poliza.getNota();
+            try {
+                poliza.setNota(present);
+                MainApp.getInstance().getBaseDeDatos().edit(poliza);
+            } catch (Exception e) {
+                poliza.setNota(old);
+                Utilities.makeAlert(e, "Error al editar nota").showAndWait();
+            }
+            notaTextArea.setText(poliza.getNota());
             //TODO: persistir nota
         });
     }
 
-    private Dialog<String> createEditNotaDialog(Poliza poliza) {
+    private Dialog<String> createEditNotaDialog(String nota) {
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Editar nota");
         //set the button types
@@ -944,15 +1039,14 @@ public class PolizaHomeController implements Initializable {
         VBox grid = new VBox();
         grid.setSpacing(10);
 
-        TextArea notaArea = new TextArea(poliza.getNota());
+        TextArea notaArea = new TextArea(nota);
 
         grid.getChildren().addAll(new Label("Nota"), notaArea);
 
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
-                poliza.setNota(notaArea.getText());
-                return poliza.getNota();
+                return notaArea.getText();
             }
             return null;
         });

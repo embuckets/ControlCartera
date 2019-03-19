@@ -117,9 +117,15 @@ public class AseguradoJpaController implements Serializable, JpaController {
             em = BaseDeDatos.getInstance().getEntityManager();
             em.getTransaction().begin();
 
-//            if (asegurado.getIddomicilio() != null) {
-//                em.merge(asegurado.getIddomicilio());
-//            }
+            if (asegurado.getIddomicilio() != null) {
+                if (asegurado.getIddomicilio().getCalle() != null) {
+                    em.merge(asegurado.getIddomicilio());
+
+                } else {
+                    asegurado.getIddomicilio().setAseguradoList(null);
+                    asegurado.setIddomicilio(null);
+                }
+            }
             for (Telefono tel : asegurado.getTelefonoList()) {
                 em.merge(tel);
             }

@@ -16,6 +16,8 @@ import com.embuckets.controlcartera.entidades.TelefonoPK;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import com.embuckets.controlcartera.entidades.globals.Utilities;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -208,6 +210,29 @@ public class TelefonoJpaController implements Serializable, JpaController {
             em.close();
         }
     }
+
+    @Override
+    public void remove(Object object) {
+        EntityManager em = null;
+        Telefono telefono = (Telefono) object;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+            List<Telefono> asegUnproxy = Utilities.initializeAndUnproxy(telefono.getAsegurado().getTelefonoList());
+            asegUnproxy.remove(telefono);
+//            email.getAsegurado().getEmailList().remove(email);
+            em.merge(telefono.getAsegurado());
+            em.remove(telefono);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+    
+    
 
     @Override
     public String getControlledClassName() {

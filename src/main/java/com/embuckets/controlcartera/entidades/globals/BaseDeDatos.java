@@ -8,11 +8,13 @@ package com.embuckets.controlcartera.entidades.globals;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Aseguradora;
 import com.embuckets.controlcartera.entidades.Auto;
+import com.embuckets.controlcartera.entidades.Beneficiario;
 import com.embuckets.controlcartera.entidades.Caratula;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.Cobranza;
 import com.embuckets.controlcartera.entidades.ConductoCobro;
 import com.embuckets.controlcartera.entidades.Delegacion;
+import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.DocumentoRecibo;
 import com.embuckets.controlcartera.entidades.Domicilio;
@@ -39,11 +41,13 @@ import com.embuckets.controlcartera.entidades.TipoTelefono;
 import com.embuckets.controlcartera.entidades.controladores.AseguradoJpaController;
 import com.embuckets.controlcartera.entidades.controladores.AseguradoraJpaController;
 import com.embuckets.controlcartera.entidades.controladores.AutoJpaController;
+import com.embuckets.controlcartera.entidades.controladores.BeneficiarioJpaController;
 import com.embuckets.controlcartera.entidades.controladores.CaratulaJpaController;
 import com.embuckets.controlcartera.entidades.controladores.ClienteJpaController;
 import com.embuckets.controlcartera.entidades.controladores.CobranzaJpaController;
 import com.embuckets.controlcartera.entidades.controladores.ConductoCobroJpaController;
 import com.embuckets.controlcartera.entidades.controladores.DelegacionJpaController;
+import com.embuckets.controlcartera.entidades.controladores.DependienteJpaController;
 import com.embuckets.controlcartera.entidades.controladores.DocumentoAseguradoJpaController;
 import com.embuckets.controlcartera.entidades.controladores.DocumentoReciboJpaController;
 import com.embuckets.controlcartera.entidades.controladores.DomicilioJpaController;
@@ -147,8 +151,13 @@ public class BaseDeDatos {
         }
     }
 
-    public void remove(Object object) {
-        controllers.get(object.getClass()).remove(object);
+    public void remove(Object object) throws Exception {
+        try {
+            controllers.get(object.getClass()).remove(object);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
     }
 
     public void close() {
@@ -218,6 +227,8 @@ public class BaseDeDatos {
         map.put(TipoEmail.class, new TipoEmailJpaController());
         map.put(TipoPersona.class, new TipoPersonaJpaController());
         map.put(TipoTelefono.class, new TipoTelefonoJpaController());
+        map.put(Beneficiario.class, new BeneficiarioJpaController());
+        map.put(Dependiente.class, new DependienteJpaController());
         return map;
     }
 

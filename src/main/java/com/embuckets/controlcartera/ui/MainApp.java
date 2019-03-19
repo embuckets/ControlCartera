@@ -117,7 +117,7 @@ public class MainApp extends Application {
     }
 
     public void goBack() throws IOException {
-        Pair pair = windowStack.getLast();
+        Pair pair = windowStack.pollLast();
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource((String) pair.getValue()));
         Parent page = (Parent) loader.load();
         Controller controller = loader.<Controller>getController();

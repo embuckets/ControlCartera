@@ -647,8 +647,6 @@ public class PolizaJpaController implements Serializable, JpaController {
                     query.setParameter("idcliente", cliente.getIdcliente());
                     query.setParameter("idpoliza", poliza.getIdpoliza());
                     query.executeUpdate();
-
-                    //TODOñ persistit benef
                 }
             }
             em.getTransaction().commit();
@@ -661,17 +659,32 @@ public class PolizaJpaController implements Serializable, JpaController {
     }
 
 //    @Override
-//    public void remove(Object object) {
-//        EntityManager em = getEntityManager();
+//    public void remove(Object object) throws Exception {
+//        Poliza poliza = (Poliza) object;
+//        boolean isSubTransaction = false;
+//        EntityManager em = null;
 //        try {
 //            em = BaseDeDatos.getInstance().getEntityManager();
-//            em.getTransaction().begin();
-//            em.remove(object);
-//            em.getReference(entityClass, object)
-//            
-//            
-//        } finally {
-//            em.close();
+//            if (em.getTransaction().isActive()) {
+//                isSubTransaction = true;
+//            }
+//            if (!isSubTransaction) {
+//                em.getTransaction().begin();
+//            }
+//
+//            if (poliza.getPolizaVida() != null) {
+//                PolizaVidaJpaController polizaVidaJpaController = new PolizaVidaJpaController();
+//                polizaVidaJpaController.remove(poliza.getPolizaVida());
+//            }
+//            em.remove(poliza);
+//            if (!isSubTransaction) {
+//                em.getTransaction().commit();
+//            }
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
 //        }
 //    }
 

@@ -16,6 +16,8 @@ import com.embuckets.controlcartera.entidades.EmailPK;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import com.embuckets.controlcartera.entidades.globals.Utilities;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -208,6 +210,50 @@ public class EmailJpaController implements Serializable, JpaController {
             em.close();
         }
     }
+
+    @Override
+    public void remove(Object object) {
+        EntityManager em = null;
+        Email email = (Email) object;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+            List<Email> asegUnproxy = Utilities.initializeAndUnproxy(email.getAsegurado().getEmailList());
+            asegUnproxy.remove(email);
+//            email.getAsegurado().getEmailList().remove(email);
+            em.merge(email.getAsegurado());
+            em.remove(email);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+//    @Override
+//    public <T> T edit(Object object) throws Exception {
+//        EntityManager em = null;
+//        Email email = (Email) object;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            em.getTransaction().begin();
+//            Query query = em.createNativeQuery("UPDATE Email e SET e.emailPK.email = :email, e.tipoemail.tipoemail = :tipo where e.emailPK.idcliente = :idcliente");
+//            query.setParameter("email", email.getEmailPK().getEmail());
+//            query.setParameter("tipo", email.getTipoemail().getTipoemail());
+//            query.setParameter("idcliente", email.getEmailPK().getIdcliente());
+//            query.executeUpdate();
+//            T merged = em.merge((T) email);
+//            em.getTransaction().commit();
+//            return merged;
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
 
     @Override
     public String getControlledClassName() {

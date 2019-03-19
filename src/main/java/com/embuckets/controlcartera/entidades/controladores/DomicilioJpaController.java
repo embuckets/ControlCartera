@@ -15,6 +15,7 @@ import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -245,6 +246,28 @@ public class DomicilioJpaController implements Serializable, JpaController {
             return ((Long) q.getSingleResult()).intValue();
         } finally {
             em.close();
+        }
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        EntityManager em = null;
+        Domicilio domicilio = (Domicilio) object;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+            if (domicilio.getIddomicilio() == null) {
+                em.persist(domicilio);
+            } else {
+                em.merge(domicilio);
+            }
+            em.getTransaction().commit();
+            return (T) domicilio;
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
         }
     }
 

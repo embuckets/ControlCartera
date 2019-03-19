@@ -227,7 +227,7 @@ public class Cliente implements Serializable, ObservableCliente {
 
     @Override
     public StringProperty nacimientoProperty() {
-        return new SimpleStringProperty(nacimiento.toString());
+        return new SimpleStringProperty(nacimiento == null ? "" : nacimiento.toString());
     }
 
 }

@@ -92,7 +92,7 @@ public interface JpaController {
         }
     }
 
-    default void remove(Object object) {
+    default void remove(Object object) throws Exception {
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
@@ -106,7 +106,7 @@ public interface JpaController {
             throw ex;
         }
     }
-    
+
     String getControlledClassName();
 
     String getFindByIdNamedQuery();

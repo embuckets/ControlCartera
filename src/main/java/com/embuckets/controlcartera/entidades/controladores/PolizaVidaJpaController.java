@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.entidades.controladores;
 
+import com.embuckets.controlcartera.entidades.Beneficiario;
 import java.io.Serializable;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
@@ -17,6 +18,7 @@ import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -269,6 +271,38 @@ public class PolizaVidaJpaController implements Serializable, JpaController {
             return ((Long) q.getSingleResult()).intValue();
         } finally {
             em.close();
+        }
+    }
+
+    @Override
+    public void remove(Object object) throws Exception {
+        PolizaVida polizaVida = (PolizaVida) object;
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+            BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
+            for (Cliente cliente : polizaVida.getClienteList()) {
+                beneficiarioJpaController.remove(new Beneficiario(cliente, polizaVida));
+            }
+//            Poliza parent = polizaVida.getPoliza();
+//            parent.setPolizaVida(null);
+//            em.merge(parent);
+//            em.remove(polizaVida);
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
         }
     }
 

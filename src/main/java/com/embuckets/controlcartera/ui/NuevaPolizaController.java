@@ -19,6 +19,7 @@ import com.embuckets.controlcartera.entidades.PolizaGmm;
 import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +27,13 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -40,6 +43,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -258,7 +262,7 @@ public class NuevaPolizaController implements Initializable, Controller {
         HBox headerHBox = new HBox();
         headerHBox.getChildren().add(new Label("Poliza de Autos"));
         HBox contentBox = new HBox();
-        sumaAseguradaAutosBox = new ComboBox<>(FXCollections.observableArrayList(getSumaAseguradaAutosValues()));
+        sumaAseguradaAutosBox = new ComboBox<>(FXCollections.observableArrayList(Globals.getAllPolizaAutoSumas()));
         contentBox.setSpacing(10);
         contentBox.getChildren().addAll(new Label("Suma asegurada"), sumaAseguradaAutosBox);
 
@@ -280,6 +284,7 @@ public class NuevaPolizaController implements Initializable, Controller {
 
     private ArrayList<String> getSumaAseguradaAutosValues() {
         ArrayList<String> values = new ArrayList<>();
+
         values.add(Globals.POLIZA_AUTO_SUMA_COMERCIAL);
         values.add(Globals.POLIZA_AUTO_SUMA_FACTURA);
         return values;
@@ -342,62 +347,25 @@ public class NuevaPolizaController implements Initializable, Controller {
         });
     }
 
-    private String[] getAseguradoras() {
-        return new String[]{"Inbursa",
-            "Quálitas",
-            "Afirme",
-            "Argos",
-            "Atlas",
-            "Azteca",
-            "Banorte",
-            "BBVA Bancomer",
-            "Sura",
-            "Monterrey New York Life",
-            "Tokio Marine",
-            "UMBRELLA",
-            "Virginia Surety",
-            "Zurich"
-        };
+    private List<String> getAseguradoras() {
+        List<Aseguradora> aseguradoras = MainApp.getInstance().getBaseDeDatos().getAll(Aseguradora.class);
+        return aseguradoras.stream().map(a -> a.getAseguradora()).collect(Collectors.toList());
     }
 
     private String[] getRamos() {
-        return new String[]{
-            Globals.POLIZA_RAMO_AUTOS,
-            Globals.POLIZA_RAMO_ACC_PER,
-            Globals.POLIZA_RAMO_EMPRESARIAL,
-            Globals.POLIZA_RAMO_FLOTILLA,
-            Globals.POLIZA_RAMO_GM,
-            Globals.POLIZA_RAMO_HOGAR,
-            Globals.POLIZA_RAMO_INVERSION,
-            Globals.POLIZA_RAMO_RC,
-            Globals.POLIZA_RAMO_TRANSPORTE,
-            Globals.POLIZA_RAMO_VIDA
-        };
+        return Globals.getAllRamos();
     }
 
     private String[] getConductoCobro() {
-        return new String[]{
-            Globals.CONDUCTO_COBRO_AGENTE,
-            Globals.CONDUCTO_COBRO_CAT,
-            Globals.CONDUCTO_COBRO_CASH
-        };
+        return Globals.getAllConductoCobro();
     }
 
     private String[] getFormaPago() {
-        return new String[]{
-            Globals.FORMA_PAGO_ANUAL,
-            Globals.FORMA_PAGO_SEMESTRAL,
-            Globals.FORMA_PAGO_TRIMESTRAL,
-            Globals.FORMA_PAGO_MENSUAL
-        };
+        return Globals.getAllFormaPago();
     }
 
     private String[] getMoneda() {
-        return new String[]{
-            Globals.MONEDA_PESOS,
-            Globals.MONEDA_DOLARES,
-            Globals.MONEDA_UMAM
-        };
+        return Globals.getAllMonedas();
     }
 
     private int cuantosRecibos() {
@@ -484,7 +452,8 @@ public class NuevaPolizaController implements Initializable, Controller {
 
     @FXML
     private void guardar(ActionEvent event) {
-        if (validarDatos()) {
+        List<String> errores = new ArrayList<>();
+        if (validarDatos(errores)) {
             poliza.setNumero(numeroField.getText());
             poliza.setContratante(contratante);
             poliza.setAseguradora(new Aseguradora(aseguradoraCombo.getValue()));
@@ -532,6 +501,7 @@ public class NuevaPolizaController implements Initializable, Controller {
 
             try {
                 //TODO: guardar poliza en base de datos
+                MainApp.getInstance().getBaseDeDatos().create(poliza);
                 FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/PolizaHome.fxml"), null, new JavaFXBuilderFactory());
                 Parent parent = loader.load();
                 PolizaHomeController controller = loader.<PolizaHomeController>getController();
@@ -539,26 +509,63 @@ public class NuevaPolizaController implements Initializable, Controller {
                 MainApp.getInstance().changeSceneContent(this, location, parent, loader);
             } catch (IOException ex) {
                 Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(NuevaPolizaController.class.getName()).log(Level.SEVERE, null, ex);
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error al guardar poliza");
+                alert.setContentText(ex.getCause().getLocalizedMessage());
+                alert.showAndWait();
             }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error al guardar poliza");
+            String mensaje = "";
+            mensaje = errores.stream().map((error) -> error + "\n").reduce(mensaje, String::concat);
+            alert.setContentText(mensaje);
+            alert.showAndWait();
         }
     }
-    //    private HBox 
 
-    private boolean validarDatos() {
+    private boolean validarDatos(List<String> errores) {
         if (this.contratante == null) {
+            errores.add("Contratante no puede estar vacío");
             return false;
         }
         if (this.titular == null) {
+            errores.add("Titular no puede estar vacío");
             return false;
         }
         if (numeroField.getText().isEmpty() && inicioVigenciaPicker.getValue() == null && finVigenciaPicker.getValue() == null && primaField.getText().isEmpty()) {
+            errores.add("Numero de poliza, inicio de vigencia y prima no pueden estar vacíos");
             return false;
         }
         if (importePrimerReciboField.getText().isEmpty()) {
+            errores.add("El importe del primer recibo no puede estar vacío");
             return false;
         }
         if (importeSubsecuentesField.getText().isEmpty() && !formaPagoCombo.getValue().equalsIgnoreCase(Globals.FORMA_PAGO_ANUAL)) {
+            errores.add("El importe de los recbios subsecuentes no puede estar vacío");
             return false;
+        }
+
+        //VALIDAR DATOS ESPECIALES
+        if (ramoCombo.getValue().equals(Globals.POLIZA_RAMO_GM)) {
+            if (deducibleGMField.getText().isEmpty() || sumaAseguradaGMField.getText().isEmpty() || coaseguroGMBox.getValue() == null) {
+                errores.add("Datos de poliza de Gastos Médicos incompletos");
+                return false;
+            }
+        } else if (ramoCombo.getValue().equals(Globals.POLIZA_RAMO_AUTOS) || ramoCombo.getValue().equals(Globals.POLIZA_RAMO_FLOTILLA)) {
+            if (sumaAseguradaAutosBox.getValue() == null) {
+                errores.add("Datos de poliza de Autos incompletos");
+                return false;
+            }
+        } else if (ramoCombo.getValue().equals(Globals.POLIZA_RAMO_VIDA)) {
+            if (sumaAseguradaVidaField.getText().isEmpty()) {
+                errores.add("Datos de poliza de Vida incompletos");
+                return false;
+            }
         }
         return true;
     }

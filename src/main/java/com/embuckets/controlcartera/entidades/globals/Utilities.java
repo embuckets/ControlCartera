@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.embuckets.controlcartera.ui;
+package com.embuckets.controlcartera.entidades.globals;
 
 import javafx.scene.control.Alert;
 import org.hibernate.Hibernate;
@@ -19,7 +19,7 @@ public class Utilities {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(header);
-        alert.setContentText(ex.getMessage());
+        alert.setContentText(ex.getCause().getLocalizedMessage());
         return alert;
     }
 

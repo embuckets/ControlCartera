@@ -30,6 +30,8 @@ import java.time.Month;
 import java.time.Year;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -157,9 +159,14 @@ public class BaseDeDatosTest {
         String nuevoNombre = "Nuevo Nombre";
         asegurado.getCliente().setNombre(nuevoNombre);
 //        asegurado.getEmailList().get(0).setTipoemail(new TipoEmail(Globals.EMAIL_TIPO_TRABAJO));
-        Asegurado edited = bd.edit(asegurado);
-        assertEquals(edited.getCliente().getNombre(), nuevoNombre);
-        assertEquals(asegurado, edited);
+        Asegurado edited;
+        try {
+            edited = bd.edit(asegurado);
+            assertEquals(edited.getCliente().getNombre(), nuevoNombre);
+            assertEquals(asegurado, edited);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatosTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
