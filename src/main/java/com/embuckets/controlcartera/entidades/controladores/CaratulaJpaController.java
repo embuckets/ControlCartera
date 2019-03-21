@@ -15,6 +15,7 @@ import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -197,6 +198,33 @@ public class CaratulaJpaController implements Serializable, JpaController {
             return ((Long) q.getSingleResult()).intValue();
         } finally {
             em.close();
+        }
+    }
+
+    @Override
+    public void remove(Object object) throws Exception {
+        Caratula caratula = (Caratula) object;
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+            Query query = em.createNativeQuery("DELETE FROM APP.Caratula WHERE idpoliza = :idpoliza");
+            query.setParameter("idpoliza", caratula.getIdpoliza());
+            query.executeUpdate();
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
         }
     }
 

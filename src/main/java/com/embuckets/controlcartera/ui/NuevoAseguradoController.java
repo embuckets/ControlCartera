@@ -8,10 +8,12 @@ package com.embuckets.controlcartera.ui;
 import com.embuckets.controlcartera.entidades.globals.Utilities;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Delegacion;
+import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.Email;
 import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.Telefono;
+import com.embuckets.controlcartera.entidades.TipoDocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
@@ -142,7 +144,7 @@ public class NuevoAseguradoController implements Initializable {
 
     //Documentos
     @FXML
-    private TableView documentoTableView;
+    private TableView<ObservableArchivo> documentoTableView;
     @FXML
     private TableColumn archivoTableColumn;
     @FXML
@@ -448,6 +450,14 @@ public class NuevoAseguradoController implements Initializable {
 
             //TODO: crear DocumentosAsegurado
             asegurado.setNota(notaTextArea.getText());
+
+            for (ObservableArchivo observableArchivo : documentoTableView.getItems()) {
+                File file = new File(observableArchivo.archivoProperty().get());
+                DocumentoAsegurado doc = new DocumentoAsegurado(file, observableArchivo.tipoProperty().get());
+                asegurado.agregarDocumento(doc);
+                doc.setAsegurado(asegurado);
+            }
+
             try {
                 //guardar asegurado
                 MainApp.getInstance().getBaseDeDatos().create(asegurado);

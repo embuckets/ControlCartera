@@ -5,9 +5,13 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -52,7 +56,7 @@ public class DocumentoRecibo implements Serializable {
     @Basic(optional = false)
     @Lob
     @Column(name = "ARCHIVO")
-    private Serializable archivo;
+    private byte[] archivo;
     @Column(name = "ACTUALIZADO")
 //    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime actualizado;
@@ -63,15 +67,28 @@ public class DocumentoRecibo implements Serializable {
     public DocumentoRecibo() {
     }
 
-    public DocumentoRecibo(Integer idrecibo) {
-        this.idrecibo = idrecibo;
-    }
-
-    public DocumentoRecibo(Integer idrecibo, String nombre, String extension, Serializable archivo) {
-        this.idrecibo = idrecibo;
-        this.nombre = nombre;
-        this.extension = extension;
-        this.archivo = archivo;
+//    public DocumentoRecibo(Integer idrecibo) {
+//        this.idrecibo = idrecibo;
+//    }
+//
+//    public DocumentoRecibo(Integer idrecibo, String nombre, String extension, Serializable archivo) {
+//        this.idrecibo = idrecibo;
+//        this.nombre = nombre;
+//        this.extension = extension;
+//        this.archivo = archivo;
+//    }
+    public DocumentoRecibo(File file, Recibo recibo) {
+        this.recibo = recibo;
+        this.idrecibo = recibo.getIdrecibo();
+        String[] tokens = file.getName().split("\\.");
+        this.nombre = tokens[0];
+        this.extension = "." + tokens[1];
+        this.actualizado = LocalDateTime.now();
+        try {
+            this.archivo = Files.readAllBytes(file.toPath());
+        } catch (Exception e) {
+            Logger.getLogger(DocumentoRecibo.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
     public Integer getIdrecibo() {
@@ -98,11 +115,11 @@ public class DocumentoRecibo implements Serializable {
         this.extension = extension;
     }
 
-    public Serializable getArchivo() {
+    public byte[] getArchivo() {
         return archivo;
     }
 
-    public void setArchivo(Serializable archivo) {
+    public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 
@@ -146,5 +163,5 @@ public class DocumentoRecibo implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.DocumentoRecibo[ idrecibo=" + idrecibo + " ]";
     }
-    
+
 }

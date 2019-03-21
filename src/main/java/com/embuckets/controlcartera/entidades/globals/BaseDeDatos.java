@@ -119,7 +119,6 @@ public class BaseDeDatos {
             controllers.get(object.getClass()).create(object);
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            String message = ex.getCause().getCause().getMessage();
             throw ex;
         }
     }
@@ -191,6 +190,15 @@ public class BaseDeDatos {
 //                System.err.println("Derby did not shut down normally");
                 Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
+
+    public void renovarPoliza(Poliza vieja, Poliza nueva) throws Exception {
+        try {
+            ((PolizaJpaController) controllers.get(Poliza.class)).renovar(vieja, nueva);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
         }
     }
 

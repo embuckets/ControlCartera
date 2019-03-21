@@ -226,6 +226,21 @@ public class Cliente implements Serializable, ObservableCliente {
     }
 
     @Override
+    public StringProperty primerNombreProperty() {
+        return new SimpleStringProperty(nombre);
+    }
+
+    @Override
+    public StringProperty paternoProperty() {
+        return new SimpleStringProperty(apellidopaterno);
+    }
+
+    @Override
+    public StringProperty maternoProperty() {
+        return new SimpleStringProperty(apellidomaterno);
+    }
+
+    @Override
     public StringProperty nacimientoProperty() {
         return new SimpleStringProperty(nacimiento == null ? "" : nacimiento.toString());
     }

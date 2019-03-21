@@ -6,39 +6,15 @@
 package com.embuckets.controlcartera.ui;
 
 import com.embuckets.controlcartera.entidades.Asegurado;
-import com.embuckets.controlcartera.entidades.Aseguradora;
-import com.embuckets.controlcartera.entidades.Auto;
 import com.embuckets.controlcartera.entidades.Cliente;
-import com.embuckets.controlcartera.entidades.ConductoCobro;
-import com.embuckets.controlcartera.entidades.EstadoPoliza;
-import com.embuckets.controlcartera.entidades.FormaPago;
-import com.embuckets.controlcartera.entidades.Moneda;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
-import com.embuckets.controlcartera.entidades.PolizaAuto;
-import com.embuckets.controlcartera.entidades.PolizaGmm;
-import com.embuckets.controlcartera.entidades.PolizaVida;
-import com.embuckets.controlcartera.entidades.Ramo;
-import com.embuckets.controlcartera.entidades.Recibo;
-import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
-import com.embuckets.controlcartera.entidades.TipoPersona;
-import com.embuckets.controlcartera.entidades.globals.Globals;
-import com.embuckets.controlcartera.ui.observable.ObservableAsegurado;
 import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
-import com.embuckets.controlcartera.ui.observable.ObservablePoliza;
 import com.embuckets.controlcartera.ui.observable.ObservableRenovacion;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
-import java.util.Date;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -141,14 +117,6 @@ public class HomeController implements Initializable, Controller {
 
     private void fillTablaAsegurados() {
         treeAsegurados.setRoot(createTree());
-        //agregar listeners
-//        treeAsegurados.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//            //Agregar listener para doble click que lleve a la pagina del asegurado o poliza
-//            System.out.println("oldValue: " + oldValue);//item previamente seleccionado
-//            System.out.println("newValue: " + newValue);//item actualmente seleccionado ObservableAsegurado | ObservablePoliza
-//            System.out.println("observable: " + observable);//item actualmente seleccionado ObservableAsegurado | ObservablePoliza
-//            System.out.println();
-//        });
 
         treeAsegurados.setRowFactory(table -> {
             TreeTableRow<ObservableTreeItem> row = new TreeTableRow<>();

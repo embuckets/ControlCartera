@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.entidades.controladores;
 
+import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.Serializable;
@@ -21,14 +22,16 @@ public class DependienteJpaController implements Serializable, JpaController {
     @Override
     public void create(Object object) throws EntityExistsException, Exception {
         EntityManager em = null;
-        Dependiente beneficiario = (Dependiente) object;
+        Dependiente dependiente = (Dependiente) object;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
             em.getTransaction().begin();
-            em.persist(beneficiario.getCliente());
+            if (dependiente.getCliente().getIdcliente() == null) {
+                em.persist(dependiente.getCliente());
+            }
             Query query = em.createNativeQuery("INSERT INTO APP.DEPENDIENTE (IDCLIENTE, IDPOLIZA) VALUES (:idcliente, :idpoliza)");
-            query.setParameter("idcliente", beneficiario.getCliente().getIdcliente());
-            query.setParameter("idpoliza", beneficiario.getPolizaGmm().getIdpoliza());
+            query.setParameter("idcliente", dependiente.getCliente().getIdcliente());
+            query.setParameter("idpoliza", dependiente.getPolizaGmm().getIdpoliza());
             query.executeUpdate();
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -95,4 +98,3 @@ public class DependienteJpaController implements Serializable, JpaController {
     }
 
 }
-

@@ -249,6 +249,7 @@
                                           <TableColumn fx:id="importeTableColumn" minWidth="100.0" prefWidth="100.0" text="Importe" />
                                           <TableColumn fx:id="cobranzaTableColumn" minWidth="100.0" prefWidth="100.0" text="Cobranza" />
                                           <TableColumn fx:id="notificacionTableColumn" minWidth="100.0" prefWidth="100.0" text="Última Notificación" />
+                                          <TableColumn fx:id="docReciboTableColumn" minWidth="100.0" prefWidth="100.0" text="Archivo" />
                                       </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

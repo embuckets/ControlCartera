@@ -37,5 +37,7 @@ public interface ObservableNotificacionRecibo {
     StringProperty cobranzaProperty();
 
     StringProperty enviadoProperty();
+    
+    StringProperty documentoProperty();
 
 }

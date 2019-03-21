@@ -31,7 +31,7 @@ public interface ObservableTreeItem {
     StringProperty primaProperty();
 
     StringProperty estadoProperty();
-    
+
     List<? extends ObservableTreeItem> getPolizaListProperty();
 
 }

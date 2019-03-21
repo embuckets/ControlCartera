@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Asegurado.findByIdcliente", query = "SELECT a FROM Asegurado a WHERE a.idcliente = :idcliente"),
     @NamedQuery(name = "Asegurado.findByRfc", query = "SELECT a FROM Asegurado a WHERE a.rfc = :rfc"),
     @NamedQuery(name = "Asegurado.findByNota", query = "SELECT a FROM Asegurado a WHERE a.nota = :nota")})
-public class Asegurado implements Serializable, ObservableTreeItem {
+public class Asegurado implements Serializable, ObservableTreeItem, ObservableCliente {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -256,6 +257,10 @@ public class Asegurado implements Serializable, ObservableTreeItem {
         emailList.add(email);
     }
 
+    public void agregarDocumento(DocumentoAsegurado documentoAsegurado) {
+        documentoAseguradoList.add(documentoAsegurado);
+    }
+
     @Override
     public int getId() {
         return getIdcliente();
@@ -306,4 +311,23 @@ public class Asegurado implements Serializable, ObservableTreeItem {
         return new SimpleStringProperty("");
     }
 
+    @Override
+    public StringProperty primerNombreProperty() {
+        return new SimpleStringProperty(cliente.getNombre());
+    }
+
+    @Override
+    public StringProperty paternoProperty() {
+        return new SimpleStringProperty(cliente.getApellidopaterno());
+    }
+
+    @Override
+    public StringProperty maternoProperty() {
+        return new SimpleStringProperty(cliente.getApellidomaterno());
+    }
+
+    @Override
+    public StringProperty nacimientoProperty() {
+        return new SimpleStringProperty(cliente.getNacimiento() == null ? "" : cliente.getNacimiento().toString());
+    }
 }

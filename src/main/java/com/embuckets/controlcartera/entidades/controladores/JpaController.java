@@ -19,12 +19,20 @@ import javax.persistence.Query;
 public interface JpaController {
 
     default void create(Object object) throws EntityExistsException, Exception {
+        boolean isSubTransaction = false;
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
             em.persist(object);
-            em.getTransaction().commit();
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -77,12 +85,20 @@ public interface JpaController {
     }
 
     default <T> T edit(Object object) throws Exception {
+        boolean isSubTransaction = false;
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
             T merged = em.merge((T) object);
-            em.getTransaction().commit();
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
             return merged;
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
@@ -93,12 +109,20 @@ public interface JpaController {
     }
 
     default void remove(Object object) throws Exception {
+        boolean isSubTransaction = false;
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
             em.remove(object);
-            em.getTransaction().commit();
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

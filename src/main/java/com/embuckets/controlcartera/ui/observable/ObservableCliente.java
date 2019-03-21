@@ -21,6 +21,12 @@ public interface ObservableCliente {
 
     StringProperty nombreProperty();
 
+    StringProperty primerNombreProperty();
+
+    StringProperty paternoProperty();
+
+    StringProperty maternoProperty();
+
     StringProperty nacimientoProperty();
 
 }

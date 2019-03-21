@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.ui;
 
+import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Auto;
 import com.embuckets.controlcartera.entidades.Beneficiario;
 import com.embuckets.controlcartera.entidades.Caratula;
@@ -12,6 +13,7 @@ import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.Cobranza;
 import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
+import com.embuckets.controlcartera.entidades.DocumentoRecibo;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
@@ -24,7 +26,11 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Year;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
@@ -33,13 +39,18 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -66,17 +77,18 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import javafx.util.Pair;
 
 /**
  * FXML Controller class
  *
  * @author emilio
  */
-public class PolizaHomeController implements Initializable {
+public class PolizaHomeController implements Initializable, Controller {
 
     @FXML
     private Label numeroPolizaLabel;
-    private String location = "fxml/PolizaHome.fxml";
+    private String location = "/fxml/PolizaHome.fxml";
 
     @FXML
     private Button eliminarPolizaButton;
@@ -134,6 +146,8 @@ public class PolizaHomeController implements Initializable {
     private TableColumn cobranzaTableColumn;
     @FXML
     private TableColumn notificacionTableColumn;
+    @FXML
+    private TableColumn docReciboTableColumn;
     @FXML
     private Button regresarButton1;
     //Nota
@@ -195,6 +209,9 @@ public class PolizaHomeController implements Initializable {
         primaTextField.setText(poliza.primaProperty().get());
         notaTextArea.setText(poliza.getNota());
 
+        renovarPolizaButton.disableProperty().bind(Bindings.not(estadoTextField.textProperty().isNotEqualTo(Globals.POLIZA_ESTADO_RENOVADA)));
+        cancelarPolizaButton.disableProperty().bind(Bindings.not(estadoTextField.textProperty().isEqualTo(Globals.POLIZA_ESTADO_VIGENTE)));
+
         llenarCamposEspeciales();
     }
 
@@ -236,10 +253,7 @@ public class PolizaHomeController implements Initializable {
         agregarAutoButton.setOnAction(event -> {
             Optional<Auto> auto = createAgregarAutoDialog(polizaAuto).showAndWait();
             auto.ifPresent(present -> {
-                polizaAuto.getAutoList().add(present);
-                autosTableView.getItems().clear();
-                autosTableView.setItems(FXCollections.observableArrayList(polizaAuto.getAutoList()));
-                //TDOD: agregar auto a la base
+                agregarAuto(present);
             });
         });
 
@@ -253,6 +267,16 @@ public class PolizaHomeController implements Initializable {
         configAutosTable(polizaAuto);
         secondColumnVBox.getChildren().addAll(sumaAseguradaPane, autosPane, autosTableView);
 
+    }
+
+    private void agregarAuto(Auto auto) {
+        try {
+            MainApp.getInstance().getBaseDeDatos().create(auto);
+            poliza.getPolizaAuto().getAutoList().add(auto);
+            autosTableView.getItems().add(auto);
+        } catch (Exception e) {
+            Utilities.makeAlert(e, "error al guardar auto").showAndWait();
+        }
     }
 
     private Dialog<Auto> createAgregarAutoDialog(PolizaAuto polizaAuto) {
@@ -292,6 +316,9 @@ public class PolizaHomeController implements Initializable {
         grid.add(modelofField, 1, 3);
 
         dialog.getDialogPane().setContent(grid);
+        final Button buttonOk = (Button) dialog.getDialogPane().lookupButton(guardar);
+        BooleanBinding binding = Bindings.or(marcaField.textProperty().isEmpty(), submarcaField.textProperty().isEmpty()).or(descripcionField.textProperty().isEmpty()).or(modelofField.textProperty().isEmpty());
+        buttonOk.disableProperty().bind(binding);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
                 Auto auto = new Auto();
@@ -336,16 +363,13 @@ public class PolizaHomeController implements Initializable {
             final ContextMenu menu = new ContextMenu();
             MenuItem borrarMenuItem = new MenuItem("Borrar");
             borrarMenuItem.setOnAction(event -> {
-                polizaAuto.getAutoList().remove(row.getItem());
-                autosTableView.getItems().remove(row.getItem());
-                //TODO quitar auto de la base de datos
+                borrarAuto(row.getItem());
             });
             MenuItem editarMenuItem = new MenuItem("Editar");
             editarMenuItem.setOnAction(event -> {
                 Optional<Auto> auto = createEditarAutoDialog(row.getItem()).showAndWait();
                 auto.ifPresent(present -> {
-                    autosTableView.getItems().clear();
-                    autosTableView.setItems(FXCollections.observableArrayList(polizaAuto.getAutoList()));
+                    editarAuto(row.getItem(), present);
                 });
                 //TODO quitar auto de la base de datos
             });
@@ -358,6 +382,52 @@ public class PolizaHomeController implements Initializable {
                             .otherwise((ContextMenu) null));
             return row;
         });
+    }
+
+    private void borrarAuto(Auto auto) {
+        try {
+            MainApp.getInstance().getBaseDeDatos().remove(auto);
+            poliza.getPolizaAuto().getAutoList().remove(auto);
+            autosTableView.getItems().remove(auto);
+        } catch (Exception e) {
+            Utilities.makeAlert(e, "error al borrar auto").showAndWait();
+        }
+    }
+
+    private void editarAuto(Auto actual, Auto edited) {
+        Map<String, Pair<Object, Object>> changes = new HashMap<>();
+        changes.put("desc", new Pair(actual.getDescripcion(), edited.getDescripcion()));
+        changes.put("marca", new Pair(actual.getMarca(), edited.getMarca()));
+        changes.put("submarca", new Pair(actual.getSubmarca(), edited.getSubmarca()));
+        changes.put("modelo", new Pair(actual.getModelo(), edited.getModelo()));
+        if (valuesChanged(changes)) {
+            try {
+                actual.setDescripcion(edited.getDescripcion());
+                actual.setMarca(edited.getMarca());
+                actual.setSubmarca(edited.getSubmarca());
+                actual.setModelo(Year.of(edited.getModelo().getYear()));
+                MainApp.getInstance().getBaseDeDatos().edit(actual);
+            } catch (Exception e) {
+                Utilities.makeAlert(e, "error al editar auto").showAndWait();
+                actual.setDescripcion((String) changes.get("desc").getKey());
+                actual.setMarca((String) changes.get("marca").getKey());
+                actual.setSubmarca((String) changes.get("submarca").getKey());
+                actual.setModelo(Year.of((int) changes.get("modelo").getKey()));
+            }
+            autosTableView.getItems().clear();
+            autosTableView.setItems(FXCollections.observableArrayList(poliza.getPolizaAuto().getAutoList()));
+
+        }
+    }
+
+    private boolean valuesChanged(Map<String, Pair<Object, Object>> changes) {
+        for (Pair pair : changes.values()) {
+            Object notNull = pair.getKey() == null ? "" : pair.getKey();
+            if (!notNull.equals(pair.getValue())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void setColumnWidth(TableColumn column, double min, double pref, double max) {
@@ -403,14 +473,19 @@ public class PolizaHomeController implements Initializable {
         grid.add(modelofField, 1, 3);
 
         dialog.getDialogPane().setContent(grid);
+        final Button buttonOk = (Button) dialog.getDialogPane().lookupButton(guardar);
+        BooleanBinding binding = Bindings.or(marcaField.textProperty().isEmpty(), submarcaField.textProperty().isEmpty()).or(descripcionField.textProperty().isEmpty()).or(modelofField.textProperty().isEmpty());
+        buttonOk.disableProperty().bind(binding);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
                 //si no estan vacios
-                auto.setDescripcion(descripcionField.getText());
-                auto.setMarca(marcaField.getText());
-                auto.setSubmarca(submarcaField.getText());
-                auto.setModelo(Year.of(Integer.valueOf(modelofField.getText())));
-                return auto;
+                Auto edited = new Auto();
+                edited.setDescripcion(descripcionField.getText());
+                edited.setMarca(marcaField.getText());
+                edited.setSubmarca(submarcaField.getText());
+                edited.setModelo(Year.of(Integer.valueOf(modelofField.getText())));
+                edited.setIdpoliza(poliza.getPolizaAuto());
+                return edited;
             }
             return null;
         });
@@ -463,16 +538,18 @@ public class PolizaHomeController implements Initializable {
 
         Button agregarDependienteButton = new Button("Agregar");
         agregarDependienteButton.setOnAction(event -> {
-            Optional<Cliente> cliente = createAgregarClienteDialog().showAndWait();
-            cliente.ifPresent(present -> {
-                try {
-                    MainApp.getInstance().getBaseDeDatos().create(new Dependiente(present, polizaGmm));
-                    polizaGmm.getClienteList().add(present);
-                    clientesTableView.getItems().add(present);
-                } catch (Exception e) {
-                    Utilities.makeAlert(e, "Error al agregar dependiente").showAndWait();
-                }
-            });
+            showAgregarDependienteDialog();
+
+//            Optional<Cliente> cliente = createAgregarClienteDialog().showAndWait();
+//            cliente.ifPresent(present -> {
+//                try {
+//                    MainApp.getInstance().getBaseDeDatos().create(new Dependiente(present, polizaGmm));
+//                    polizaGmm.getClienteList().add(present);
+//                    clientesTableView.getItems().add(present);
+//                } catch (Exception e) {
+//                    Utilities.makeAlert(e, "Error al agregar dependiente").showAndWait();
+//                }
+//            });
         });
 
         GridPane clientesPane = new GridPane();
@@ -550,18 +627,23 @@ public class PolizaHomeController implements Initializable {
         sumaAseguradPane.add(sumaAseguradaVidaTextField, 1, 0);
 
         Button agregarBeneficiarioButton = new Button("Agregar");
-        agregarBeneficiarioButton.setOnAction(event -> {
-            Optional<Cliente> beneficiario = createAgregarClienteDialog().showAndWait();
-            beneficiario.ifPresent(present -> {
-                try {
-                    //TODO
-                    MainApp.getInstance().getBaseDeDatos().create(new Beneficiario(present, polizaVida));
-                    polizaVida.getClienteList().add(present);
-                    clientesTableView.getItems().add(present);
-                } catch (Exception e) {
-                    Utilities.makeAlert(e, "Error al agregar beneficiario").showAndWait();
-                }
-            });
+        agregarBeneficiarioButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                showAgregarBeneficiarioDialog();
+
+//            Optional<Cliente> beneficiario = createAgregarClienteDialog().showAndWait();
+//            beneficiario.ifPresent(present -> {
+//                try {
+//                    //TODO
+//                    MainApp.getInstance().getBaseDeDatos().create(new Beneficiario(present, polizaVida));
+//                    polizaVida.getClienteList().add(present);
+//                    clientesTableView.getItems().add(present);
+//                } catch (Exception e) {
+//                    Utilities.makeAlert(e, "Error al agregar beneficiario").showAndWait();
+//                }
+//            });
+            }
         });
 
         GridPane tableBeneficiariosGridPane = new GridPane();
@@ -572,6 +654,50 @@ public class PolizaHomeController implements Initializable {
 
         configBeneficiariosTable(polizaVida);
         secondColumnVBox.getChildren().addAll(sumaAseguradPane, tableBeneficiariosGridPane, clientesTableView);
+    }
+
+    private void showAgregarBeneficiarioDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AgregarCliente.fxml"), null, new JavaFXBuilderFactory());
+            Parent parent = loader.load();
+            AgregarClienteController agregarClienteController = loader.getController();
+            Optional<Cliente> cliente = agregarClienteController.getDialog().showAndWait();
+            cliente.ifPresent((present) -> {
+                try {
+                    MainApp.getInstance().getBaseDeDatos().create(new Beneficiario(present, poliza.getPolizaVida()));
+                    poliza.getPolizaVida().getClienteList().add(present);
+                    clientesTableView.getItems().add(present);
+                } catch (Exception ex) {
+                    Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    Utilities.makeAlert(ex, "Error al agregar beneficiario").showAndWait();
+                }
+            });
+        } catch (Exception e) {
+            Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, e);
+            Utilities.makeAlert(e, "Error al agregar beneficiario").showAndWait();
+        }
+    }
+
+    private void showAgregarDependienteDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AgregarCliente.fxml"), null, new JavaFXBuilderFactory());
+            Parent parent = loader.load();
+            AgregarClienteController agregarClienteController = loader.getController();
+            Optional<Cliente> cliente = agregarClienteController.getDialog().showAndWait();
+            cliente.ifPresent((present) -> {
+                try {
+                    MainApp.getInstance().getBaseDeDatos().create(new Dependiente(present, poliza.getPolizaGmm()));
+                    poliza.getPolizaGmm().getClienteList().add(present);
+                    clientesTableView.getItems().add(present);
+                } catch (Exception e) {
+                    Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, e);
+                    Utilities.makeAlert(e, "Error al agregar dependiente").showAndWait();
+                }
+            });
+        } catch (Exception ex) {
+            Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            Utilities.makeAlert(ex, "Error al agregar dependiente").showAndWait();
+        }
     }
 
     private Dialog<Cliente> createAgregarClienteDialog() {
@@ -722,9 +848,10 @@ public class PolizaHomeController implements Initializable {
         if (poliza.getCaratula() != null) {
             caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));
         }
-//        BooleanBinding agregarCaratulaBinding = Bindings.isNotEmpty(caratulaTableView.getItems());
-//        agregarCaratulaButton.disableProperty().bind(agregarCaratulaBinding);
 
+        BooleanBinding agregarCaratulaBinding = Bindings.isNotEmpty(caratulaTableView.itemsProperty().get());
+        agregarCaratulaButton.disableProperty().bind(agregarCaratulaBinding);
+//        agregarAutoButton.setDisable(caratulaTableView.getItems().isEmpty());
         archivoTableColumn.setCellValueFactory(new PropertyValueFactory("archivo"));
 
         caratulaTableView.setRowFactory((TableView<Caratula> table) -> {
@@ -732,37 +859,22 @@ public class PolizaHomeController implements Initializable {
             final ContextMenu menu = new ContextMenu();
             MenuItem verItem = new MenuItem("Ver");
             verItem.setOnAction((event) -> {
-                Caratula caratula = row.getItem();
-                File file = new File(caratula.getNombre());
-                if (!Desktop.isDesktopSupported()) {
-                    System.out.println("Desktop not supported");
-                }
-                if (file.exists()) {
-                    try {
-                        Desktop.getDesktop().open(file);
-                    } catch (IOException ex) {
-                        Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+                verCaratula(row.getItem());
             });
+
             MenuItem editarItem = new MenuItem("Editar");
             editarItem.setOnAction((event) -> {
                 Optional<Caratula> documentoEditado = createDialogEditarDocumento(row.getItem()).showAndWait();
                 documentoEditado.ifPresent((present) -> {
-                    //TODO: update documento en base de datos
-                    //refresh tabla documentos
-                    caratulaTableView.getItems().clear();
-                    caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));
+                    editarCaratula(present);
                 });
             });
+
             MenuItem eliminarItem = new MenuItem("Eliminar");
             eliminarItem.setOnAction((event) -> {
-                //TODO: eliminar de base de datos
-                poliza.setCaratula(null);
-                caratulaTableView.getItems().clear();
-                agregarCaratulaButton.setDisable(false);
-//                caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));// esta por demar
+                borrarCaratula(row.getItem());
             });
+
             menu.getItems().addAll(verItem, editarItem, eliminarItem);
             row.contextMenuProperty().bind(
                     Bindings.when(Bindings.isNotNull(row.itemProperty()))
@@ -770,6 +882,59 @@ public class PolizaHomeController implements Initializable {
                             .otherwise((ContextMenu) null));
             return row; //To change body of generated lambdas, choose Tools | Templates.
         });
+    }
+
+    private void verCaratula(Caratula caratula) {
+        try {
+            Path temp = Files.createTempFile(caratula.getNombre(), caratula.getExtension());
+            Files.write(temp, caratula.getArchivo());
+            if (!Desktop.isDesktopSupported()) {
+                Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, "Desktop not supported");
+            }
+            if (temp.toFile().exists()) {
+                try {
+                    Desktop.getDesktop().open(temp.toFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    Utilities.makeAlert(ex, "Error al ver documento").showAndWait();
+                }
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            Utilities.makeAlert(ex, "Error al ver documento").showAndWait();
+        }
+    }
+
+    private void borrarCaratula(Caratula caratula) {
+        try {
+            MainApp.getInstance().getBaseDeDatos().remove(caratula);
+            poliza.setCaratula(null);
+            caratulaTableView.getItems().clear();
+//            agregarCaratulaButton.setDisable(false);
+        } catch (Exception e) {
+            Utilities.makeAlert(e, "error al borrar caratula").showAndWait();
+        }
+    }
+
+    private void editarCaratula(Caratula caratula) {
+        Caratula actual = this.poliza.getCaratula();
+        String oldNombre = actual.getNombre();
+        String oldExtension = actual.getExtension();
+        byte[] oldArchivo = actual.getArchivo();
+        try {
+            actual.setNombre(caratula.getNombre());
+            actual.setExtension(caratula.getExtension());
+            actual.setArchivo(caratula.getArchivo());
+            MainApp.getInstance().getBaseDeDatos().edit(actual);
+        } catch (Exception e) {
+            actual.setNombre(oldNombre);
+            actual.setExtension(oldExtension);
+            actual.setArchivo(oldArchivo);
+            Utilities.makeAlert(e, "error al editar caratula").showAndWait();
+        }
+        caratulaTableView.getItems().clear();
+        caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));
     }
 
     private Dialog<Caratula> createDialogEditarDocumento(Caratula caratula) {
@@ -804,8 +969,10 @@ public class PolizaHomeController implements Initializable {
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
-                caratula.setNombre(archivoField.getText());
-                return caratula;
+                Caratula nueva = new Caratula(new File(archivoField.getText()), poliza);
+                nueva.setIdpoliza(poliza.getIdpoliza());
+                nueva.setPoliza(poliza);
+                return nueva;
             }
             return null;
         });
@@ -821,12 +988,11 @@ public class PolizaHomeController implements Initializable {
         importeTableColumn.setCellValueFactory(new PropertyValueFactory("importe"));
         cobranzaTableColumn.setCellValueFactory(new PropertyValueFactory("cobranza"));
         notificacionTableColumn.setCellValueFactory(new PropertyValueFactory("enviado"));
+        docReciboTableColumn.setCellValueFactory(new PropertyValueFactory("documento"));
 
 //        crearContextMenuTablaRecibos();
         recibosTableView.setRowFactory((TableView<Recibo> table) -> {
             final TableRow<Recibo> row = new TableRow<>();
-//            final ContextMenu rowMenu = new ContextMenu();
-
             row.setOnMouseClicked((event) -> {
                 if (event.getButton() == MouseButton.SECONDARY) {
                     Recibo selected = recibosTableView.getSelectionModel().getSelectedItem();
@@ -848,21 +1014,7 @@ public class PolizaHomeController implements Initializable {
         if (recibo.getCobranza().getCobranza().equalsIgnoreCase(Globals.RECIBO_COBRANZA_PENDIENTE)) {
             MenuItem pagarItem = new MenuItem("Pagar");
             pagarItem.setOnAction((event) -> {
-                try {
-                    recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PAGADO));
-                    MainApp.getInstance().getBaseDeDatos().edit(recibo);
-                } catch (Exception e) {
-                    recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PENDIENTE));
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error al cambiar a estatus de pago");
-                    alert.setContentText(e.getLocalizedMessage());
-                }
-                //TODO: refresh list
-                //guardar en base de datos
-                //refresh contex menu??
-                recibosTableView.getItems().clear();
-                recibosTableView.setItems(FXCollections.observableArrayList(poliza.getReciboList()));
+                pagarRecibo(recibo);
             });
             menu.getItems().add(pagarItem);
             //si no tiene archivo de recibo
@@ -876,66 +1028,67 @@ public class PolizaHomeController implements Initializable {
                 chooser.setInitialDirectory(new File(System.getProperty("user.home")));
                 File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
                 if (file != null) {
-                    //TODO: crear DocumentoRecibo
-                    //recibo.setDocumento(newDocumento)
-                    //guardar newDocumento
-                    System.out.println(file.getPath());
+                    guardarDocumentoRecibo(file, recibo);
                 }
-                // TODO: mostrar dialogo para seleccion de archivo
-                //guardar archivo en base de datos
             });
             menu.getItems().add(agregarArchivoItem);
-
         } // si existe archivo adjunto
         else {
             MenuItem verArchivoItem = new MenuItem("Ver recibo");
             verArchivoItem.setOnAction(event -> {
-                System.out.println("abrir programa para ver archivo recibo");
-                // TODO: abrir archivo con programa predefinido por sistema (pdf)
+                verDocumento(recibo.getDocumentoRecibo());
             });
             menu.getItems().add(verArchivoItem);
+
+            //TODO; menu para cambiar archivo
         }
         return menu;
     }
 
-    private void crearContextMenuTablaRecibos() {
-//        recibosTableView.setRowFactory((TableView<Recibo> table) -> {
-//            final TableRow<Recibo> row = new TableRow<>();
-//            final ContextMenu rowMenu = new ContextMenu();
-//            //set cobranza pagada
-//            if (row.getItem().getCobranza().getCobranza().equals(Globals.RECIBO_COBRANZA_PENDIENTE)) {
-//                MenuItem pagadoItem = new MenuItem("Pagado");
-//                pagadoItem.setOnAction(event -> {
-//                    row.getItem().getCobranza().setCobranza(Globals.RECIBO_COBRANZA_PAGADO);
-//                    //refresh lista???
-//                    //TODO: update recbio en base de datos
-//                });
-//            }
-//            //si no tiene archivo de recibo
-//            //agregar menu seleccion de archivo
-//            if (row.getItem().getDocumentoRecibo() == null) {
-//                MenuItem agregarArchivoItem = new MenuItem("Agregar recibo");
-//                agregarArchivoItem.setOnAction(event -> {
-//                    // TODO: mostrar dialogo para seleccion de archivo
-//                    //guardar archivo en base de datos
-//                });
-//            } // si existe archivo adjunto
-//            else {
-//                MenuItem verArchivoItem = new MenuItem("Ver recibo");
-//                verArchivoItem.setOnAction(event -> {
-//                    // TODO: abrir archivo con programa predefinido por sistema (pdf)
-//                });
-//            }
-//            //TODO: Opcion de enviar notificacion del recibo seleccionado?
-//
-//            // only display context menu for non-null items:
-//            row.contextMenuProperty().bind(
-//                    Bindings.when(Bindings.isNotNull(row.itemProperty()))
-//                            .then(rowMenu)
-//                            .otherwise((ContextMenu) null));
-//
-//            return row; //To change body of generated lambdas, choose Tools | Templates.
-//        });
+    private void pagarRecibo(Recibo recibo) {
+        try {
+            recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PAGADO));
+            MainApp.getInstance().getBaseDeDatos().edit(recibo);
+        } catch (Exception e) {
+            recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PENDIENTE));
+            Utilities.makeAlert(e, "Error al pagar recibo").showAndWait();
+        }
+        recibosTableView.getItems().clear();
+        recibosTableView.setItems(FXCollections.observableArrayList(poliza.getReciboList()));
+    }
+
+    private void verDocumento(DocumentoRecibo doc) {
+        try {
+            Path temp = Files.createTempFile(doc.getNombre(), doc.getExtension());
+            Files.write(temp, doc.getArchivo());
+            if (!Desktop.isDesktopSupported()) {
+                Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, "Desktop not supported");
+            }
+            if (temp.toFile().exists()) {
+                try {
+                    Desktop.getDesktop().open(temp.toFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    Utilities.makeAlert(ex, "Error al ver documento").showAndWait();
+                }
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            Utilities.makeAlert(ex, "Error al ver documento").showAndWait();
+        }
+    }
+
+    private void guardarDocumentoRecibo(File file, Recibo recibo) {
+        DocumentoRecibo documentoRecibo = new DocumentoRecibo(file, recibo);
+        try {
+            MainApp.getInstance().getBaseDeDatos().create(documentoRecibo);
+            recibo.setDocumentoRecibo(documentoRecibo);
+            recibosTableView.getItems().clear();
+            recibosTableView.setItems(FXCollections.observableArrayList(poliza.getReciboList()));
+        } catch (Exception e) {
+            Utilities.makeAlert(e, "error al agregar documento recibo").showAndWait();
+        }
     }
 
     public void setPoliza(Poliza poliza) {
@@ -949,21 +1102,44 @@ public class PolizaHomeController implements Initializable {
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
         if (file != null) {
-            Caratula caratula = new Caratula(poliza.getId());
-            caratula.setNombre(file.getPath());
-            caratula.setPoliza(poliza);
-//                caratula.setArchivo(file);
-            poliza.setCaratula(caratula);
-            //TODO: leer archivo, persistir caratula
-            caratulaTableView.setItems(FXCollections.observableArrayList(caratula));
-            agregarCaratulaButton.setDisable(true);
+            createCaratula(file);
         }
 
+    }
+
+    private void createCaratula(File file) {
+        Caratula caratula = new Caratula(file, poliza);
+        caratula.setPoliza(poliza);
+        caratula.setIdpoliza(poliza.getIdpoliza());
+        try {
+            MainApp.getInstance().getBaseDeDatos().create(caratula);
+            poliza.setCaratula(caratula);
+            caratulaTableView.getItems().add(caratula);
+//            agregarCaratulaButton.setDisable(true);
+        } catch (Exception e) {
+            Utilities.makeAlert(e, "error al agregar caratula").showAndWait();
+        }
     }
 
     @FXML
     private void renovarPoliza(ActionEvent event) {
         //TODO: hacer ventana de renovar poliza
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Renovar poliza");
+        alert.setHeaderText("Seguro que quieres renovar la poliza?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/RenovarPoliza.fxml"), null, new JavaFXBuilderFactory());
+                Parent parent = loader.load();
+                RenovarPolizaController controller = loader.<RenovarPolizaController>getController();
+                controller.setData(this.poliza);
+                MainApp.getInstance().changeSceneContent(this, location, parent, loader);
+            } catch (IOException ex) {
+                Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
     }
 
     @FXML
@@ -1070,6 +1246,16 @@ public class PolizaHomeController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void setData(Object obj) {
+        this.poliza = (Poliza) obj;
+    }
+
+    @Override
+    public Object getData() {
+        return this.poliza;
     }
 
 }

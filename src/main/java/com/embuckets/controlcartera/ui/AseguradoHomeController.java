@@ -13,6 +13,7 @@ import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.Email;
 import com.embuckets.controlcartera.entidades.EmailPK;
 import com.embuckets.controlcartera.entidades.Estado;
+import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.TelefonoPK;
@@ -20,10 +21,14 @@ import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.sun.org.apache.bcel.internal.generic.D2F;
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -153,7 +158,7 @@ public class AseguradoHomeController implements Initializable, Controller {
     @FXML
     private Button selectArchivoButton;
     @FXML
-    private ComboBox tipoArchivoComboBox;
+    private ComboBox<String> tipoArchivoComboBox;
     @FXML
     private Button agregarArchivoButton;
     @FXML
@@ -226,24 +231,24 @@ public class AseguradoHomeController implements Initializable, Controller {
     }
 
     private void llenarDomicilio() {
-        if (asegurado.getIddomicilio() == null) {
-            asegurado.setIddomicilio(new Domicilio());
-            Domicilio domicilio = asegurado.getIddomicilio();
-            domicilio.setCalle("");
-            domicilio.setExterior("");
-            domicilio.setInterior("");
-            domicilio.setCodigopostal("");
-            domicilio.setColonia("");
-            domicilio.setDelegacion(new Delegacion());
-            domicilio.setEstado(new Estado());
+        if (asegurado.getIddomicilio() != null) {
+//            asegurado.setIddomicilio(new Domicilio());
+//            Domicilio domicilio = asegurado.getIddomicilio();
+//            domicilio.setCalle("");
+//            domicilio.setExterior("");
+//            domicilio.setInterior("");
+//            domicilio.setCodigopostal("");
+//            domicilio.setColonia("");
+//            domicilio.setDelegacion(new Delegacion());
+//            domicilio.setEstado(new Estado());
+            calleTextField.setText(asegurado.getIddomicilio().getCalle());
+            exteriorTextField.setText(asegurado.getIddomicilio().getExterior());
+            interiorTextField.setText(asegurado.getIddomicilio().getInterior());
+            codigoPostaTextField.setText(asegurado.getIddomicilio().getCodigopostal());
+            coloniaTextField.setText(asegurado.getIddomicilio().getColonia());
+            delegacionTextField.setText(asegurado.getIddomicilio().getDelegacion().getDelegacion());
+            estadoTextField.setText(asegurado.getIddomicilio().getEstado().getEstado());
         }
-        calleTextField.setText(asegurado.getIddomicilio().getCalle());
-        exteriorTextField.setText(asegurado.getIddomicilio().getExterior());
-        interiorTextField.setText(asegurado.getIddomicilio().getInterior());
-        codigoPostaTextField.setText(asegurado.getIddomicilio().getCodigopostal());
-        coloniaTextField.setText(asegurado.getIddomicilio().getColonia());
-        delegacionTextField.setText(asegurado.getIddomicilio().getDelegacion().getDelegacion());
-        estadoTextField.setText(asegurado.getIddomicilio().getEstado().getEstado());
     }
 
     private void llenarTablaTelefono() {
@@ -527,36 +532,28 @@ public class AseguradoHomeController implements Initializable, Controller {
             final ContextMenu menu = new ContextMenu();
             MenuItem verItem = new MenuItem("Ver");
             verItem.setOnAction((event) -> {
-                DocumentoAsegurado documento = row.getItem();
-                File file = new File(documento.getDocumentoAseguradoPK().getNombre());
-                if (!Desktop.isDesktopSupported()) {
-                    System.out.println("Desktop not supported");
-                }
-                if (file.exists()) {
-                    try {
-                        Desktop.getDesktop().open(file);
-                    } catch (IOException ex) {
-                        Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+                verDocumento(row.getItem());
             });
             MenuItem editarItem = new MenuItem("Editar");
             editarItem.setOnAction((event) -> {
                 Optional<DocumentoAsegurado> documentoEditado = createDialogEditarDocumento(row.getItem()).showAndWait();
                 documentoEditado.ifPresent((present) -> {
-                    //TODO: update documento en base de datos
-                    //refresh tabla documentos
+                    try {
+                        editarDocumento(row.getItem(), present);
+                    } catch (Exception e) {
+                        Utilities.makeAlert(e, "Error al editar documento").showAndWait();
+                    }
                     documentoTableView.getItems().clear();
                     documentoTableView.setItems(FXCollections.observableArrayList(asegurado.getDocumentoAseguradoList()));
                 });
             });
             MenuItem eliminarItem = new MenuItem("Eliminar");
             eliminarItem.setOnAction((event) -> {
-                //TODO: eliminar de base de datos
-                asegurado.getDocumentoAseguradoList().remove(row.getItem());
-                documentoTableView.getItems().clear();
-                documentoTableView.setItems(FXCollections.observableArrayList(asegurado.getDocumentoAseguradoList()));
-
+                try {
+                    borrarDocumento(row.getItem());
+                } catch (Exception e) {
+                    Utilities.makeAlert(e, "Error al borrar documento").showAndWait();
+                }
             });
             menu.getItems().addAll(verItem, editarItem, eliminarItem);
             row.contextMenuProperty().bind(
@@ -568,6 +565,49 @@ public class AseguradoHomeController implements Initializable, Controller {
         });
 
         fillTipoDocumentoComboBox();
+    }
+
+    private void editarDocumento(DocumentoAsegurado viejo, DocumentoAsegurado nuevo) throws Exception {
+        try {
+            MainApp.getInstance().getBaseDeDatos().remove(viejo);
+            MainApp.getInstance().getBaseDeDatos().create(nuevo);
+            asegurado.getDocumentoAseguradoList().remove(viejo);
+            asegurado.getDocumentoAseguradoList().add(nuevo);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    private void borrarDocumento(DocumentoAsegurado doc) throws Exception {
+        try {
+            MainApp.getInstance().getBaseDeDatos().remove(doc);
+            asegurado.getDocumentoAseguradoList().remove(doc);
+            documentoTableView.getItems().remove(doc);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    private void verDocumento(DocumentoAsegurado doc) {
+        try {
+            Path temp = Files.createTempFile(doc.getNombreArchivo(), doc.getExtension());
+            Files.write(temp, doc.getArchivo());
+            if (!Desktop.isDesktopSupported()) {
+                Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, "Desktop not supported");
+            }
+            if (temp.toFile().exists()) {
+                try {
+                    Desktop.getDesktop().open(temp.toFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    showAlert(ex, "Error al ver documento");
+                }
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert(ex, "Error al ver documento");
+        }
     }
 
     private Dialog<DocumentoAsegurado> createDialogEditarDocumento(DocumentoAsegurado doc) {
@@ -582,8 +622,9 @@ public class AseguradoHomeController implements Initializable, Controller {
         grid.setHgap(10);
         grid.setVgap(10);
 
-        TextField archivoField = new TextField(doc.getNombreArchivo());
+        TextField archivoField = new TextField(doc.archivoProperty().get());
         archivoField.setPrefColumnCount(50);
+        archivoField.setEditable(false);
         Button selectButton = new Button("Seleccionar archivo");
         selectButton.setOnAction((event) -> {
             FileChooser chooser = new FileChooser();
@@ -597,7 +638,7 @@ public class AseguradoHomeController implements Initializable, Controller {
 
         //combo box
         ObservableList<String> list = FXCollections.observableArrayList(Globals.getAllDocumentoAseguradoTipos());
-        ComboBox tipoDocumentoBox = new ComboBox(list);
+        ComboBox<String> tipoDocumentoBox = new ComboBox(list);
         tipoDocumentoBox.getSelectionModel().select(list.indexOf(doc.getTipoDocumentoAsegurado().getTipodocumento()));
 
         grid.add(archivoField, 0, 0);
@@ -608,9 +649,9 @@ public class AseguradoHomeController implements Initializable, Controller {
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
-                doc.getDocumentoAseguradoPK().setNombre(archivoField.getText());
-                doc.getTipoDocumentoAsegurado().setTipodocumento(tipoDocumentoBox.getValue().toString());
-                return doc;
+                DocumentoAsegurado nuevo = new DocumentoAsegurado(new File(archivoField.getText()), tipoDocumentoBox.getValue());
+                nuevo.getDocumentoAseguradoPK().setIdcliente(doc.getDocumentoAseguradoPK().getIdcliente());
+                return nuevo;
             }
             return null;
         });
@@ -674,15 +715,17 @@ public class AseguradoHomeController implements Initializable, Controller {
 
     @FXML
     private void agregarDocumento(ActionEvent event) {
-        //TODO: crear DocumentoAsegurado 
-        //agregar el documento al asegurado
-        //persist el documento
-        DocumentoAsegurado nuevoDoc = new DocumentoAsegurado();
-        nuevoDoc.getDocumentoAseguradoPK().setIdcliente(asegurado.getId());
-        nuevoDoc.getDocumentoAseguradoPK().setNombre(archivoTextField.getText());
-        nuevoDoc.getTipoDocumentoAsegurado().setTipodocumento(tipoArchivoComboBox.getValue().toString());
-        documentoTableView.getItems().add(nuevoDoc);
-        archivoTextField.setText("");
+        try {
+            DocumentoAsegurado doc = new DocumentoAsegurado(new File(archivoTextField.getText()), tipoArchivoComboBox.getValue());
+            doc.setAsegurado(asegurado);
+            doc.getDocumentoAseguradoPK().setIdcliente(asegurado.getIdcliente());
+            MainApp.getInstance().getBaseDeDatos().create(doc);
+            asegurado.getDocumentoAseguradoList().add(doc);
+            documentoTableView.getItems().add(doc);
+            archivoTextField.setText("");
+        } catch (Exception e) {
+            Utilities.makeAlert(e, "Error al guardar documento").showAndWait();
+        }
     }
 
     @FXML
@@ -736,15 +779,13 @@ public class AseguradoHomeController implements Initializable, Controller {
         if (poliza.getEstado().getEstado().equalsIgnoreCase(Globals.POLIZA_ESTADO_VIGENTE)) {
             MenuItem cancelarItem = new MenuItem("Cancelar");
             cancelarItem.setOnAction((event) -> {
-                poliza.getEstado().setEstado(Globals.POLIZA_ESTADO_CANCELADA);
-                //TODO:
-                //update en base de datos
+                cancelarPoliza(poliza);
                 refreshPolizaList();
             });
             MenuItem renovarItem = new MenuItem("Renovar");
             renovarItem.setOnAction((event) -> {
-                poliza.getEstado().setEstado(Globals.POLIZA_ESTADO_RENOVADA);
-                refreshPolizaList();
+//                poliza.getEstado().setEstado(Globals.POLIZA_ESTADO_RENOVADA);
+//                refreshPolizaList();
                 //TODO: abrir ventana para renovar poliza
                 //update en base de datos
             });
@@ -754,13 +795,55 @@ public class AseguradoHomeController implements Initializable, Controller {
 
         MenuItem borrarItem = new MenuItem("Eliminar");
         borrarItem.setOnAction((event) -> {
-            asegurado.getPolizaList().remove(polizasTableView.getSelectionModel().getSelectedItem());
+            borrarPoliza(poliza);
             refreshPolizaList();
             //TODO: eliminar poliza de base de datos
         });
         menu.getItems().add(borrarItem);
 
         return menu;
+    }
+
+    private void borrarPoliza(Poliza poliza) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Borrar poliza");
+        alert.setHeaderText("Seguro que quieres borrar la poliza?");
+        alert.setContentText("Esta acción eliminara la poliza permanentemente.\nQuiere continuar?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            EstadoPoliza anterior = poliza.getEstado();
+            try {
+                MainApp.getInstance().getBaseDeDatos().remove(poliza);
+            } catch (Exception e) {
+                Alert error = Utilities.makeAlert(e, "Error al borrar poliza");
+                error.showAndWait();
+            }
+            // ... user chose OK
+        }
+    }
+
+    private void cancelarPoliza(Poliza poliza) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Cancelar poliza");
+        alert.setHeaderText("Seguro que quieres cancelar la poliza?");
+        alert.setContentText("Esta acción cambia el estatus de la poliza a cancelada y no se enviaran notificaciones.\n"
+                + "Podrás consultarla en cualquier momento.");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            EstadoPoliza anterior = poliza.getEstado();
+            try {
+                poliza.setEstado(new EstadoPoliza(Globals.POLIZA_ESTADO_CANCELADA));
+                MainApp.getInstance().getBaseDeDatos().edit(poliza);
+            } catch (Exception e) {
+                poliza.setEstado(new EstadoPoliza(anterior.getEstado()));
+                Alert error = Utilities.makeAlert(e, "Error al cancelar poliza");
+                error.showAndWait();
+            }
+            // ... user chose OK
+        }
+//        else {
+//            // ... user chose CANCEL or closed the dialog
+//        }
     }
 
     private void goPolizaHomeScene(Poliza poliza) {
@@ -962,13 +1045,19 @@ public class AseguradoHomeController implements Initializable, Controller {
             }
         }
         return false;
-//        return changes.values().stream().anyMatch(p -> !p.getKey().equals(p.getValue()));
     }
 
     private Dialog<Domicilio> createEditDomicilioDialog(Domicilio domicilio) {
-//        if (domicilio == null) {
-//            domicilio = new Domicilio();
-//        }
+        if (domicilio == null) {
+            domicilio = new Domicilio();
+            domicilio.setCalle("");
+            domicilio.setExterior("");
+            domicilio.setInterior("");
+            domicilio.setCodigopostal("");
+            domicilio.setColonia("");
+            domicilio.setDelegacion(new Delegacion());
+            domicilio.setEstado(new Estado());
+        }
         Dialog<Domicilio> dialog = new Dialog<>();
         dialog.setTitle("Editar domicilio");
         //set the button types

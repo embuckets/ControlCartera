@@ -91,6 +91,11 @@ public class AseguradoJpaController implements Serializable, JpaController {
                     em.persist(telefono);
                 }
             }
+            for (DocumentoAsegurado doc : asegurado.getDocumentoAseguradoList()) {
+                doc.getDocumentoAseguradoPK().setIdcliente(cliente.getIdcliente());
+                em.persist(doc);
+            }
+
             em.getTransaction().commit();
 
         } catch (Exception ex) {

@@ -6,9 +6,13 @@
 package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
+import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -55,7 +59,7 @@ public class Caratula implements Serializable, ObservableDocumento {
     @Basic(optional = false)
     @Lob
     @Column(name = "ARCHIVO")
-    private Serializable archivo;
+    private byte[] archivo;
     @Column(name = "ACTUALIZADO")
 //    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime actualizado;
@@ -66,15 +70,29 @@ public class Caratula implements Serializable, ObservableDocumento {
     public Caratula() {
     }
 
-    public Caratula(Integer idpoliza) {
-        this.idpoliza = idpoliza;
-    }
-
-    public Caratula(Integer idpoliza, String nombre, String extension, Serializable archivo) {
-        this.idpoliza = idpoliza;
-        this.nombre = nombre;
-        this.extension = extension;
-        this.archivo = archivo;
+//    public Caratula(Integer idpoliza) {
+//        this.idpoliza = idpoliza;
+//    }
+//
+//    public Caratula(Integer idpoliza, String nombre, String extension, Serializable archivo) {
+//        this.idpoliza = idpoliza;
+//        this.nombre = nombre;
+//        this.extension = extension;
+//        this.archivo = archivo;
+//    }
+    
+    public Caratula(File file, Poliza poliza){
+        this.poliza = poliza;
+        this.idpoliza = poliza.getIdpoliza();
+        String[] tokens = file.getName().split("\\.");
+        this.nombre = tokens[0];
+        this.extension = "." + tokens[1];
+        this.actualizado = LocalDateTime.now();
+        try {
+            this.archivo = Files.readAllBytes(file.toPath());
+        } catch (Exception e) {
+            Logger.getLogger(DocumentoRecibo.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
     public Integer getIdpoliza() {
@@ -101,11 +119,11 @@ public class Caratula implements Serializable, ObservableDocumento {
         this.extension = extension;
     }
 
-    public Serializable getArchivo() {
+    public byte [] getArchivo() {
         return archivo;
     }
 
-    public void setArchivo(Serializable archivo) {
+    public void setArchivo(byte [] archivo) {
         this.archivo = archivo;
     }
 

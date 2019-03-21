@@ -15,6 +15,7 @@ import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -202,6 +203,36 @@ public class DocumentoReciboJpaController implements Serializable, JpaController
             em.close();
         }
     }
+
+    @Override
+    public void remove(Object object) throws Exception {
+        DocumentoRecibo documentoRecibo = (DocumentoRecibo) object;
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+            Query query = em.createNativeQuery("DELETE FROM APP.Documento_Recibo WHERE idrecibo = :idrecibo");
+            query.setParameter("idrecibo", documentoRecibo.getIdrecibo());
+            query.executeUpdate();
+            
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+    
+    
 
     @Override
     public String getControlledClassName() {

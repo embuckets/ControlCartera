@@ -16,6 +16,7 @@ import com.embuckets.controlcartera.entidades.DocumentoAseguradoPK;
 import com.embuckets.controlcartera.entidades.TipoDocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -208,6 +209,36 @@ public class DocumentoAseguradoJpaController implements Serializable, JpaControl
             return ((Long) q.getSingleResult()).intValue();
         } finally {
             em.close();
+        }
+    }
+
+    @Override
+    public void remove(Object object) throws Exception {
+        DocumentoAsegurado documentoAsegurado = (DocumentoAsegurado) object;
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+            Query query = em.createNativeQuery("DELETE FROM APP.Documento_Asegurado WHERE nombre = :nombre AND tipodocumento = :tipo AND idcliente = :idcliente");
+            query.setParameter("nombre", documentoAsegurado.getDocumentoAseguradoPK().getNombre());
+            query.setParameter("tipo", documentoAsegurado.getTipoDocumentoAsegurado().getTipodocumento());
+            query.setParameter("idcliente", documentoAsegurado.getAsegurado().getIdcliente());
+            query.executeUpdate();
+
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
         }
     }
 

@@ -5,7 +5,6 @@
  */
 package com.embuckets.controlcartera.entidades;
 
-import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
 import java.io.Serializable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -20,11 +19,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -51,7 +53,7 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
     @Basic(optional = false)
     @Lob
     @Column(name = "ARCHIVO")
-    private Serializable archivo;
+    private byte[] archivo;
     @Column(name = "ACTUALIZADO")
 //    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime actualizado;
@@ -66,20 +68,35 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
         this.documentoAseguradoPK = new DocumentoAseguradoPK();
         this.tipoDocumentoAsegurado = new TipoDocumentoAsegurado();
     }
+//
+//    public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK) {
+//        this.documentoAseguradoPK = documentoAseguradoPK;
+//    }
+//
+//    public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK, String extension, byte[] archivo) {
+//        this.documentoAseguradoPK = documentoAseguradoPK;
+//        this.extension = extension;
+//        this.archivo = archivo;
+//    }
 
-    public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK) {
-        this.documentoAseguradoPK = documentoAseguradoPK;
+    public DocumentoAsegurado(File file, String tipoDocumentoAsegurado) {
+        this.documentoAseguradoPK = new DocumentoAseguradoPK();
+        String[] tokens = file.getName().split("\\.");
+        this.documentoAseguradoPK.setNombre(tokens[0]);
+        this.documentoAseguradoPK.setTipodocumento(tipoDocumentoAsegurado);
+        this.extension = "." + tokens[1];
+        this.actualizado = LocalDateTime.now();
+        this.tipoDocumentoAsegurado = new TipoDocumentoAsegurado(tipoDocumentoAsegurado);
+        try {
+            this.archivo = Files.readAllBytes(file.toPath());
+        } catch (IOException ex) {
+            Logger.getLogger(DocumentoAsegurado.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-
-    public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK, String extension, Serializable archivo) {
-        this.documentoAseguradoPK = documentoAseguradoPK;
-        this.extension = extension;
-        this.archivo = archivo;
-    }
-
-    public DocumentoAsegurado(int idcliente, String nombre, String tipodocumento) {
-        this.documentoAseguradoPK = new DocumentoAseguradoPK(idcliente, nombre, tipodocumento);
-    }
+//
+//    public DocumentoAsegurado(int idcliente, String nombre, String tipodocumento) {
+//        this.documentoAseguradoPK = new DocumentoAseguradoPK(idcliente, nombre, tipodocumento);
+//    }
 
     public DocumentoAseguradoPK getDocumentoAseguradoPK() {
         return documentoAseguradoPK;
@@ -97,11 +114,11 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
         this.extension = extension;
     }
 
-    public Serializable getArchivo() {
+    public byte[] getArchivo() {
         return archivo;
     }
 
-    public void setArchivo(Serializable archivo) {
+    public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 
@@ -150,7 +167,7 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
     }
 
     public String getNombreArchivo() {
-        return documentoAseguradoPK.getNombre() + extension;
+        return documentoAseguradoPK.getNombre();
     }
 
     @Override

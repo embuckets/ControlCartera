@@ -160,4 +160,9 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         return recibo.cobranzaProperty();
     }
 
+    @Override
+    public StringProperty documentoProperty() {
+        return new SimpleStringProperty("");
+    }
+
 }

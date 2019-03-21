@@ -27,7 +27,9 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
             em.getTransaction().begin();
-            em.persist(beneficiario.getCliente());
+            if (beneficiario.getCliente().getIdcliente() == null) {
+                em.persist(beneficiario.getCliente());
+            }
             Query query = em.createNativeQuery("INSERT INTO APP.BENEFICIARIO (IDCLIENTE, IDPOLIZA) VALUES (:idcliente, :idpoliza)");
             query.setParameter("idcliente", beneficiario.getCliente().getIdcliente());
             query.setParameter("idpoliza", beneficiario.getPolizaVida().getIdpoliza());

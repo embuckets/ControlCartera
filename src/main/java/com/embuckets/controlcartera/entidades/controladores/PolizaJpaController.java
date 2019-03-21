@@ -15,6 +15,7 @@ import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Aseguradora;
 import com.embuckets.controlcartera.entidades.Auto;
+import com.embuckets.controlcartera.entidades.Beneficiario;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.ConductoCobro;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
@@ -29,6 +30,7 @@ import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOr
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import com.embuckets.controlcartera.entidades.globals.Globals;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -49,166 +51,165 @@ public class PolizaJpaController implements Serializable, JpaController {
         return emf.createEntityManager();
     }
 
-    public void create(Poliza poliza) {
-        if (poliza.getReciboList() == null) {
-            poliza.setReciboList(new ArrayList<Recibo>());
-        }
-        EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Caratula caratula = poliza.getCaratula();
-            if (caratula != null) {
-                caratula = em.getReference(caratula.getClass(), caratula.getIdpoliza());
-                poliza.setCaratula(caratula);
-            }
-            PolizaAuto polizaAuto = poliza.getPolizaAuto();
-            if (polizaAuto != null) {
-                polizaAuto = em.getReference(polizaAuto.getClass(), polizaAuto.getIdpoliza());
-                poliza.setPolizaAuto(polizaAuto);
-            }
-            Asegurado contratante = poliza.getContratante();
-            if (contratante != null) {
-                contratante = em.getReference(contratante.getClass(), contratante.getIdcliente());
-                poliza.setContratante(contratante);
-            }
-            Aseguradora aseguradora = poliza.getAseguradora();
-            if (aseguradora != null) {
-                aseguradora = em.getReference(aseguradora.getClass(), aseguradora.getAseguradora());
-                poliza.setAseguradora(aseguradora);
-            }
-            Cliente titular = poliza.getTitular();
-            if (titular != null) {
-                titular = em.getReference(titular.getClass(), titular.getIdcliente());
-                poliza.setTitular(titular);
-            }
-            ConductoCobro conductocobro = poliza.getConductocobro();
-            if (conductocobro != null) {
-                conductocobro = em.getReference(conductocobro.getClass(), conductocobro.getConductocobro());
-                poliza.setConductocobro(conductocobro);
-            }
-            EstadoPoliza estado = poliza.getEstado();
-            if (estado != null) {
-                estado = em.getReference(estado.getClass(), estado.getEstado());
-                poliza.setEstado(estado);
-            }
-            FormaPago formapago = poliza.getFormapago();
-            if (formapago != null) {
-                formapago = em.getReference(formapago.getClass(), formapago.getFormapago());
-                poliza.setFormapago(formapago);
-            }
-            Moneda primamoneda = poliza.getPrimamoneda();
-            if (primamoneda != null) {
-                primamoneda = em.getReference(primamoneda.getClass(), primamoneda.getMoneda());
-                poliza.setPrimamoneda(primamoneda);
-            }
-            Ramo ramo = poliza.getRamo();
-            if (ramo != null) {
-                ramo = em.getReference(ramo.getClass(), ramo.getRamo());
-                poliza.setRamo(ramo);
-            }
-            PolizaVida polizaVida = poliza.getPolizaVida();
-            if (polizaVida != null) {
-                polizaVida = em.getReference(polizaVida.getClass(), polizaVida.getIdpoliza());
-                poliza.setPolizaVida(polizaVida);
-            }
-            PolizaGmm polizaGmm = poliza.getPolizaGmm();
-            if (polizaGmm != null) {
-                polizaGmm = em.getReference(polizaGmm.getClass(), polizaGmm.getIdpoliza());
-                poliza.setPolizaGmm(polizaGmm);
-            }
-            List<Recibo> attachedReciboList = new ArrayList<Recibo>();
-            for (Recibo reciboListReciboToAttach : poliza.getReciboList()) {
-                reciboListReciboToAttach = em.getReference(reciboListReciboToAttach.getClass(), reciboListReciboToAttach.getIdrecibo());
-                attachedReciboList.add(reciboListReciboToAttach);
-            }
-            poliza.setReciboList(attachedReciboList);
-            em.persist(poliza);
-            if (caratula != null) {
-                Poliza oldPolizaOfCaratula = caratula.getPoliza();
-                if (oldPolizaOfCaratula != null) {
-                    oldPolizaOfCaratula.setCaratula(null);
-                    oldPolizaOfCaratula = em.merge(oldPolizaOfCaratula);
-                }
-                caratula.setPoliza(poliza);
-                caratula = em.merge(caratula);
-            }
-            if (polizaAuto != null) {
-                Poliza oldPolizaOfPolizaAuto = polizaAuto.getPoliza();
-                if (oldPolizaOfPolizaAuto != null) {
-                    oldPolizaOfPolizaAuto.setPolizaAuto(null);
-                    oldPolizaOfPolizaAuto = em.merge(oldPolizaOfPolizaAuto);
-                }
-                polizaAuto.setPoliza(poliza);
-                polizaAuto = em.merge(polizaAuto);
-            }
-            if (contratante != null) {
-                contratante.getPolizaList().add(poliza);
-                contratante = em.merge(contratante);
-            }
-            if (aseguradora != null) {
-                aseguradora.getPolizaList().add(poliza);
-                aseguradora = em.merge(aseguradora);
-            }
-            if (titular != null) {
-                titular.getPolizaList().add(poliza);
-                titular = em.merge(titular);
-            }
-            if (conductocobro != null) {
-                conductocobro.getPolizaList().add(poliza);
-                conductocobro = em.merge(conductocobro);
-            }
-            if (estado != null) {
-                estado.getPolizaList().add(poliza);
-                estado = em.merge(estado);
-            }
-            if (formapago != null) {
-                formapago.getPolizaList().add(poliza);
-                formapago = em.merge(formapago);
-            }
-            if (primamoneda != null) {
-                primamoneda.getPolizaList().add(poliza);
-                primamoneda = em.merge(primamoneda);
-            }
-            if (ramo != null) {
-                ramo.getPolizaList().add(poliza);
-                ramo = em.merge(ramo);
-            }
-            if (polizaVida != null) {
-                Poliza oldPolizaOfPolizaVida = polizaVida.getPoliza();
-                if (oldPolizaOfPolizaVida != null) {
-                    oldPolizaOfPolizaVida.setPolizaVida(null);
-                    oldPolizaOfPolizaVida = em.merge(oldPolizaOfPolizaVida);
-                }
-                polizaVida.setPoliza(poliza);
-                polizaVida = em.merge(polizaVida);
-            }
-            if (polizaGmm != null) {
-                Poliza oldPolizaOfPolizaGmm = polizaGmm.getPoliza();
-                if (oldPolizaOfPolizaGmm != null) {
-                    oldPolizaOfPolizaGmm.setPolizaGmm(null);
-                    oldPolizaOfPolizaGmm = em.merge(oldPolizaOfPolizaGmm);
-                }
-                polizaGmm.setPoliza(poliza);
-                polizaGmm = em.merge(polizaGmm);
-            }
-            for (Recibo reciboListRecibo : poliza.getReciboList()) {
-                Poliza oldIdpolizaOfReciboListRecibo = reciboListRecibo.getIdpoliza();
-                reciboListRecibo.setIdpoliza(poliza);
-                reciboListRecibo = em.merge(reciboListRecibo);
-                if (oldIdpolizaOfReciboListRecibo != null) {
-                    oldIdpolizaOfReciboListRecibo.getReciboList().remove(reciboListRecibo);
-                    oldIdpolizaOfReciboListRecibo = em.merge(oldIdpolizaOfReciboListRecibo);
-                }
-            }
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-    }
-
+//    public void create(Poliza poliza) {
+//        if (poliza.getReciboList() == null) {
+//            poliza.setReciboList(new ArrayList<Recibo>());
+//        }
+//        EntityManager em = null;
+//        try {
+//            em = getEntityManager();
+//            em.getTransaction().begin();
+//            Caratula caratula = poliza.getCaratula();
+//            if (caratula != null) {
+//                caratula = em.getReference(caratula.getClass(), caratula.getIdpoliza());
+//                poliza.setCaratula(caratula);
+//            }
+//            PolizaAuto polizaAuto = poliza.getPolizaAuto();
+//            if (polizaAuto != null) {
+//                polizaAuto = em.getReference(polizaAuto.getClass(), polizaAuto.getIdpoliza());
+//                poliza.setPolizaAuto(polizaAuto);
+//            }
+//            Asegurado contratante = poliza.getContratante();
+//            if (contratante != null) {
+//                contratante = em.getReference(contratante.getClass(), contratante.getIdcliente());
+//                poliza.setContratante(contratante);
+//            }
+//            Aseguradora aseguradora = poliza.getAseguradora();
+//            if (aseguradora != null) {
+//                aseguradora = em.getReference(aseguradora.getClass(), aseguradora.getAseguradora());
+//                poliza.setAseguradora(aseguradora);
+//            }
+//            Cliente titular = poliza.getTitular();
+//            if (titular != null) {
+//                titular = em.getReference(titular.getClass(), titular.getIdcliente());
+//                poliza.setTitular(titular);
+//            }
+//            ConductoCobro conductocobro = poliza.getConductocobro();
+//            if (conductocobro != null) {
+//                conductocobro = em.getReference(conductocobro.getClass(), conductocobro.getConductocobro());
+//                poliza.setConductocobro(conductocobro);
+//            }
+//            EstadoPoliza estado = poliza.getEstado();
+//            if (estado != null) {
+//                estado = em.getReference(estado.getClass(), estado.getEstado());
+//                poliza.setEstado(estado);
+//            }
+//            FormaPago formapago = poliza.getFormapago();
+//            if (formapago != null) {
+//                formapago = em.getReference(formapago.getClass(), formapago.getFormapago());
+//                poliza.setFormapago(formapago);
+//            }
+//            Moneda primamoneda = poliza.getPrimamoneda();
+//            if (primamoneda != null) {
+//                primamoneda = em.getReference(primamoneda.getClass(), primamoneda.getMoneda());
+//                poliza.setPrimamoneda(primamoneda);
+//            }
+//            Ramo ramo = poliza.getRamo();
+//            if (ramo != null) {
+//                ramo = em.getReference(ramo.getClass(), ramo.getRamo());
+//                poliza.setRamo(ramo);
+//            }
+//            PolizaVida polizaVida = poliza.getPolizaVida();
+//            if (polizaVida != null) {
+//                polizaVida = em.getReference(polizaVida.getClass(), polizaVida.getIdpoliza());
+//                poliza.setPolizaVida(polizaVida);
+//            }
+//            PolizaGmm polizaGmm = poliza.getPolizaGmm();
+//            if (polizaGmm != null) {
+//                polizaGmm = em.getReference(polizaGmm.getClass(), polizaGmm.getIdpoliza());
+//                poliza.setPolizaGmm(polizaGmm);
+//            }
+//            List<Recibo> attachedReciboList = new ArrayList<Recibo>();
+//            for (Recibo reciboListReciboToAttach : poliza.getReciboList()) {
+//                reciboListReciboToAttach = em.getReference(reciboListReciboToAttach.getClass(), reciboListReciboToAttach.getIdrecibo());
+//                attachedReciboList.add(reciboListReciboToAttach);
+//            }
+//            poliza.setReciboList(attachedReciboList);
+//            em.persist(poliza);
+//            if (caratula != null) {
+//                Poliza oldPolizaOfCaratula = caratula.getPoliza();
+//                if (oldPolizaOfCaratula != null) {
+//                    oldPolizaOfCaratula.setCaratula(null);
+//                    oldPolizaOfCaratula = em.merge(oldPolizaOfCaratula);
+//                }
+//                caratula.setPoliza(poliza);
+//                caratula = em.merge(caratula);
+//            }
+//            if (polizaAuto != null) {
+//                Poliza oldPolizaOfPolizaAuto = polizaAuto.getPoliza();
+//                if (oldPolizaOfPolizaAuto != null) {
+//                    oldPolizaOfPolizaAuto.setPolizaAuto(null);
+//                    oldPolizaOfPolizaAuto = em.merge(oldPolizaOfPolizaAuto);
+//                }
+//                polizaAuto.setPoliza(poliza);
+//                polizaAuto = em.merge(polizaAuto);
+//            }
+//            if (contratante != null) {
+//                contratante.getPolizaList().add(poliza);
+//                contratante = em.merge(contratante);
+//            }
+//            if (aseguradora != null) {
+//                aseguradora.getPolizaList().add(poliza);
+//                aseguradora = em.merge(aseguradora);
+//            }
+//            if (titular != null) {
+//                titular.getPolizaList().add(poliza);
+//                titular = em.merge(titular);
+//            }
+//            if (conductocobro != null) {
+//                conductocobro.getPolizaList().add(poliza);
+//                conductocobro = em.merge(conductocobro);
+//            }
+//            if (estado != null) {
+//                estado.getPolizaList().add(poliza);
+//                estado = em.merge(estado);
+//            }
+//            if (formapago != null) {
+//                formapago.getPolizaList().add(poliza);
+//                formapago = em.merge(formapago);
+//            }
+//            if (primamoneda != null) {
+//                primamoneda.getPolizaList().add(poliza);
+//                primamoneda = em.merge(primamoneda);
+//            }
+//            if (ramo != null) {
+//                ramo.getPolizaList().add(poliza);
+//                ramo = em.merge(ramo);
+//            }
+//            if (polizaVida != null) {
+//                Poliza oldPolizaOfPolizaVida = polizaVida.getPoliza();
+//                if (oldPolizaOfPolizaVida != null) {
+//                    oldPolizaOfPolizaVida.setPolizaVida(null);
+//                    oldPolizaOfPolizaVida = em.merge(oldPolizaOfPolizaVida);
+//                }
+//                polizaVida.setPoliza(poliza);
+//                polizaVida = em.merge(polizaVida);
+//            }
+//            if (polizaGmm != null) {
+//                Poliza oldPolizaOfPolizaGmm = polizaGmm.getPoliza();
+//                if (oldPolizaOfPolizaGmm != null) {
+//                    oldPolizaOfPolizaGmm.setPolizaGmm(null);
+//                    oldPolizaOfPolizaGmm = em.merge(oldPolizaOfPolizaGmm);
+//                }
+//                polizaGmm.setPoliza(poliza);
+//                polizaGmm = em.merge(polizaGmm);
+//            }
+//            for (Recibo reciboListRecibo : poliza.getReciboList()) {
+//                Poliza oldIdpolizaOfReciboListRecibo = reciboListRecibo.getIdpoliza();
+//                reciboListRecibo.setIdpoliza(poliza);
+//                reciboListRecibo = em.merge(reciboListRecibo);
+//                if (oldIdpolizaOfReciboListRecibo != null) {
+//                    oldIdpolizaOfReciboListRecibo.getReciboList().remove(reciboListRecibo);
+//                    oldIdpolizaOfReciboListRecibo = em.merge(oldIdpolizaOfReciboListRecibo);
+//                }
+//            }
+//            em.getTransaction().commit();
+//        } finally {
+//            if (em != null) {
+//                em.close();
+//            }
+//        }
+//    }
     public void edit(Poliza poliza) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
@@ -609,11 +610,17 @@ public class PolizaJpaController implements Serializable, JpaController {
 
     @Override
     public void create(Object object) throws PreexistingEntityException, Exception {
-        EntityManager em = null;
         Poliza poliza = (Poliza) object;
+        boolean isSubTransaction = false;
+        EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
 
             em.persist(poliza);
 
@@ -649,7 +656,10 @@ public class PolizaJpaController implements Serializable, JpaController {
                     query.executeUpdate();
                 }
             }
-            em.getTransaction().commit();
+
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -687,6 +697,92 @@ public class PolizaJpaController implements Serializable, JpaController {
 //            throw ex;
 //        }
 //    }
+    public void renovar(Poliza vieja, Poliza nueva) throws Exception {
+        Poliza polizaVieja = (Poliza) vieja;
+        Poliza polizaNueva = (Poliza) nueva;
+        EstadoPoliza oldEstado = vieja.getEstado();
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+
+            polizaVieja.setEstado(new EstadoPoliza(Globals.POLIZA_ESTADO_RENOVADA));
+            em.merge(polizaVieja);
+            create(polizaNueva);
+
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+            polizaNueva.getContratante().getPolizaList().add(polizaNueva);
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                polizaVieja.setEstado(oldEstado);
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    @Override
+    public void remove(Object object) throws Exception {
+        Poliza poliza = (Poliza) object;
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+
+            if (poliza.getPolizaVida() != null) {
+                BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
+                for (Cliente cliente : poliza.getPolizaVida().getClienteList()) {
+                    Beneficiario benef = new Beneficiario(cliente, poliza.getPolizaVida());
+                    beneficiarioJpaController.remove(benef);
+                }
+                em.remove(poliza.getPolizaVida());
+            }
+            if (poliza.getPolizaGmm() != null) {
+                DependienteJpaController dependienteJpaController = new DependienteJpaController();
+                for (Cliente cliente : poliza.getPolizaVida().getClienteList()) {
+                    dependienteJpaController.remove(cliente);
+                }
+                em.remove(poliza.getPolizaGmm());
+            }
+            if (poliza.getPolizaAuto() != null) {
+                for (Auto auto : poliza.getPolizaAuto().getAutoList()) {
+                    em.remove(auto);
+                }
+                em.remove(poliza.getPolizaAuto());
+            }
+            for (Recibo recibo : poliza.getReciboList()) {
+                em.remove(recibo);
+            }
+            if (poliza.getCaratula() != null) {
+                CaratulaJpaController caratulaJpaController = new CaratulaJpaController();
+                caratulaJpaController.remove(poliza.getCaratula());
+            }
+            em.remove(poliza);
+
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
 
     @Override
     public String getControlledClassName() {

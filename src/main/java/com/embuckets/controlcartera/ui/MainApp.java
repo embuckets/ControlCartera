@@ -91,7 +91,9 @@ public class MainApp extends Application {
 
     public void changeSceneContent(Object previousController, String previousFxml, String nextFxml) throws IOException {
         Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(nextFxml), null, new JavaFXBuilderFactory());
-        windowStack.addLast(new Pair(previousController, previousFxml));
+        if (!(previousFxml.equals("/fxml/RenovarPoliza.fxml") && nextFxml.equals("/fxml/PolizaHome.fxml"))) {
+            windowStack.addLast(new Pair(previousController, previousFxml));
+        }
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -104,7 +106,10 @@ public class MainApp extends Application {
     }
 
     public void changeSceneContent(Object previousController, String previousFxml, Parent page, FXMLLoader loader) {
-        windowStack.addLast(new Pair<>(previousController, previousFxml));
+        if (!(previousFxml.equals("/fxml/RenovarPoliza.fxml") && loader.getLocation().getFile().endsWith("/fxml/PolizaHome.fxml"))) {
+            windowStack.addLast(new Pair(previousController, previousFxml));
+        }
+//        windowStack.addLast(new Pair<>(previousController, previousFxml));
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);

@@ -91,7 +91,7 @@ public class BuscarAseguradoController implements Initializable {
     private void llenarTablaAsegurados() {
         clienteTableView.setItems(FXCollections.observableArrayList(getAllAsegurados()));
 
-        nombreColumn.setCellValueFactory(new PropertyValueFactory("nombre"));
+        nombreColumn.setCellValueFactory(new PropertyValueFactory("primerNombre"));
         paternoColumn.setCellValueFactory(new PropertyValueFactory("paterno"));
         maternoColumn.setCellValueFactory(new PropertyValueFactory("materno"));
 

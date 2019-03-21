@@ -178,7 +178,11 @@ public class BaseDeDatosTest {
         int id = 1508;
         Asegurado asegurado = bd.getById(Asegurado.class, id);
         assertNotNull(asegurado);
-        bd.remove(asegurado);
+        try {
+            bd.remove(asegurado);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatosTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
         assertNull(bd.getById(Asegurado.class, id));
 //        assertNull(asegurado);
     }
@@ -301,7 +305,11 @@ public class BaseDeDatosTest {
         int id = 16;
         Poliza retrieved = bd.getById(Poliza.class, id);
         assertNotNull(retrieved);
-        bd.remove(retrieved);
+        try {
+            bd.remove(retrieved);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatosTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
         assertNull(bd.getById(Poliza.class, id));
 //        assertNull(asegurado);
     }
@@ -336,7 +344,11 @@ public class BaseDeDatosTest {
         Poliza poliza = bd.getById(Poliza.class, id);
         assertNotNull(poliza);
         Auto auto = poliza.getPolizaAuto().getAutoList().get(0);
-        bd.remove(auto);
+        try {
+            bd.remove(auto);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatosTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
         assertNull(bd.getById(Auto.class, auto.getIdauto()));
 //        assertNull(asegurado);
     }

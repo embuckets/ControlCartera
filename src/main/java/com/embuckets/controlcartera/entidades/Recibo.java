@@ -110,7 +110,6 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
 //    public void setCubredesde(LocalDate cubredesde) {
 //        this.cubredesde = Date.from(cubredesde.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 //    }
-
     public LocalDate getCubrehasta() {
         return cubrehasta;
     }
@@ -122,7 +121,6 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
 //    public void setCubrehasta(LocalDate cubrehasta) {
 //        this.cubrehasta = Date.from(cubrehasta.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 //    }
-
     public BigDecimal getImporte() {
         return importe;
     }
@@ -231,6 +229,11 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     @Override
     public StringProperty cobranzaProperty() {
         return new SimpleStringProperty(cobranza.getCobranza());
+    }
+
+    @Override
+    public StringProperty documentoProperty() {
+        return documentoRecibo == null ? new SimpleStringProperty("NO") : new SimpleStringProperty("SI");
     }
 
 }
