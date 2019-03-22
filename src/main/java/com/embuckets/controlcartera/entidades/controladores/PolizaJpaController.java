@@ -21,6 +21,7 @@ import com.embuckets.controlcartera.entidades.ConductoCobro;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.FormaPago;
 import com.embuckets.controlcartera.entidades.Moneda;
+import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.PolizaVida;
@@ -31,6 +32,7 @@ import com.embuckets.controlcartera.entidades.controladores.exceptions.Nonexiste
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -623,6 +625,13 @@ public class PolizaJpaController implements Serializable, JpaController {
             }
 
             em.persist(poliza);
+            
+            for (Recibo recibo : poliza.getReciboList()){
+                NotificacionRecibo notificacion = new NotificacionRecibo(recibo, LocalDateTime.now(), Globals.NOTIFICACION_ESTADO_PENDIENTE);
+                notificacion.setIdrecibo(recibo.getIdrecibo());
+                em.persist(notificacion);
+                recibo.setNotificacionRecibo(notificacion);
+            }
 
             if (poliza.getPolizaAuto() != null) {
                 poliza.getPolizaAuto().setPoliza(poliza);

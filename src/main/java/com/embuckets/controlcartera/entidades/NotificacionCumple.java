@@ -5,9 +5,13 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableNotificacionCumple;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,8 +37,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "NotificacionCumple.findAll", query = "SELECT n FROM NotificacionCumple n"),
     @NamedQuery(name = "NotificacionCumple.findByIdcliente", query = "SELECT n FROM NotificacionCumple n WHERE n.idcliente = :idcliente"),
-    @NamedQuery(name = "NotificacionCumple.findByEnviado", query = "SELECT n FROM NotificacionCumple n WHERE n.enviado = :enviado")})
-public class NotificacionCumple implements Serializable {
+    @NamedQuery(name = "NotificacionCumple.findByEnviado", query = "SELECT n FROM NotificacionCumple n WHERE n.enviado = :enviado"),
+    @NamedQuery(name = "NotificacionCumple.findPendingWithin", query = "SELECT n FROM NotificacionCumple n WHERE n.estadonotificacion.estadonotificacion = :estado AND n.cliente.nacimiento BETWEEN :startDate AND :endDate"),
+    @NamedQuery(name = "NotificacionCumple.findWithin", query = "SELECT n FROM NotificacionCumple n WHERE n.cliente.nacimiento BETWEEN :startDate AND :endDate")})
+public class NotificacionCumple implements Serializable, ObservableNotificacionCumple {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,9 +59,15 @@ public class NotificacionCumple implements Serializable {
 
     public NotificacionCumple() {
     }
-
-    public NotificacionCumple(Integer idcliente) {
-        this.idcliente = idcliente;
+//
+//    public NotificacionCumple(Integer idcliente) {
+//        this.idcliente = idcliente;
+//    }
+    public NotificacionCumple(Cliente cliente, LocalDateTime enviado, String estadonotificacion) {
+        this.idcliente = cliente.getIdcliente();
+        this.enviado = enviado;
+        this.cliente = cliente;
+        this.estadonotificacion = new EstadoNotificacion(estadonotificacion);
     }
 
     public Integer getIdcliente() {
@@ -114,5 +126,26 @@ public class NotificacionCumple implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.NotificacionCumple[ idcliente=" + idcliente + " ]";
     }
-    
+
+    @Override
+    public StringProperty nombreCompletoProperty() {
+        return cliente.nombreProperty();
+    }
+
+    @Override
+    public StringProperty nacimientoProperty() {
+        return cliente.nacimientoProperty();
+    }
+
+    @Override
+    public StringProperty faltanProperty() {
+        LocalDate nacimiento = this.cliente.getNacimiento();
+        return new SimpleStringProperty("" + (nacimiento.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
+    }
+
+    @Override
+    public StringProperty estadoProperty() {
+        return new SimpleStringProperty(this.estadonotificacion.getEstadonotificacion());
+    }
+
 }

@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -57,9 +58,16 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
 
     public NotificacionRecibo() {
     }
+//
+//    public NotificacionRecibo(Integer idrecibo) {
+//        this.idrecibo = idrecibo;
+//    }
 
-    public NotificacionRecibo(Integer idrecibo) {
-        this.idrecibo = idrecibo;
+    public NotificacionRecibo(Recibo recibo, LocalDateTime enviado, String estadonotificacion) {
+        this.idrecibo = recibo.getIdrecibo();
+        this.enviado = enviado;
+        this.estadonotificacion = new EstadoNotificacion(estadonotificacion);
+        this.recibo = recibo;
     }
 
     public Integer getIdrecibo() {
@@ -120,11 +128,6 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
     }
 
     @Override
-    public int getId() {
-        return idrecibo;
-    }
-
-    @Override
     public StringProperty polizaProperty() {
         return new SimpleStringProperty(this.recibo.getIdpoliza().getNumero());
     }
@@ -147,7 +150,7 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
 
     @Override
     public StringProperty importeProperty() {
-        return new SimpleStringProperty("$" + this.recibo.getImporte().toString());
+        return new SimpleStringProperty(Globals.formatCantidad(this.recibo.getImporte()));
     }
 
     @Override

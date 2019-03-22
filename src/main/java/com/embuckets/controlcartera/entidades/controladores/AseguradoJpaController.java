@@ -20,11 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.DocumentoAsegurado;
+import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import com.embuckets.controlcartera.entidades.globals.Globals;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.EntityExistsException;
@@ -32,6 +35,7 @@ import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
+import jdk.nashorn.internal.objects.Global;
 
 /**
  *
@@ -61,6 +65,10 @@ public class AseguradoJpaController implements Serializable, JpaController {
             Cliente cliente = asegurado.getCliente();
             //save cliente
             em.persist(cliente);
+            NotificacionCumple notificacionCumple = new NotificacionCumple(cliente, LocalDateTime.now(), Globals.NOTIFICACION_ESTADO_PENDIENTE);
+            notificacionCumple.setIdcliente(cliente.getIdcliente());
+            em.persist(notificacionCumple);
+            cliente.setNotificacionCumple(notificacionCumple);
             asegurado.setIdcliente(cliente.getIdcliente());
 //            ClienteJpaController clienteJpaController = new ClienteJpaController(emf);
 //            clienteJpaController.create(cliente);

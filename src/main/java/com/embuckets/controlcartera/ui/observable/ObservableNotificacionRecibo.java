@@ -22,8 +22,6 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableNotificacionRecibo {
 
-    int getId();
-
     StringProperty polizaProperty();
 
     StringProperty aseguradoProperty();
@@ -39,5 +37,5 @@ public interface ObservableNotificacionRecibo {
     StringProperty enviadoProperty();
     
     StringProperty documentoProperty();
-
+    
 }

@@ -7,14 +7,17 @@ package com.embuckets.controlcartera.ui;
 
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Cliente;
+import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
+import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import com.embuckets.controlcartera.ui.observable.ObservableRenovacion;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -94,11 +97,15 @@ public class HomeController implements Initializable, Controller {
 
     //TableView Cumple
     @FXML
-    private TableView<ObservableCliente> tableViewCumple;
+    private TableView<NotificacionCumple> tableViewCumple;
     @FXML
     private TableColumn cumpleNombreTableColumn;
     @FXML
     private TableColumn cumpleNacimientoTableColumn;
+    @FXML
+    private TableColumn cumpleFaltanTableColumn;
+    @FXML
+    private TableColumn cumpleEstadoTableColumn;
 
     //Botones
     @FXML
@@ -213,99 +220,8 @@ public class HomeController implements Initializable, Controller {
         return MainApp.getInstance().getBaseDeDatos().getAll(Asegurado.class);
     }
 
-//    private List<Asegurado> createAseguradosFalsos() {
-//        Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
-//        asegurado1.setIdcliente(1);
-//        asegurado1.getCliente().setIdcliente(1);
-//        asegurado1.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
-//        asegurado1.setTipopersona(new TipoPersona("Fisica"));
-//        Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
-//        asegurado2.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
-//        asegurado2.setIdcliente(2);
-//        asegurado2.getCliente().setIdcliente(2);
-//        asegurado2.setTipopersona(new TipoPersona("Fisica"));
-//
-//        Poliza poliza1 = new Poliza();
-//        poliza1.setIdpoliza(1);
-//        poliza1.setNumero("numeor1");
-//        poliza1.setAseguradora(new Aseguradora("GNP"));
-//        poliza1.setRamo(new Ramo("vida"));
-//        poliza1.setProducto("producto");
-//        poliza1.setPlan("plan");
-//        poliza1.setPrima(new BigDecimal(21456));
-//        poliza1.setPrimamoneda(new Moneda("pesos"));
-//        poliza1.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(15))));
-//        poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-//        poliza1.setEstado(new EstadoPoliza("Vigente"));
-//        poliza1.setConductocobro(new ConductoCobro("agente"));
-//        poliza1.setFormapago(new FormaPago("mensual"));
-//        Cliente benef = new Cliente("beneficiario1", "hijo", "hijo");
-//        benef.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
-//        poliza1.setPolizaVida(new PolizaVida(1));
-//        poliza1.getPolizaVida().setSumaasegurada(BigDecimal.valueOf(50000));
-//        poliza1.getPolizaVida().setSumaaseguradamoneda(new Moneda("Dolares"));
-//        poliza1.getPolizaVida().getClienteList().add(benef);
-//        poliza1.generarRecibos(3, new BigDecimal(10123.12), new BigDecimal(9123.12));
-//
-//        Poliza poliza2 = new Poliza();
-//        poliza2.setIdpoliza(2);
-//        poliza2.setNumero("numeor2");
-//        poliza2.setAseguradora(new Aseguradora("GNP"));
-//        poliza2.setRamo(new Ramo("autos"));
-//        poliza2.setProducto("producto");
-//        poliza2.setPlan("plan");
-//        poliza2.setPrima(new BigDecimal(54789));
-//        poliza2.setPrimamoneda(new Moneda("pesos"));
-//        poliza2.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(20))));
-//        poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-//        poliza2.setEstado(new EstadoPoliza("Cancelada"));
-//        poliza2.setPolizaAuto(new PolizaAuto(2));
-//        poliza2.getPolizaAuto().setSumaaseguradaauto(new SumaAseguradaAuto("Factura"));
-//        poliza2.getPolizaAuto().getAutoList().add(new Auto(2, "STD 4PT RL", "VW", "Jetta", Year.of(2016)));
-//        poliza2.setConductocobro(new ConductoCobro("agente"));
-//        poliza2.setFormapago(new FormaPago("mensual"));
-//        poliza2.generarRecibos(4, new BigDecimal(10123.12), new BigDecimal(9123.12));
-//
-//        poliza1.setContratante(asegurado1);
-//        poliza1.setTitular(asegurado1.getCliente());
-//        poliza2.setContratante(asegurado1);
-//        poliza2.setTitular(asegurado1.getCliente());
-//        asegurado1.getPolizaList().add(poliza1);
-//        asegurado1.getPolizaList().add(poliza2);
-//
-//        Poliza poliza3 = new Poliza();
-//        poliza3.setIdpoliza(3);
-//        poliza3.setNumero("numeor3");
-//        poliza3.setAseguradora(new Aseguradora("PLAN SEGURO"));
-//        poliza3.setRamo(new Ramo("gastos medicos"));
-//        poliza3.setProducto("producto");
-//        poliza3.setPlan("plan");
-//        poliza3.setPrima(new BigDecimal(12456));
-//        poliza3.setPrimamoneda(new Moneda("PESOS"));
-//        poliza3.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(5))));
-//        poliza3.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-//        poliza3.setEstado(new EstadoPoliza("No vigente"));
-//        poliza3.setConductocobro(new ConductoCobro("agente"));
-//        poliza3.setFormapago(new FormaPago(Globals.FORMA_PAGO_TRIMESTRAL));
-//        poliza3.setPolizaGmm(new PolizaGmm(3, BigDecimal.valueOf(79654.12), "100000000", (short) 10));
-//        poliza3.getPolizaGmm().setDeduciblemoneda(new Moneda("PESOS"));
-//        poliza3.getPolizaGmm().setSumaaseguradamondeda(new Moneda("PESOS"));
-//        Cliente depend = new Cliente("beneficiario1", "hijo", "hijo");
-//        depend.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
-//        poliza3.getPolizaGmm().getClienteList().add(depend);
-//        poliza3.generarRecibos(2, new BigDecimal(10123.12), new BigDecimal(9123.12));
-//
-//        poliza3.setContratante(asegurado2);
-//        poliza3.setTitular(asegurado2.getCliente());
-//        asegurado2.getPolizaList().add(poliza3);
-//
-//        List<Asegurado> list = new ArrayList<>();
-//        list.add(asegurado1);
-//        list.add(asegurado2);
-//        return list;
-//    }
-    private ObservableList<ObservableCliente> createCumple() {
-        return FXCollections.observableArrayList(getClientes());
+    private ObservableList<NotificacionCumple> createCumple() {
+        return FXCollections.observableArrayList(getNotificacionesCumple());
 //        return createObservableClientes(getClientes());
     }
 
@@ -316,9 +232,10 @@ public class HomeController implements Initializable, Controller {
 //        });
 //        return FXCollections.observableArrayList(observableClientes);
 //    }
-    private List<? extends Cliente> getClientes() {
+    private List<NotificacionCumple> getNotificacionesCumple() {
         //TODO: pedir clientes que cumplan EN LOS PROXIMOS DIAS
-        return MainApp.getInstance().getBaseDeDatos().getAll(Cliente.class);
+        return MainApp.getInstance().getBaseDeDatos().getCumplesProximos();
+//        return MainApp.getInstance().getBaseDeDatos().getCumplesEntre(LocalDate.now(), LocalDate.now().plusMonths(1));
 //        return createClientesFalsos();
     }
 
@@ -396,8 +313,10 @@ public class HomeController implements Initializable, Controller {
     private void fillTablaCumple() {
         tableViewCumple.setItems(createCumple());
 
-        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory("nombre"));
+        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory("nombreCompleto"));
         cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory("nacimiento"));
+        cumpleFaltanTableColumn.setCellValueFactory(new PropertyValueFactory("faltan"));
+        cumpleEstadoTableColumn.setCellValueFactory(new PropertyValueFactory("estado"));
     }
 
     private void fillTablaRecibos() {
@@ -440,14 +359,13 @@ public class HomeController implements Initializable, Controller {
 //        }
 //        return result;
 //    }
-
     private ObservableList<ObservableNotificacionRecibo> createRecibos() {
         return FXCollections.observableArrayList(getNotificacionesRecibos());
     }
 
-    private List<? extends NotificacionRecibo> getNotificacionesRecibos() {
+    private List<NotificacionRecibo> getNotificacionesRecibos() {
         //TODO: getNotifacaciones de la base de datos DEL MES
-        return MainApp.getInstance().getBaseDeDatos().getAll(NotificacionRecibo.class);
+        return MainApp.getInstance().getBaseDeDatos().getRecibosProximos();
 //        return createNotificacionesRecibosFalsos();
     }
 

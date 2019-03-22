@@ -16,6 +16,8 @@ import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -229,6 +231,23 @@ public class NotificacionReciboJpaController implements Serializable, JpaControl
             return ((Long) q.getSingleResult()).intValue();
         } finally {
             em.close();
+        }
+    }
+    
+    public List<NotificacionRecibo> getNotificacionesProximas(){
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (MONTH(n.recibo.cubrehasta) = :today OR MONTH(n.recibo.cubrehasta) = :next) AND YEAR(n.recibo.cubrehasta) = :year");
+            query.setParameter("today", LocalDate.now().getMonthValue());
+            query.setParameter("next", LocalDate.now().plusMonths(1).getMonthValue());
+            query.setParameter("year", LocalDate.now().getYear());
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
         }
     }
 

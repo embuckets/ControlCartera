@@ -187,11 +187,6 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     }
 
     @Override
-    public int getId() {
-        return idrecibo;
-    }
-
-    @Override
     public StringProperty polizaProperty() {
         return getIdpoliza().numeroProperty();
     }

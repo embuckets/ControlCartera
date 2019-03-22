@@ -16,6 +16,9 @@ import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import com.embuckets.controlcartera.entidades.globals.Globals;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -229,6 +232,56 @@ public class NotificacionCumpleJpaController implements Serializable, JpaControl
             return ((Long) q.getSingleResult()).intValue();
         } finally {
             em.close();
+        }
+    }
+
+    public List<NotificacionCumple> getNotificacionesPendientesEntre(LocalDate start, LocalDate end) {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            Query query = em.createNamedQuery("NotificacionCumple.findPendingWithin");
+            query.setParameter("startDate", start);
+            query.setParameter("endDate", end);
+            query.setParameter("estado", Globals.NOTIFICACION_ESTADO_PENDIENTE);
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    public List<NotificacionCumple> getNotificacionesEntre(LocalDate start, LocalDate end) {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            Query query = em.createNamedQuery("NotificacionCumple.findWithin");
+            query.setParameter("startDate", start);
+            query.setParameter("endDate", end);
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    public List<NotificacionCumple> getNotificacionesProximas() {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+                
+            Query query = em.createQuery("SELECT n FROM NotificacionCumple n WHERE MONTH(n.cliente.nacimiento) = :today OR MONTH(n.cliente.nacimiento) = :next");
+            query.setParameter("today", LocalDate.now().getMonthValue());
+            query.setParameter("next", LocalDate.now().plusMonths(1).getMonthValue());
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
         }
     }
 

@@ -74,6 +74,7 @@ import com.embuckets.controlcartera.entidades.controladores.TipoPersonaJpaContro
 import com.embuckets.controlcartera.entidades.controladores.TipoTelefonoJpaController;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,6 +197,33 @@ public class BaseDeDatos {
     public void renovarPoliza(Poliza vieja, Poliza nueva) throws Exception {
         try {
             ((PolizaJpaController) controllers.get(Poliza.class)).renovar(vieja, nueva);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<NotificacionCumple> getCumplesEntre(LocalDate start, LocalDate end) {
+        try {
+            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesEntre(start, end);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<NotificacionCumple> getCumplesProximos() {
+        try {
+            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesProximas();
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<NotificacionRecibo> getRecibosProximos() {
+        try {
+            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesProximas();
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
