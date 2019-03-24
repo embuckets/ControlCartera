@@ -74,8 +74,6 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
             if (!isSubTransaction) {
                 em.getTransaction().begin();
             }
-//            beneficiario.getPolizaVida().getClienteList().remove(beneficiario.getCliente());
-//            em.merge(beneficiario.getPolizaVida());
             Query query = em.createNativeQuery("DELETE FROM APP.Beneficiario WHERE idcliente = :idcliente AND idpoliza = :idpoliza");
             query.setParameter("idcliente", beneficiario.getCliente().getIdcliente());
             query.setParameter("idpoliza", beneficiario.getPolizaVida().getIdpoliza());

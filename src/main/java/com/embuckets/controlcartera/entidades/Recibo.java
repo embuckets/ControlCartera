@@ -214,7 +214,7 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     @Override
     public StringProperty enviadoProperty() {
         //puede ser null
-        if (notificacionRecibo != null) {
+        if (notificacionRecibo != null && notificacionRecibo.getEnviado() != null) {
             return notificacionRecibo.enviadoProperty();
         } else {
             return new SimpleStringProperty(Globals.NOTIFICACION_ESTADO_PENDIENTE);

@@ -32,6 +32,7 @@
 package com.embuckets.controlcartera.ui;
 
 //import dominio.ControlCartera;
+import com.embuckets.controlcartera.entidades.Agente;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -52,12 +53,14 @@ public class MainApp extends Application {
     private static MainApp instance;
     private Deque<Pair<Object, String>> windowStack;
     private BaseDeDatos bd;
+    private Agente agente;
 //    private ControlCartera controlCartera;
 
     public MainApp() {
         instance = this;
         windowStack = new ArrayDeque<>();
         this.bd = BaseDeDatos.getInstance();
+        this.agente = Agente.getInstance();
     }
 
     public static MainApp getInstance() {
@@ -163,6 +166,10 @@ public class MainApp extends Application {
 
     public BaseDeDatos getBaseDeDatos() {
         return this.bd;
+    }
+
+    public Agente getAgente() {
+        return this.agente;
     }
 
 }

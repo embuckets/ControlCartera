@@ -38,8 +38,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -71,6 +73,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
@@ -117,6 +120,8 @@ public class AseguradoHomeController implements Initializable, Controller {
     private TextField coloniaTextField;
     @FXML
     private TextField delegacionTextField;
+    @FXML
+    private Button domicilioButton;
     @FXML
     private TextField estadoTextField;
     @FXML
@@ -232,15 +237,6 @@ public class AseguradoHomeController implements Initializable, Controller {
 
     private void llenarDomicilio() {
         if (asegurado.getIddomicilio() != null) {
-//            asegurado.setIddomicilio(new Domicilio());
-//            Domicilio domicilio = asegurado.getIddomicilio();
-//            domicilio.setCalle("");
-//            domicilio.setExterior("");
-//            domicilio.setInterior("");
-//            domicilio.setCodigopostal("");
-//            domicilio.setColonia("");
-//            domicilio.setDelegacion(new Delegacion());
-//            domicilio.setEstado(new Estado());
             calleTextField.setText(asegurado.getIddomicilio().getCalle());
             exteriorTextField.setText(asegurado.getIddomicilio().getExterior());
             interiorTextField.setText(asegurado.getIddomicilio().getInterior());
@@ -248,21 +244,28 @@ public class AseguradoHomeController implements Initializable, Controller {
             coloniaTextField.setText(asegurado.getIddomicilio().getColonia());
             delegacionTextField.setText(asegurado.getIddomicilio().getDelegacion().getDelegacion());
             estadoTextField.setText(asegurado.getIddomicilio().getEstado().getEstado());
+            domicilioButton.setText("Editar");
+            domicilioButton.setOnAction((event) -> {
+                editarDomicilio(event);
+            });
+        } else {
+            domicilioButton.setText("Agregar");
+            domicilioButton.setOnAction((event) -> {
+                agregarDomicilio(event);
+            });
+
         }
     }
 
     private void llenarTablaTelefono() {
-//        List<Telefono> obsTelefonoList = new ArrayList<>();
-//        for (Telefono telefono : asegurado.getTelefonoList()) {
-//            ObservableTelefono obsTel = new ObservableTelefono(telefono.getTelefonoPK().getTelefono(), telefono.getExtension(), telefono.getTipotelefono().getTipotelefono());
-//            obsTel.setIdCliente(telefono.getTelefonoPK().getIdcliente());
-//            obsTelefonoList.add(obsTel);
-//        }
-
         telefonoTableView.setItems(FXCollections.observableArrayList(asegurado.getTelefonoList()));
         telefonoTableColumn.setCellValueFactory(new PropertyValueFactory("telefono"));
         extensionTableColumn.setCellValueFactory(new PropertyValueFactory("extension"));
         tipoTelefonoTableColumn.setCellValueFactory(new PropertyValueFactory("tipo"));
+
+        telefonoTextField.setTextFormatter(new TextFormatter<>(textFormatterOnlyNumbers()));
+        extensionTextField.setTextFormatter(new TextFormatter<>(textFormatterOnlyNumbers()));
+
         fillTipoTelefonoComboBox();
         //crear contex menu
         telefonoTableView.setRowFactory(new Callback<TableView<Telefono>, TableRow<Telefono>>() {
@@ -303,6 +306,28 @@ public class AseguradoHomeController implements Initializable, Controller {
                 return row;
             }
         });
+    }
+
+    private UnaryOperator<TextFormatter.Change> textFormatterOnlyNumbers() {
+        UnaryOperator<TextFormatter.Change> cantidadFilter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("[0-9]*")) {
+                return change;
+            }
+            return null;
+        };
+        return cantidadFilter;
+    }
+
+    private UnaryOperator<TextFormatter.Change> textFormatterEmails() {
+        UnaryOperator<TextFormatter.Change> cantidadFilter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*)|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*:(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*)(?:,\\s*(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*))*)?;\\s*)")) {
+                return change;
+            }
+            return null;
+        };
+        return cantidadFilter;
     }
 
     private void editarTelefono(Telefono viejo, Telefono nuevo) throws Exception {
@@ -402,6 +427,7 @@ public class AseguradoHomeController implements Initializable, Controller {
         emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
         emailTableColumn.setCellValueFactory(new PropertyValueFactory("email"));
         tipoEmailTableColumn.setCellValueFactory(new PropertyValueFactory("tipo"));
+
         fillTipoEmailComboBox();
 
         emailTableView.setRowFactory((TableView<Email> tableView) -> {
@@ -671,35 +697,44 @@ public class AseguradoHomeController implements Initializable, Controller {
 
     @FXML
     private void agregarTelefono(ActionEvent event) {
-        try {
-            Telefono telefono = new Telefono(asegurado.getIdcliente(), telefonoTextField.getText());
-            telefono.setExtension(extensionTextField.getText());
-            telefono.setTipotelefono(new TipoTelefono(tipoTelefonoComboBox.getValue().toString()));
-            telefono.setAsegurado(asegurado);
-            MainApp.getInstance().getBaseDeDatos().create(telefono);
-            asegurado.agregarTelefono(telefono);
-            telefonoTableView.getItems().add(telefono);
-            telefonoTextField.setText("");
-            extensionTextField.setText("");
-        } catch (Exception ex) {
-            showAlert(ex, "Error al guardar telefono");
+        if (!telefonoTextField.getText().isEmpty()) {
+            try {
+                Telefono telefono = new Telefono(asegurado.getIdcliente(), telefonoTextField.getText());
+                telefono.setExtension(extensionTextField.getText());
+                telefono.setTipotelefono(new TipoTelefono(tipoTelefonoComboBox.getValue().toString()));
+                telefono.setAsegurado(asegurado);
+                MainApp.getInstance().getBaseDeDatos().create(telefono);
+                asegurado.agregarTelefono(telefono);
+                telefonoTableView.getItems().add(telefono);
+                telefonoTextField.setText("");
+                extensionTextField.setText("");
+            } catch (Exception ex) {
+                showAlert(ex, "Error al guardar telefono");
+            }
         }
     }
 
     @FXML
     private void agregarEmail(ActionEvent event) {
-        try {
-            Email email = new Email(asegurado.getIdcliente(), emailTextField.getText());
-            email.setTipoemail(new TipoEmail(tipoEmailComboBox.getValue().toString()));
-            email.setAsegurado(asegurado);
-            MainApp.getInstance().getBaseDeDatos().create(email);
-            asegurado.agregarEmail(email);
-            emailTableView.getItems().add(email);
-            emailTextField.setText("");
+        if (validarEmail()) {
+            try {
+                Email email = new Email(asegurado.getIdcliente(), emailTextField.getText());
+                email.setTipoemail(new TipoEmail(tipoEmailComboBox.getValue().toString()));
+                email.setAsegurado(asegurado);
+                MainApp.getInstance().getBaseDeDatos().create(email);
+                asegurado.agregarEmail(email);
+                emailTableView.getItems().add(email);
+                emailTextField.setText("");
 
-        } catch (Exception ex) {
-            showAlert(ex, "Error al guardar email");
+            } catch (Exception ex) {
+                showAlert(ex, "Error al guardar email");
+            }
         }
+    }
+
+    private boolean validarEmail() {
+        Pattern ptr = Pattern.compile("(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*)|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*:(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*)(?:,\\s*(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*))*)?;\\s*)");
+        return ptr.matcher(emailTextField.getText()).matches();
     }
 
     @FXML
@@ -715,16 +750,18 @@ public class AseguradoHomeController implements Initializable, Controller {
 
     @FXML
     private void agregarDocumento(ActionEvent event) {
-        try {
-            DocumentoAsegurado doc = new DocumentoAsegurado(new File(archivoTextField.getText()), tipoArchivoComboBox.getValue());
-            doc.setAsegurado(asegurado);
-            doc.getDocumentoAseguradoPK().setIdcliente(asegurado.getIdcliente());
-            MainApp.getInstance().getBaseDeDatos().create(doc);
-            asegurado.getDocumentoAseguradoList().add(doc);
-            documentoTableView.getItems().add(doc);
-            archivoTextField.setText("");
-        } catch (Exception e) {
-            Utilities.makeAlert(e, "Error al guardar documento").showAndWait();
+        if (!archivoTextField.getText().isEmpty()) {
+            try {
+                DocumentoAsegurado doc = new DocumentoAsegurado(new File(archivoTextField.getText()), tipoArchivoComboBox.getValue());
+                doc.setAsegurado(asegurado);
+                doc.getDocumentoAseguradoPK().setIdcliente(asegurado.getIdcliente());
+                MainApp.getInstance().getBaseDeDatos().create(doc);
+                asegurado.getDocumentoAseguradoList().add(doc);
+                documentoTableView.getItems().add(doc);
+                archivoTextField.setText("");
+            } catch (Exception e) {
+                Utilities.makeAlert(e, "Error al guardar documento").showAndWait();
+            }
         }
     }
 
@@ -994,7 +1031,6 @@ public class AseguradoHomeController implements Initializable, Controller {
         return dialog;
     }
 
-    @FXML
     private void editarDomicilio(ActionEvent event) {
         Domicilio actual = asegurado.getIddomicilio();
         Optional<Domicilio> editedDomicilio = createEditDomicilioDialog(asegurado.getIddomicilio()).showAndWait();
@@ -1011,7 +1047,6 @@ public class AseguradoHomeController implements Initializable, Controller {
             changes.put("delegacion", new Pair<>(actual.getDelegacion().getDelegacion(), edited.getDelegacion().getDelegacion()));
             changes.put("estado", new Pair<>(actual.getEstado().getEstado(), edited.getEstado().getEstado()));
             if (valuesChanged(changes)) {
-                //edit
                 try {
                     actual.setCalle(edited.getCalle());
                     actual.setExterior(edited.getExterior());
@@ -1020,8 +1055,8 @@ public class AseguradoHomeController implements Initializable, Controller {
                     actual.setColonia(edited.getColonia());
                     actual.setDelegacion(new Delegacion(edited.getDelegacion().getDelegacion()));
                     actual.setEstado(new Estado(edited.getEstado().getEstado()));
-                    Domicilio unproxy = Utilities.initializeAndUnproxy(actual);
-                    MainApp.getInstance().getBaseDeDatos().edit(unproxy);
+//                    Domicilio unproxy = Utilities.initializeAndUnproxy(actual);
+                    MainApp.getInstance().getBaseDeDatos().edit(actual);
                 } catch (Exception e) {
                     showAlert(e, "Error al editar domicilio");
                     actual.setCalle((String) changes.get("calle").getKey());
@@ -1032,6 +1067,21 @@ public class AseguradoHomeController implements Initializable, Controller {
                     actual.setDelegacion(new Delegacion((String) changes.get("delegacion").getKey()));
                     actual.setEstado(new Estado((String) changes.get("estado").getKey()));
                 }
+            }
+        }
+        llenarDomicilio();
+    }
+
+    private void agregarDomicilio(ActionEvent event) {
+        Optional<Domicilio> editedDomicilio = createAgregarDomicilioDialog().showAndWait();
+        //TODO: update domicilio
+        if (editedDomicilio.isPresent()) {
+            try {
+                asegurado.setIddomicilio(editedDomicilio.get());
+                MainApp.getInstance().getBaseDeDatos().create(asegurado.getIddomicilio());
+            } catch (Exception e) {
+                showAlert(e, "Error al agregar domicilio");
+                asegurado.setIddomicilio(null);
             }
         }
         llenarDomicilio();
@@ -1048,16 +1098,16 @@ public class AseguradoHomeController implements Initializable, Controller {
     }
 
     private Dialog<Domicilio> createEditDomicilioDialog(Domicilio domicilio) {
-        if (domicilio == null) {
-            domicilio = new Domicilio();
-            domicilio.setCalle("");
-            domicilio.setExterior("");
-            domicilio.setInterior("");
-            domicilio.setCodigopostal("");
-            domicilio.setColonia("");
-            domicilio.setDelegacion(new Delegacion());
-            domicilio.setEstado(new Estado());
-        }
+//        if (domicilio == null) {
+//            domicilio = new Domicilio();
+//            domicilio.setCalle("");
+//            domicilio.setExterior("");
+//            domicilio.setInterior("");
+//            domicilio.setCodigopostal("");
+//            domicilio.setColonia("");
+//            domicilio.setDelegacion(new Delegacion());
+//            domicilio.setEstado(new Estado());
+//        }
         Dialog<Domicilio> dialog = new Dialog<>();
         dialog.setTitle("Editar domicilio");
         //set the button types
@@ -1075,32 +1125,21 @@ public class AseguradoHomeController implements Initializable, Controller {
         TextField codigoPostalField = new TextField(domicilio.getCodigopostal());
         TextField coloniaField = new TextField(domicilio.getColonia());
 
-//        String[] delegaciones = {"Álvaro Obregón", " Azcapotzalco", " Benito Juárez",
-//            " Coyoacán", " Cuajimalpa de Morelos", " Cuauhtémoc", "Gustavo A. Madero",
-//            " Iztacalco", " Iztapalapa", " La Magdalena Contreras", "Miguel Hidalgo", " Milpa Alta",
-//            " Tláhuac", " Tlalpan", " Venustiano Carranza", " Xochimilco"};
         List<Delegacion> delegaciones = MainApp.getInstance().getBaseDeDatos().getAll(Delegacion.class);
         ObservableList<String> obsDelegaciones = FXCollections.observableArrayList(delegaciones.stream().map(d -> d.getDelegacion()).collect(Collectors.toList()));
         ComboBox delegacionBox = new ComboBox(obsDelegaciones);
         delegacionBox.getSelectionModel().select(obsDelegaciones.indexOf(domicilio.getDelegacion().getDelegacion()));
-        if (delegacionBox.getSelectionModel().getSelectedItem() == null) {
-            delegacionBox.getSelectionModel().select(0);
-        }
+//        if (delegacionBox.getSelectionModel().getSelectedItem() == null) {
+//            delegacionBox.getSelectionModel().select(0);
+//        }
 
-//        String[] estados = {"Aguascalientes", " Baja California", " Baja California Sur",
-//            " Campeche", " Chiapas", " Chihuahua", " Ciudad de México",
-//            " Coahuila", " Colima", " Durango", " Estado de México", " Guanajuato",
-//            " Guerrero", " Hidalgo", " Jalisco", " Michoacán", " Morelos",
-//            " Nayarit", " Nuevo León", " Oaxaca", " Puebla", " Querétaro",
-//            " Quintana Roo", " San Luis Potosí", " Sinaloa", " Sonora",
-//            " Tabasco", " Tamaulipas", " Tlaxcala", " Veracruz", " Yucatán", " Zacatecas"};
         List<Estado> estados = MainApp.getInstance().getBaseDeDatos().getAll(Estado.class);
         ObservableList<String> obsEstados = FXCollections.observableArrayList(estados.stream().map(e -> e.getEstado()).collect(Collectors.toList()));
         ComboBox estadosBox = new ComboBox(obsEstados);
         estadosBox.getSelectionModel().select(obsEstados.indexOf(domicilio.getEstado().getEstado()));
-        if (estadosBox.getSelectionModel().getSelectedItem() == null) {
-            estadosBox.getSelectionModel().select(0);
-        }
+//        if (estadosBox.getSelectionModel().getSelectedItem() == null) {
+//            estadosBox.getSelectionModel().select(0);
+//        }
         grid.add(new Label("Calle"), 0, 0);
         grid.add(calleField, 1, 0);
         grid.add(new Label("No. Exterior"), 0, 1);
@@ -1123,6 +1162,73 @@ public class AseguradoHomeController implements Initializable, Controller {
         BooleanBinding predicate = calleField.textProperty().isEmpty().or(exteriorField.textProperty().isEmpty());
         btnOk.disableProperty().bind(predicate);
 //        btnOk.disableProperty().bind(Bindings.or(calleField.textProperty().isEmpty(), exteriorField.textProperty().isEmpty()));
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == guardar) {
+                Domicilio nuevo = new Domicilio();
+                //Creear nuevo domicilio y
+                nuevo.setCalle(calleField.getText());
+                nuevo.setExterior(exteriorField.getText());
+                nuevo.setInterior(interiorField.getText());
+                nuevo.setCodigopostal(codigoPostalField.getText());
+                nuevo.setColonia(coloniaField.getText());
+                nuevo.setDelegacion(new Delegacion(delegacionBox.getValue().toString()));
+                nuevo.setEstado(new Estado(estadosBox.getValue().toString()));
+                return nuevo;
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    private Dialog<Domicilio> createAgregarDomicilioDialog() {
+        Dialog<Domicilio> dialog = new Dialog<>();
+        dialog.setTitle("Editar domicilio");
+        //set the button types
+        ButtonType guardar = new ButtonType("Guardar", ButtonData.OK_DONE);
+
+        //create labels and fields
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField calleField = new TextField();
+        TextField exteriorField = new TextField();
+        TextField interiorField = new TextField();
+        TextField codigoPostalField = new TextField();
+        TextField coloniaField = new TextField();
+
+        List<Delegacion> delegaciones = MainApp.getInstance().getBaseDeDatos().getAll(Delegacion.class);
+        ObservableList<String> obsDelegaciones = FXCollections.observableArrayList(delegaciones.stream().map(d -> d.getDelegacion()).collect(Collectors.toList()));
+        ComboBox delegacionBox = new ComboBox(obsDelegaciones);
+        delegacionBox.getSelectionModel().selectFirst();
+        List<Estado> estados = MainApp.getInstance().getBaseDeDatos().getAll(Estado.class);
+        ObservableList<String> obsEstados = FXCollections.observableArrayList(estados.stream().map(e -> e.getEstado()).collect(Collectors.toList()));
+        ComboBox estadosBox = new ComboBox(obsEstados);
+        estadosBox.getSelectionModel().selectFirst();
+        grid.add(new Label("Calle"), 0, 0);
+        grid.add(calleField, 1, 0);
+        grid.add(new Label("No. Exterior"), 0, 1);
+        grid.add(exteriorField, 1, 1);
+        grid.add(new Label("No. Interior"), 0, 2);
+        grid.add(interiorField, 1, 2);
+        grid.add(new Label("Código Postal"), 0, 3);
+        grid.add(codigoPostalField, 1, 3);
+        grid.add(new Label("Colonia"), 0, 4);
+        grid.add(coloniaField, 1, 4);
+        grid.add(new Label("Delegación"), 0, 5);
+        grid.add(delegacionBox, 1, 5);
+        grid.add(new Label("Estado"), 0, 6);
+        grid.add(estadosBox, 1, 6);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.getDialogPane().getButtonTypes().addAll(guardar, ButtonType.CANCEL);
+        final Button btnOk = (Button) dialog.getDialogPane().lookupButton(guardar);
+        BooleanBinding predicate = calleField.textProperty().isEmpty().or(exteriorField.textProperty().isEmpty());
+        btnOk.disableProperty().bind(predicate);
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {

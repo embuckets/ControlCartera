@@ -345,13 +345,13 @@ public class RenovarPolizaController implements Initializable, Controller {
         agregarCaratulaButton.disableProperty().bind(agregarCaratulaBinding);
 //        agregarCaratulaButton.setDisable(caratulaTableView.getItems().isEmpty());
 
-        archivoTableColumn.setCellValueFactory(new PropertyValueFactory("archivo"));
-
         caratulaTableView.setRowFactory((TableView<Caratula> table) -> {
             final TableRow<Caratula> row = new TableRow<>();
             final ContextMenu menu = new ContextMenu();
             MenuItem eliminarItem = new MenuItem("Eliminar");
             eliminarItem.setOnAction((event) -> {
+                caratula = null;
+                polizaRenovada.setCaratula(null);
                 caratulaTableView.getItems().clear();
             });
             menu.getItems().addAll(eliminarItem);
@@ -456,6 +456,7 @@ public class RenovarPolizaController implements Initializable, Controller {
 
     private void createCaratula(File file) {
         caratula = new Caratula(file, this.polizaRenovada);
+        polizaRenovada.setCaratula(caratula);
 //        caratula.setPoliza(polizaRenovada);
         caratulaTableView.getItems().add(caratula);
     }

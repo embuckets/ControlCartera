@@ -16,6 +16,7 @@ import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.FormaPago;
 import com.embuckets.controlcartera.entidades.Moneda;
+import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.PolizaVida;
@@ -350,6 +351,20 @@ public class BaseDeDatosTest {
             Logger.getLogger(BaseDeDatosTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         assertNull(bd.getById(Auto.class, auto.getIdauto()));
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testGetNotificacionesCumplePendientes() {
+        System.out.println("testGetNotificacionesCumplePendientes");
+        List<NotificacionCumple> notificacionCumples = bd.getCumplesPendientes();
+        for (NotificacionCumple noti : notificacionCumples) {
+            assertNull(noti.getEnviado());
+            assertEquals(noti.getEstadonotificacion().getEstadonotificacion(), Globals.NOTIFICACION_ESTADO_PENDIENTE);
+        }
 //        assertNull(asegurado);
     }
 

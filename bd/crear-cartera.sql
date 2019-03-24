@@ -555,7 +555,7 @@ CREATE TABLE  ESTADO_NOTIFICACION (
 -- -----------------------------------------------------
 CREATE TABLE  NOTIFICACION_CUMPLE (
   idCliente INT NOT NULL,
-  Enviado TIMESTAMP WITH DEFAULT CURRENT_TIMESTAMP,
+  Enviado TIMESTAMP,--  WITH DEFAULT CURRENT_TIMESTAMP
   EstadoNotificacion VARCHAR(9) NOT NULL,
   PRIMARY KEY (idCliente),
   CONSTRAINT fk_notifCumple_estadoNotif
@@ -572,7 +572,7 @@ CREATE TABLE  NOTIFICACION_CUMPLE (
 -- -----------------------------------------------------
 CREATE TABLE  NOTIFICACION_RECIBO (
   idRecibo INT NOT NULL,
-  Enviado TIMESTAMP WITH DEFAULT CURRENT_TIMESTAMP,
+  Enviado TIMESTAMP,--  WITH DEFAULT CURRENT_TIMESTAMP
   EstadoNotificacion VARCHAR(9) NOT NULL,
   PRIMARY KEY (idRecibo),
   CONSTRAINT fk_notifRecibo_estadoNotif

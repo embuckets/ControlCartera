@@ -1179,6 +1179,7 @@ public class PolizaHomeController implements Initializable, Controller {
             EstadoPoliza anterior = poliza.getEstado();
             try {
                 MainApp.getInstance().getBaseDeDatos().remove(poliza);
+                MainApp.getInstance().goBack();
             } catch (Exception e) {
                 Alert error = Utilities.makeAlert(e, "Error al borrar poliza");
                 error.showAndWait();

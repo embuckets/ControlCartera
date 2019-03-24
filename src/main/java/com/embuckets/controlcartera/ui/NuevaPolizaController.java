@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -320,10 +321,11 @@ public class NuevaPolizaController implements Initializable, Controller {
     }
 
     private void configTablaCaratula() {
-        archivoTableColumn.setCellValueFactory(new PropertyValueFactory("archivo"));
         caratulaTableView.setItems(FXCollections.observableArrayList());
-
         archivoTableColumn.setCellValueFactory(new PropertyValueFactory("archivo"));
+
+        BooleanBinding agregarCaratulaBinding = Bindings.isNotEmpty(caratulaTableView.itemsProperty().get());
+        agregarCaratulaButton.disableProperty().bind(agregarCaratulaBinding);
 
         caratulaTableView.setRowFactory((TableView<Caratula> table) -> {
             final TableRow<Caratula> row = new TableRow<>();
@@ -331,9 +333,10 @@ public class NuevaPolizaController implements Initializable, Controller {
             MenuItem eliminarItem = new MenuItem("Eliminar");
             eliminarItem.setOnAction((event) -> {
                 //TODO: eliminar de base de datos
+                caratula = null;
                 poliza.setCaratula(null);
                 caratulaTableView.getItems().clear();
-                agregarCaratulaButton.setDisable(false);
+//                agregarCaratulaButton.setDisable(false);
 //                caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));// esta por demar
             });
             menu.getItems().addAll(eliminarItem);
@@ -432,14 +435,10 @@ public class NuevaPolizaController implements Initializable, Controller {
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
         if (file != null) {
-            caratula = new Caratula();
-            caratula.setNombre(file.getPath());
-            caratula.setPoliza(poliza);
-//                caratula.setArchivo(file);
+            caratula = new Caratula(file, poliza);
             poliza.setCaratula(caratula);
-            //TODO: leer archivo, persistir caratula
-            caratulaTableView.setItems(FXCollections.observableArrayList(caratula));
-            agregarCaratulaButton.setDisable(true);
+            caratulaTableView.getItems().add(caratula);
+//            agregarCaratulaButton.setDisable(true);
         }
     }
 

@@ -63,9 +63,9 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
 //    public NotificacionCumple(Integer idcliente) {
 //        this.idcliente = idcliente;
 //    }
-    public NotificacionCumple(Cliente cliente, LocalDateTime enviado, String estadonotificacion) {
+
+    public NotificacionCumple(Cliente cliente, String estadonotificacion) {
         this.idcliente = cliente.getIdcliente();
-        this.enviado = enviado;
         this.cliente = cliente;
         this.estadonotificacion = new EstadoNotificacion(estadonotificacion);
     }
@@ -100,6 +100,10 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
 
     public void setEstadonotificacion(EstadoNotificacion estadonotificacion) {
         this.estadonotificacion = estadonotificacion;
+    }
+
+    public String getNombreAsegurado() {
+        return cliente.nombreProperty().get();
     }
 
     @Override

@@ -346,7 +346,7 @@ public class HomeController implements Initializable, Controller {
 //    }
     private List<? extends ObservableRenovacion> getRenovaciones() {
         //TODO: get renovaciones de la base de datos DEL MES
-        return MainApp.getInstance().getBaseDeDatos().getAll(Poliza.class);
+        return MainApp.getInstance().getBaseDeDatos().getRenovacionesProximos();
 //        return createRenovacionesFalsas();
     }
 

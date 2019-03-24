@@ -7,10 +7,20 @@ package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -63,9 +73,8 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
 //        this.idrecibo = idrecibo;
 //    }
 
-    public NotificacionRecibo(Recibo recibo, LocalDateTime enviado, String estadonotificacion) {
+    public NotificacionRecibo(Recibo recibo, String estadonotificacion) {
         this.idrecibo = recibo.getIdrecibo();
-        this.enviado = enviado;
         this.estadonotificacion = new EstadoNotificacion(estadonotificacion);
         this.recibo = recibo;
     }
@@ -102,6 +111,44 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         this.recibo = recibo;
     }
 
+    public String getNombreArchivo() {
+        return recibo.getDocumentoRecibo() != null ? recibo.getDocumentoRecibo().getNombre() : "";
+    }
+
+    public String getExtensionArchivo() {
+        return recibo.getDocumentoRecibo() != null ? recibo.getDocumentoRecibo().getExtension() : "";
+    }
+
+    public boolean tieneArchivo() {
+        return recibo.getDocumentoRecibo() != null;
+    }
+
+    public byte[] getArchivoBytes() {
+        return recibo.getDocumentoRecibo() != null ? recibo.getDocumentoRecibo().getArchivo() : null;
+    }
+
+    public File getArchivo() {
+        if (tieneArchivo()) {
+            try {
+                Path temp = Files.createTempFile(getNombreArchivo(), getExtensionArchivo());
+                Files.write(temp, getArchivoBytes());
+                return temp.toFile();
+            } catch (IOException ex) {
+                Logger.getLogger(NotificacionRecibo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+
+    public boolean tieneEmail() {
+        return !recibo.getIdpoliza().getContratante().getEmailList().isEmpty();
+    }
+
+    public String getEmail() {
+        List<Email> emails = recibo.getIdpoliza().getContratante().getEmailList();
+        return emails.stream().sorted((o1, o2) -> o1.getTipoemail().getTipoemail().compareTo(o2.getTipoemail().getTipoemail())).findFirst().get().getEmailPK().getEmail();
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -120,6 +167,14 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
             return false;
         }
         return true;
+    }
+
+    public String getNombreContratante() {
+        return recibo.getIdpoliza().getContratante().getCliente().nombreProperty().get();
+    }
+
+    public String getNumeroPoliza() {
+        return recibo.getIdpoliza().getNumero();
     }
 
     @Override
@@ -155,7 +210,13 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
 
     @Override
     public StringProperty enviadoProperty() {
-        return new SimpleStringProperty(this.enviado.toString());
+        if (enviado != null) {
+            String date = enviado.toLocalDate().toString();
+            String time = enviado.toLocalTime().truncatedTo(ChronoUnit.MINUTES).toString();
+            return new SimpleStringProperty(date + " " + time);
+        } else {
+            return new SimpleStringProperty(Globals.NOTIFICACION_ESTADO_PENDIENTE);
+        }
     }
 
     @Override

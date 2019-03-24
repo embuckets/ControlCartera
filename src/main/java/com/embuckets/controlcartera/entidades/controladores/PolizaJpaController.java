@@ -18,6 +18,7 @@ import com.embuckets.controlcartera.entidades.Auto;
 import com.embuckets.controlcartera.entidades.Beneficiario;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.ConductoCobro;
+import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.FormaPago;
 import com.embuckets.controlcartera.entidades.Moneda;
@@ -32,6 +33,7 @@ import com.embuckets.controlcartera.entidades.controladores.exceptions.Nonexiste
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -211,6 +213,7 @@ public class PolizaJpaController implements Serializable, JpaController {
 //                em.close();
 //            }
 //        }
+//    }
 //    }
     public void edit(Poliza poliza) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
@@ -564,6 +567,150 @@ public class PolizaJpaController implements Serializable, JpaController {
         }
     }
 
+    @Override
+    public void remove(Object object) throws IllegalOrphanException, NonexistentEntityException, Exception {
+        EntityManager em = null;
+        boolean isSubTransaction = false;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+            Poliza poliza = (Poliza) object;
+            int id = poliza.getIdpoliza();
+            try {
+                poliza = em.getReference(Poliza.class, poliza.getIdpoliza());
+                poliza.getIdpoliza();
+            } catch (EntityNotFoundException enfe) {
+                throw new NonexistentEntityException("The poliza with id " + id + " no longer exists.", enfe);
+            }
+//            List<String> illegalOrphanMessages = null;
+//            Caratula caratulaOrphanCheck = poliza.getCaratula();
+//            if (caratulaOrphanCheck != null) {
+//                if (illegalOrphanMessages == null) {
+//                    illegalOrphanMessages = new ArrayList<String>();
+//                }
+//                illegalOrphanMessages.add("This Poliza (" + poliza + ") cannot be destroyed since the Caratula " + caratulaOrphanCheck + " in its caratula field has a non-nullable poliza field.");
+//            }
+//            PolizaAuto polizaAutoOrphanCheck = poliza.getPolizaAuto();
+//            if (polizaAutoOrphanCheck != null) {
+//                if (illegalOrphanMessages == null) {
+//                    illegalOrphanMessages = new ArrayList<String>();
+//                }
+//                illegalOrphanMessages.add("This Poliza (" + poliza + ") cannot be destroyed since the PolizaAuto " + polizaAutoOrphanCheck + " in its polizaAuto field has a non-nullable poliza field.");
+//            }
+//            PolizaVida polizaVidaOrphanCheck = poliza.getPolizaVida();
+//            if (polizaVidaOrphanCheck != null) {
+//                if (illegalOrphanMessages == null) {
+//                    illegalOrphanMessages = new ArrayList<String>();
+//                }
+//                illegalOrphanMessages.add("This Poliza (" + poliza + ") cannot be destroyed since the PolizaVida " + polizaVidaOrphanCheck + " in its polizaVida field has a non-nullable poliza field.");
+//            }
+//            PolizaGmm polizaGmmOrphanCheck = poliza.getPolizaGmm();
+//            if (polizaGmmOrphanCheck != null) {
+//                if (illegalOrphanMessages == null) {
+//                    illegalOrphanMessages = new ArrayList<String>();
+//                }
+//                illegalOrphanMessages.add("This Poliza (" + poliza + ") cannot be destroyed since the PolizaGmm " + polizaGmmOrphanCheck + " in its polizaGmm field has a non-nullable poliza field.");
+//            }
+//            List<Recibo> reciboListOrphanCheck = poliza.getReciboList();
+//            for (Recibo reciboListOrphanCheckRecibo : reciboListOrphanCheck) {
+//                if (illegalOrphanMessages == null) {
+//                    illegalOrphanMessages = new ArrayList<String>();
+//                }
+//                illegalOrphanMessages.add("This Poliza (" + poliza + ") cannot be destroyed since the Recibo " + reciboListOrphanCheckRecibo + " in its reciboList field has a non-nullable idpoliza field.");
+//            }
+//            if (illegalOrphanMessages != null) {
+//                throw new IllegalOrphanException(illegalOrphanMessages);
+//            }
+            Caratula caratulaOrphanCheck = poliza.getCaratula();
+            if (caratulaOrphanCheck != null) {
+                caratulaOrphanCheck.setPoliza(null);
+                caratulaOrphanCheck = em.merge(caratulaOrphanCheck);
+            }
+            PolizaAuto polizaAutoOrphanCheck = poliza.getPolizaAuto();
+            if (polizaAutoOrphanCheck != null) {
+                polizaAutoOrphanCheck.setPoliza(null);
+                polizaAutoOrphanCheck = em.merge(polizaAutoOrphanCheck);
+            }
+            PolizaVida polizaVidaOrphanCheck = poliza.getPolizaVida();
+            if (polizaVidaOrphanCheck != null) {
+                BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
+                for (Cliente cliente : polizaVidaOrphanCheck.getClienteList()){
+                    beneficiarioJpaController.remove(new Beneficiario(cliente, polizaVidaOrphanCheck));
+                }
+                polizaVidaOrphanCheck.setPoliza(null);
+                polizaVidaOrphanCheck = em.merge(polizaVidaOrphanCheck);
+            }
+            PolizaGmm polizaGmmOrphanCheck = poliza.getPolizaGmm();
+            if (polizaGmmOrphanCheck != null) {
+                DependienteJpaController dependienteJpaController = new DependienteJpaController();
+                for (Cliente cliente : polizaGmmOrphanCheck.getClienteList()){
+                    dependienteJpaController.remove(new Dependiente(cliente, polizaGmmOrphanCheck));
+                }
+                polizaGmmOrphanCheck.setPoliza(null);
+                polizaGmmOrphanCheck = em.merge(polizaGmmOrphanCheck);
+            }
+            List<Recibo> reciboListOrphanCheck = poliza.getReciboList();
+            for (Recibo reciboListOrphanCheckRecibo : reciboListOrphanCheck) {
+                reciboListOrphanCheckRecibo.setIdpoliza(null);
+                reciboListOrphanCheckRecibo = em.merge(reciboListOrphanCheckRecibo);
+            }
+            Asegurado contratante = poliza.getContratante();
+            if (contratante != null) {
+                contratante.getPolizaList().remove(poliza);
+                contratante = em.merge(contratante);
+            }
+            Aseguradora aseguradora = poliza.getAseguradora();
+            if (aseguradora != null) {
+                aseguradora.getPolizaList().remove(poliza);
+                aseguradora = em.merge(aseguradora);
+            }
+            Cliente titular = poliza.getTitular();
+            if (titular != null) {
+                titular.getPolizaList().remove(poliza);
+                titular = em.merge(titular);
+            }
+            ConductoCobro conductocobro = poliza.getConductocobro();
+            if (conductocobro != null) {
+                conductocobro.getPolizaList().remove(poliza);
+                conductocobro = em.merge(conductocobro);
+            }
+            EstadoPoliza estado = poliza.getEstado();
+            if (estado != null) {
+                estado.getPolizaList().remove(poliza);
+                estado = em.merge(estado);
+            }
+            FormaPago formapago = poliza.getFormapago();
+            if (formapago != null) {
+                formapago.getPolizaList().remove(poliza);
+                formapago = em.merge(formapago);
+            }
+            Moneda primamoneda = poliza.getPrimamoneda();
+            if (primamoneda != null) {
+                primamoneda.getPolizaList().remove(poliza);
+                primamoneda = em.merge(primamoneda);
+            }
+            Ramo ramo = poliza.getRamo();
+            if (ramo != null) {
+                ramo.getPolizaList().remove(poliza);
+                ramo = em.merge(ramo);
+            }
+            em.remove(poliza);
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
     public List<Poliza> findPolizaEntities() {
         return findPolizaEntities(true, -1, -1);
     }
@@ -626,8 +773,15 @@ public class PolizaJpaController implements Serializable, JpaController {
 
             em.persist(poliza);
             
-            for (Recibo recibo : poliza.getReciboList()){
-                NotificacionRecibo notificacion = new NotificacionRecibo(recibo, LocalDateTime.now(), Globals.NOTIFICACION_ESTADO_PENDIENTE);
+            if (poliza.getCaratula() != null){
+                Caratula caratula = poliza.getCaratula();
+                caratula.setPoliza(poliza);
+                caratula.setIdpoliza(poliza.getId());
+                em.persist(caratula);
+            }
+
+            for (Recibo recibo : poliza.getReciboList()) {
+                NotificacionRecibo notificacion = new NotificacionRecibo(recibo, Globals.NOTIFICACION_ESTADO_PENDIENTE);
                 notificacion.setIdrecibo(recibo.getIdrecibo());
                 em.persist(notificacion);
                 recibo.setNotificacionRecibo(notificacion);
@@ -665,6 +819,9 @@ public class PolizaJpaController implements Serializable, JpaController {
                     query.executeUpdate();
                 }
             }
+            Asegurado contratante = poliza.getContratante();
+            contratante.getPolizaList().add(poliza);
+            contratante = em.merge(contratante);
 
             if (!isSubTransaction) {
                 em.getTransaction().commit();
@@ -738,53 +895,14 @@ public class PolizaJpaController implements Serializable, JpaController {
         }
     }
 
-    @Override
-    public void remove(Object object) throws Exception {
-        Poliza poliza = (Poliza) object;
-        boolean isSubTransaction = false;
+    public List<Poliza> getRenovacionesProximas() {
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            if (em.getTransaction().isActive()) {
-                isSubTransaction = true;
-            }
-            if (!isSubTransaction) {
-                em.getTransaction().begin();
-            }
-
-            if (poliza.getPolizaVida() != null) {
-                BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
-                for (Cliente cliente : poliza.getPolizaVida().getClienteList()) {
-                    Beneficiario benef = new Beneficiario(cliente, poliza.getPolizaVida());
-                    beneficiarioJpaController.remove(benef);
-                }
-                em.remove(poliza.getPolizaVida());
-            }
-            if (poliza.getPolizaGmm() != null) {
-                DependienteJpaController dependienteJpaController = new DependienteJpaController();
-                for (Cliente cliente : poliza.getPolizaVida().getClienteList()) {
-                    dependienteJpaController.remove(cliente);
-                }
-                em.remove(poliza.getPolizaGmm());
-            }
-            if (poliza.getPolizaAuto() != null) {
-                for (Auto auto : poliza.getPolizaAuto().getAutoList()) {
-                    em.remove(auto);
-                }
-                em.remove(poliza.getPolizaAuto());
-            }
-            for (Recibo recibo : poliza.getReciboList()) {
-                em.remove(recibo);
-            }
-            if (poliza.getCaratula() != null) {
-                CaratulaJpaController caratulaJpaController = new CaratulaJpaController();
-                caratulaJpaController.remove(poliza.getCaratula());
-            }
-            em.remove(poliza);
-
-            if (!isSubTransaction) {
-                em.getTransaction().commit();
-            }
+            Query query = em.createQuery("SELECT p FROM Poliza p WHERE p.finvigencia BETWEEN :today AND :next");
+            query.setParameter("today", LocalDate.now());
+            query.setParameter("next", LocalDate.now().plusMonths(1));
+            return query.getResultList();
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -793,6 +911,60 @@ public class PolizaJpaController implements Serializable, JpaController {
         }
     }
 
+//    @Override
+//    public void remove(Object object) throws Exception {
+//        Poliza poliza = (Poliza) object;
+//        boolean isSubTransaction = false;
+//        EntityManager em = null;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            if (em.getTransaction().isActive()) {
+//                isSubTransaction = true;
+//            }
+//            if (!isSubTransaction) {
+//                em.getTransaction().begin();
+//            }
+//
+//            if (poliza.getPolizaVida() != null) {
+//                BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
+//                for (Cliente cliente : poliza.getPolizaVida().getClienteList()) {
+//                    Beneficiario benef = new Beneficiario(cliente, poliza.getPolizaVida());
+//                    beneficiarioJpaController.remove(benef);
+//                }
+//                em.remove(poliza.getPolizaVida());
+//            }
+//            if (poliza.getPolizaGmm() != null) {
+//                DependienteJpaController dependienteJpaController = new DependienteJpaController();
+//                for (Cliente cliente : poliza.getPolizaVida().getClienteList()) {
+//                    dependienteJpaController.remove(cliente);
+//                }
+//                em.remove(poliza.getPolizaGmm());
+//            }
+//            if (poliza.getPolizaAuto() != null) {
+//                for (Auto auto : poliza.getPolizaAuto().getAutoList()) {
+//                    em.remove(auto);
+//                }
+//                em.remove(poliza.getPolizaAuto());
+//            }
+//            for (Recibo recibo : poliza.getReciboList()) {
+//                em.remove(recibo);
+//            }
+//            if (poliza.getCaratula() != null) {
+//                CaratulaJpaController caratulaJpaController = new CaratulaJpaController();
+//                caratulaJpaController.remove(poliza.getCaratula());
+//            }
+//            em.remove(poliza);
+//
+//            if (!isSubTransaction) {
+//                em.getTransaction().commit();
+//            }
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
     @Override
     public String getControlledClassName() {
         return Poliza.class.getSimpleName();

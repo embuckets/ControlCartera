@@ -65,7 +65,7 @@ public class AseguradoJpaController implements Serializable, JpaController {
             Cliente cliente = asegurado.getCliente();
             //save cliente
             em.persist(cliente);
-            NotificacionCumple notificacionCumple = new NotificacionCumple(cliente, LocalDateTime.now(), Globals.NOTIFICACION_ESTADO_PENDIENTE);
+            NotificacionCumple notificacionCumple = new NotificacionCumple(cliente, Globals.NOTIFICACION_ESTADO_PENDIENTE);
             notificacionCumple.setIdcliente(cliente.getIdcliente());
             em.persist(notificacionCumple);
             cliente.setNotificacionCumple(notificacionCumple);
@@ -219,35 +219,104 @@ public class AseguradoJpaController implements Serializable, JpaController {
 //            throw ex;
 //        }
 //    }
+//    @Override
+//    public void remove(Object object) {
+//        EntityManager em = null;
+//        Asegurado asegurado = (Asegurado) object;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            em.getTransaction().begin();
+//
+//            //
+//            if (asegurado.getIddomicilio() != null) {
+//                em.remove(asegurado.getIddomicilio());
+//            }
+//            for (Email email : asegurado.getEmailList()) {
+//                em.remove(email);
+//            }
+//            for (Telefono telefono : asegurado.getTelefonoList()) {
+//                em.remove(telefono);
+//            }
+//            for (DocumentoAsegurado doc : asegurado.getDocumentoAseguradoList()) {
+//                em.remove(doc);
+//            }
+//            for (Poliza poliza : asegurado.getPolizaList()) {
+//                //TODO: llamar PolizaJpaController para que elimine la poliza con sus hijos
+//                removePoliza(poliza);
+//            }
+////            em.remove(asegurado.getTipopersona());
+//            em.remove(asegurado.getCliente());
+//            em.remove(asegurado);
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
     @Override
-    public void remove(Object object) {
+    public void remove(Object object) throws Exception {
         EntityManager em = null;
-        Asegurado asegurado = (Asegurado) object;
+        boolean isSubTransaction = false;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
 
-            //
-            if (asegurado.getIddomicilio() != null) {
-                em.remove(asegurado.getIddomicilio());
+            Asegurado asegurado = (Asegurado) object;
+            int id = asegurado.getIdcliente();
+            try {
+                asegurado = em.getReference(Asegurado.class, id);
+                asegurado.getIdcliente();
+            } catch (EntityNotFoundException enfe) {
+                throw new NonexistentEntityException("The asegurado with id " + id + " no longer exists.", enfe);
             }
-            for (Email email : asegurado.getEmailList()) {
-                em.remove(email);
+            
+            List<String> illegalOrphanMessages = null;
+            List<Email> emailListOrphanCheck = asegurado.getEmailList();
+            for (Email emailListOrphanCheckEmail : emailListOrphanCheck) {
+                emailListOrphanCheckEmail.setAsegurado(null);
+                emailListOrphanCheckEmail = em.merge(emailListOrphanCheckEmail);
             }
-            for (Telefono telefono : asegurado.getTelefonoList()) {
-                em.remove(telefono);
+            List<Poliza> polizaListOrphanCheck = asegurado.getPolizaList();
+            PolizaJpaController polizaJpaController = new PolizaJpaController();
+            for (Poliza polizaListOrphanCheckPoliza : polizaListOrphanCheck) {
+                polizaJpaController.remove(polizaListOrphanCheckPoliza);
             }
-            for (DocumentoAsegurado doc : asegurado.getDocumentoAseguradoList()) {
-                em.remove(doc);
+            List<DocumentoAsegurado> documentoAseguradoListOrphanCheck = asegurado.getDocumentoAseguradoList();
+            for (DocumentoAsegurado documentoAseguradoListOrphanCheckDocumentoAsegurado : documentoAseguradoListOrphanCheck) {
+                documentoAseguradoListOrphanCheckDocumentoAsegurado.setAsegurado(null);
+                documentoAseguradoListOrphanCheckDocumentoAsegurado = em.merge(documentoAseguradoListOrphanCheckDocumentoAsegurado);
             }
-            for (Poliza poliza : asegurado.getPolizaList()) {
-                //TODO: llamar PolizaJpaController para que elimine la poliza con sus hijos
-                removePoliza(poliza);
+            List<Telefono> telefonoListOrphanCheck = asegurado.getTelefonoList();
+            for (Telefono telefonoListOrphanCheckTelefono : telefonoListOrphanCheck) {
+                telefonoListOrphanCheckTelefono.setAsegurado(null);
+                telefonoListOrphanCheckTelefono = em.merge(telefonoListOrphanCheckTelefono);
             }
-//            em.remove(asegurado.getTipopersona());
-            em.remove(asegurado.getCliente());
+            Cliente cliente = asegurado.getCliente();
+            if (cliente != null) {
+                cliente.setAsegurado(null);
+                cliente = em.merge(cliente);
+            }
+            Domicilio iddomicilio = asegurado.getIddomicilio();
+            if (iddomicilio != null) {
+                iddomicilio.getAseguradoList().remove(asegurado);
+                iddomicilio = em.merge(iddomicilio);
+            }
+            TipoPersona tipopersona = asegurado.getTipopersona();
+            if (tipopersona != null) {
+                tipopersona.getAseguradoList().remove(asegurado);
+                tipopersona = em.merge(tipopersona);
+            }
             em.remove(asegurado);
-            em.getTransaction().commit();
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

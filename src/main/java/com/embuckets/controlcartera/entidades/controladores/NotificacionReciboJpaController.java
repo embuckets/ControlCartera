@@ -17,6 +17,7 @@ import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOr
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import com.embuckets.controlcartera.entidades.globals.Globals;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -233,15 +234,35 @@ public class NotificacionReciboJpaController implements Serializable, JpaControl
             em.close();
         }
     }
-    
-    public List<NotificacionRecibo> getNotificacionesProximas(){
+
+    public List<NotificacionRecibo> getNotificacionesProximas() {
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (MONTH(n.recibo.cubrehasta) = :today OR MONTH(n.recibo.cubrehasta) = :next) AND YEAR(n.recibo.cubrehasta) = :year");
-            query.setParameter("today", LocalDate.now().getMonthValue());
-            query.setParameter("next", LocalDate.now().plusMonths(1).getMonthValue());
-            query.setParameter("year", LocalDate.now().getYear());
+//            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (MONTH(n.recibo.cubrehasta) = :today OR MONTH(n.recibo.cubrehasta) = :next) AND YEAR(n.recibo.cubrehasta) = :year");
+            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubrehasta BETWEEN :today AND :next");
+            query.setParameter("today", LocalDate.now());
+            query.setParameter("next", LocalDate.now().plusMonths(1));
+//            query.setParameter("year", LocalDate.now().getYear());
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    public List<NotificacionRecibo> getNotificacionesPendientes() {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+//            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (MONTH(n.recibo.cubrehasta) = :today OR MONTH(n.recibo.cubrehasta) = :next) AND YEAR(n.recibo.cubrehasta) = :year");
+            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubrehasta BETWEEN :today AND :next AND n.estadonotificacion.estadonotificacion = :pendiente");
+            query.setParameter("today", LocalDate.now());
+            query.setParameter("next", LocalDate.now().plusMonths(1));
+            query.setParameter("pendiente", Globals.NOTIFICACION_ESTADO_PENDIENTE);
+//            query.setParameter("year", LocalDate.now().getYear());
             return query.getResultList();
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {

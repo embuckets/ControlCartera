@@ -84,7 +84,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     private BigDecimal prima;
     @Column(name = "NOTA")
     private String nota;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private Caratula caratula;
     @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaAuto polizaAuto;

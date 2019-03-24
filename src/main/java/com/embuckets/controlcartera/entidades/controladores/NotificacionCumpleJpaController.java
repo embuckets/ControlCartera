@@ -272,10 +272,28 @@ public class NotificacionCumpleJpaController implements Serializable, JpaControl
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-                
+
             Query query = em.createQuery("SELECT n FROM NotificacionCumple n WHERE MONTH(n.cliente.nacimiento) = :today OR MONTH(n.cliente.nacimiento) = :next");
             query.setParameter("today", LocalDate.now().getMonthValue());
             query.setParameter("next", LocalDate.now().plusMonths(1).getMonthValue());
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    public List<NotificacionCumple> getCumplesPendientes() {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+
+            Query query = em.createQuery("SELECT n FROM NotificacionCumple n WHERE (MONTH(n.cliente.nacimiento) = :thisMonth AND DAY(n.cliente.nacimiento) <= :today) AND n.estadonotificacion.estadonotificacion = :pendiente");
+            query.setParameter("thisMonth", LocalDate.now().getMonthValue());
+            query.setParameter("today", LocalDate.now().getDayOfMonth());
+            query.setParameter("pendiente", Globals.NOTIFICACION_ESTADO_PENDIENTE);
             return query.getResultList();
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {

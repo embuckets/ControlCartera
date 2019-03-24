@@ -64,16 +64,22 @@ public class DependienteJpaController implements Serializable, JpaController {
     public void remove(Object object) {
         EntityManager em = null;
         Dependiente beneficiario = (Dependiente) object;
+        boolean isSubTransaction = false;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
-            beneficiario.getPolizaGmm().getClienteList().remove(beneficiario.getCliente());
-            em.merge(beneficiario.getPolizaGmm());
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
             Query query = em.createNativeQuery("DELETE FROM APP.DEPENDIENTE WHERE idcliente = :idcliente AND idpoliza = :idpoliza");
             query.setParameter("idcliente", beneficiario.getCliente().getIdcliente());
             query.setParameter("idpoliza", beneficiario.getPolizaGmm().getIdpoliza());
             query.executeUpdate();
-            em.getTransaction().commit();
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

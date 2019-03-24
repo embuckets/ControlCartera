@@ -118,7 +118,7 @@
                                                       <Label text="Domicilio" />
                                                       <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
                                                          <children>
-                                                            <Button mnemonicParsing="false" onAction="#editarDomicilio" text="Editar" />
+                                                            <Button fx:id="domicilioButton" mnemonicParsing="false" text="Editar" />
                                                          </children>
                                                       </HBox>
                                                       <Label text="Calle" GridPane.rowIndex="1" />
@@ -210,7 +210,7 @@
                                           </TableView>
                                           <HBox spacing="10.0" VBox.vgrow="NEVER">
                                              <children>
-                                                <TextField fx:id="archivoTextField" editable="false" prefWidth="300.0" />
+                                                <TextField fx:id="archivoTextField" editable="false" prefWidth="350.0" />
                                                 <Button fx:id="selectArchivoButton" mnemonicParsing="false" onAction="#seleccionarArchivo" text="Seleccionar archivo" />
                                                 <ComboBox fx:id="tipoArchivoComboBox" prefWidth="150.0" promptText="Tipo" />
                                                 <Button fx:id="agregarArchivoButton" mnemonicParsing="false" onAction="#agregarDocumento" text="Agregar" />

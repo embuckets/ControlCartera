@@ -18,6 +18,7 @@ import com.embuckets.controlcartera.entidades.controladores.exceptions.Nonexiste
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -249,27 +250,44 @@ public class DomicilioJpaController implements Serializable, JpaController {
         }
     }
 
-    @Override
-    public <T> T edit(Object object) throws Exception {
-        EntityManager em = null;
-        Domicilio domicilio = (Domicilio) object;
-        try {
-            em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
-            if (domicilio.getIddomicilio() == null) {
-                em.persist(domicilio);
-            } else {
-                em.merge(domicilio);
-            }
-            em.getTransaction().commit();
-            return (T) domicilio;
-        } catch (Exception ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw ex;
-        }
-    }
+//    @Override
+//    public <T> T edit(Object object) throws Exception {
+//        EntityManager em = null;
+//        Domicilio domicilio = (Domicilio) object;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            em.getTransaction().begin();
+//            if (domicilio.getIddomicilio() == null) {
+//                em.persist(domicilio);
+//            } else {
+//                em.merge(domicilio);
+//            }
+//            em.getTransaction().commit();
+//            return (T) domicilio;
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
+
+//    @Override
+//    public void create(Object object) throws EntityExistsException, Exception {
+//        EntityManager em = null;
+//        Domicilio domicilio = (Domicilio) object;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+//            em.getTransaction().begin();
+//            em.persist(domicilio);
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
 
     @Override
     public String getControlledClassName() {

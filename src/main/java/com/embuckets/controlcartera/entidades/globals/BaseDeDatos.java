@@ -221,9 +221,36 @@ public class BaseDeDatos {
         }
     }
 
+    public List<NotificacionCumple> getCumplesPendientes() {
+        try {
+            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getCumplesPendientes();
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<NotificacionRecibo> getRecibosPendientes() {
+        try {
+            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientes();
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
     public List<NotificacionRecibo> getRecibosProximos() {
         try {
             return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesProximas();
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<Poliza> getRenovacionesProximos() {
+        try {
+            return ((PolizaJpaController) controllers.get(Poliza.class)).getRenovacionesProximas();
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;

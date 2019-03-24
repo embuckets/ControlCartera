@@ -14,6 +14,16 @@ import java.text.DecimalFormat;
  */
 public class Globals {
 
+    public static String DEFAULT_CONFIG_PATH = "config/default.config";
+    public static String USER_CONFIG_PATH = "config/user.config";
+    public static String SMTP_CONFIG_PATH = "config/smtp.config";
+    public static String TEMPLATE_CUMPLE_PATH = "templates/cumple.html";
+    public static String TEMPLATE_COBRANZA_PATH = "templates/cobranza.html";
+
+    public static String DEFAULT_AGENTE_NOMBRE = "Su";
+    public static String DEFAULT_AGENTE_PATERNO = "Asesor";
+    public static String DEFAULT_AGENTE_MATERNO = "Financiero";
+
     public static String TIPO_PERSONA_MORAL = "Moral";
     public static String TIPO_PERSONA_FISICA = "Física";
 

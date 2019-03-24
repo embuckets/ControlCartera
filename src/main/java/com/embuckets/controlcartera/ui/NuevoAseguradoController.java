@@ -395,9 +395,11 @@ public class NuevoAseguradoController implements Initializable {
     }
 
     public void agregarDocumento(ActionEvent event) {
-        ObservableArchivo obs = new ObservableArchivo(archivoTextField.getText(), tipoArchivoComboBox.getValue().toString());
-        documentoTableView.getItems().add(obs);
-        archivoTextField.setText("");
+        if (!archivoTextField.getText().isEmpty()) {
+            ObservableArchivo obs = new ObservableArchivo(archivoTextField.getText(), tipoArchivoComboBox.getValue().toString());
+            documentoTableView.getItems().add(obs);
+            archivoTextField.setText("");
+        }
     }
 
     public void homePage(ActionEvent event) throws IOException {
