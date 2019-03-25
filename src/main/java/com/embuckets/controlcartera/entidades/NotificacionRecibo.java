@@ -39,6 +39,15 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * -- recibos dentro de primeros 15 dias (0,15]
+select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} > 0 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} <= 15);
+-- recibos dentro de (15,25]
+select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} > 15 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} <= 25);
+-- recibos dentro de (25,30]
+select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} > 25 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} <= 30);
+ */
+
+/**
  *
  * @author emilio
  */
@@ -49,6 +58,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "NotificacionRecibo.findAll", query = "SELECT n FROM NotificacionRecibo n"),
     @NamedQuery(name = "NotificacionRecibo.findByIdrecibo", query = "SELECT n FROM NotificacionRecibo n WHERE n.idrecibo = :idrecibo"),
     @NamedQuery(name = "NotificacionRecibo.findByEnviado", query = "SELECT n FROM NotificacionRecibo n WHERE n.enviado = :enviado")})
+//    @NamedQuery(name = "NotificacionRecibo.findDentro15DiasPendientes", query = "SELECT n FROM NotificacionRecibo n WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, n.recibo.cubredesde, CURRENT_TIMESTAMP)} > 0 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY,  n.recibo.cubredesde, CURRENT_TIMESTAMP)} <= 15) AND n.recibo.cobranza.cobranza = :pendiente")})
 public class NotificacionRecibo implements Serializable, ObservableNotificacionRecibo {
 
     private static final long serialVersionUID = 1L;

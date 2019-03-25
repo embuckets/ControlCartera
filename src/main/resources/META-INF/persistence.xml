@@ -34,6 +34,7 @@
     <class>com.embuckets.controlcartera.entidades.Telefono</class>
     <class>com.embuckets.controlcartera.entidades.DocumentoRecibo</class>
     <properties>
+      <property name="hibernate.dialect" value="com.embuckets.controlcartera.hibernate.MyDerbyDialect"/>
       <property name="javax.persistence.jdbc.url" value="jdbc:derby:cartera"/>
       <property name="javax.persistence.jdbc.user" value="emilio"/>
       <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>

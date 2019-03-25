@@ -267,6 +267,12 @@ public class NotificacionCumpleJpaController implements Serializable, JpaControl
             throw ex;
         }
     }
+    
+    /**
+     * regresa todas las notificaciones de mes actual y siguiente
+     * @return 
+     */
+    
 
     public List<NotificacionCumple> getNotificacionesProximas() {
         EntityManager em = null;
@@ -284,8 +290,12 @@ public class NotificacionCumpleJpaController implements Serializable, JpaControl
             throw ex;
         }
     }
+    /**
+     * 
+     * @return regresa las notficaciones de este mes y menor o igual al dia de hoy aun pendientes de enviar
+     */
 
-    public List<NotificacionCumple> getCumplesPendientes() {
+    public List<NotificacionCumple> getNotificacionesPendientes() {
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();

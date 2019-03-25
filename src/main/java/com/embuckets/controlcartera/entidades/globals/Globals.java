@@ -23,6 +23,8 @@ public class Globals {
     public static String DEFAULT_AGENTE_NOMBRE = "Su";
     public static String DEFAULT_AGENTE_PATERNO = "Asesor";
     public static String DEFAULT_AGENTE_MATERNO = "Financiero";
+    
+    public static int DEFAULT_COBRANZA_DENTRO_PRIMEROS_DIAS = 20;
 
     public static String TIPO_PERSONA_MORAL = "Moral";
     public static String TIPO_PERSONA_FISICA = "Física";

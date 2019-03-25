@@ -239,10 +239,10 @@ public class NotificacionReciboJpaController implements Serializable, JpaControl
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-//            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (MONTH(n.recibo.cubrehasta) = :today OR MONTH(n.recibo.cubrehasta) = :next) AND YEAR(n.recibo.cubrehasta) = :year");
-            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubrehasta BETWEEN :today AND :next");
+//            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (MONTH(n.recibo.cubredesde) = :today OR MONTH(n.recibo.cubredesde) = :next) AND YEAR(n.recibo.cubredesde) = :year");
+            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubredesde BETWEEN :today AND :nextMonth");
             query.setParameter("today", LocalDate.now());
-            query.setParameter("next", LocalDate.now().plusMonths(1));
+            query.setParameter("nextMonth", LocalDate.now().plusMonths(1));
 //            query.setParameter("year", LocalDate.now().getYear());
             return query.getResultList();
         } catch (Exception ex) {
@@ -257,12 +257,29 @@ public class NotificacionReciboJpaController implements Serializable, JpaControl
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-//            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (MONTH(n.recibo.cubrehasta) = :today OR MONTH(n.recibo.cubrehasta) = :next) AND YEAR(n.recibo.cubrehasta) = :year");
-            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubrehasta BETWEEN :today AND :next AND n.estadonotificacion.estadonotificacion = :pendiente");
+            //TODO: ESTA MAL
+            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubredesde BETWEEN :today AND :nextMonth AND n.estadonotificacion.estadonotificacion = :pendiente");
             query.setParameter("today", LocalDate.now());
-            query.setParameter("next", LocalDate.now().plusMonths(1));
+            query.setParameter("nextMonth", LocalDate.now().plusMonths(1));
             query.setParameter("pendiente", Globals.NOTIFICACION_ESTADO_PENDIENTE);
 //            query.setParameter("year", LocalDate.now().getYear());
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    public List<NotificacionRecibo> getNotificacionesPendientesDentroDePrimeros(int dias) {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            //TODO: ESTA MAL
+            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (FUNCTION('timeDiff',SQL_TSI_DAY,n.recibo.cubredesde, CURRENT_TIMESTAMP) > 0 AND FUNCTION('timeDiff',SQL_TSI_DAY,n.recibo.cubredesde, CURRENT_TIMESTAMP) <= :dias) AND n.recibo.cobranza.cobranza = :pendiente");
+            query.setParameter("dias", dias);
+            query.setParameter("pendiente", Globals.NOTIFICACION_ESTADO_PENDIENTE);
             return query.getResultList();
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {

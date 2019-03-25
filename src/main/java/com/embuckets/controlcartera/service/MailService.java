@@ -6,6 +6,7 @@
 package com.embuckets.controlcartera.service;
 
 import com.embuckets.controlcartera.entidades.Agente;
+import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -129,6 +131,53 @@ public class MailService {
             Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
         }
+    }
+    
+    public void enviarNotificacionesCobranza(List<NotificacionRecibo> notificaciones) {
+        Session session = createSession();
+        try {
+            Transport transport = session.getTransport("smtp");
+            transport.connect(mailHost, from, password);
+            for (NotificacionRecibo notificacion : notificaciones){
+                if (!notificacion.tieneEmail()){
+                    continue;
+                }
+                MimeMessage mimeMessage = createMimeMessage(notificacion, session);
+                transport.sendMessage(mimeMessage, arg1);
+            }
+            transport.close();
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (MessagingException ex) {
+            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private MimeMessage createMimeMessage(NotificacionRecibo notificacionRecibo, Session session) {
+        MimeMessage message = new MimeMessage(session);
+        
+//        message.setFrom(new InternetAddress(from));
+//        
+//        
+//        
+//            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+//            message.setSubject(subject);
+//            message.setHeader("X-Mailer", "sendhtml");
+//            //text bodyPart
+//            MimeBodyPart textBodyPart = new MimeBodyPart();
+//            textBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(messageText, "text/html")));
+//            //attachemnt bodyPart
+//            MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+//            attachmentBodyPart.attachFile(file);
+//
+//            Multipart multipart = new MimeMultipart();
+//            multipart.addBodyPart(textBodyPart);
+//            multipart.addBodyPart(attachmentBodyPart);
+//
+//            message.setSentDate(new Date());
+//
+//            message.setContent(multipart);
+        
     }
 
     private Session createSession() {

@@ -17,6 +17,7 @@ import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.FormaPago;
 import com.embuckets.controlcartera.entidades.Moneda;
 import com.embuckets.controlcartera.entidades.NotificacionCumple;
+import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.PolizaVida;
@@ -365,6 +366,18 @@ public class BaseDeDatosTest {
             assertNull(noti.getEnviado());
             assertEquals(noti.getEstadonotificacion().getEstadonotificacion(), Globals.NOTIFICACION_ESTADO_PENDIENTE);
         }
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testGetNotificacioneRecibosDentro15Dias() {
+        System.out.println("testGetNotificacioneRecibosDentro15Dias");
+        List<NotificacionRecibo> notificacionRecibos = bd.getRecibosPendientesDentroDePrimerosDias();
+        assertNotNull(notificacionRecibos);
+
 //        assertNull(asegurado);
     }
 

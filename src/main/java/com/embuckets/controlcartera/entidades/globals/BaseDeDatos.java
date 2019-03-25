@@ -223,7 +223,7 @@ public class BaseDeDatos {
 
     public List<NotificacionCumple> getCumplesPendientes() {
         try {
-            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getCumplesPendientes();
+            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesPendientes();
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
@@ -233,6 +233,15 @@ public class BaseDeDatos {
     public List<NotificacionRecibo> getRecibosPendientes() {
         try {
             return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientes();
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<NotificacionRecibo> getRecibosPendientesDentroDePrimerosDias() {
+        try {
+            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientesDentroDePrimeros(Globals.DEFAULT_COBRANZA_DENTRO_PRIMEROS_DIAS);
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
