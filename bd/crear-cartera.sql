@@ -156,6 +156,7 @@ CREATE TABLE EMAIL (
   idCliente INT NOT NULL,
   Email VARCHAR(45) NOT NULL,
   TipoEmail VARCHAR(8),
+  NOTIFICAR BOOLEAN DEFAULT FALSE NOT NULL,
   PRIMARY KEY (Email, idCliente),
   CONSTRAINT fk_email_asegurado
     FOREIGN KEY (idCliente)

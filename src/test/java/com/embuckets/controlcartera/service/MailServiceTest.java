@@ -75,21 +75,20 @@ public class MailServiceTest {
      * Test of sendMail method, of class MailService.
      */
     @Test
-    public void testSendMailJustText() throws Exception {
+    public void testSendMailJustText() {
         System.out.println("sendMail");
-        List<NotificacionRecibo> notificaciones = bd.getRecibosPendientes();
+        List<NotificacionRecibo> notificaciones = bd.getRecibosPendientesDentroDePrimerosDias();
         for (NotificacionRecibo notificacion : notificaciones) {
             if (notificacion.tieneEmail()) {
                 String message = TemplateGenerator.getCobranzaMessage(notificacion);
                 try {
-                    mailService.sendMail(message, notificacion.getEmail(), "Notificacion de cobranza");
+                    mailService.sendMail(message, notificacion.getEmailsDeNotificacion().get(0), "Notificacion de cobranza");
                 } catch (MessagingException e) {
                     Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, e);
                     fail(e.getLocalizedMessage());
                 }
             }
         }
-
     }
 
     /**
@@ -104,7 +103,7 @@ public class MailServiceTest {
                 if (notificacion.tieneArchivo()) {
                     String message = TemplateGenerator.getCobranzaMessage(notificacion);
                     try {
-                        mailService.sendMail(message, notificacion.getEmail(), "Notificacion de cobranza", notificacion.getArchivo());
+                        mailService.sendMail(message, notificacion.getEmailsDeNotificacion().get(0), "Notificacion de cobranza", notificacion.getArchivo());
                     } catch (MessagingException e) {
                         Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, e);
                         fail(e.getLocalizedMessage());

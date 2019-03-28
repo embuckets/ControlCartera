@@ -147,6 +147,8 @@ public class AseguradoHomeController implements Initializable, Controller {
     @FXML
     private TableColumn tipoEmailTableColumn;
     @FXML
+    private TableColumn notificarTableColumn;
+    @FXML
     private TextField emailTextField;
     @FXML
     private ComboBox tipoEmailComboBox;
@@ -427,6 +429,7 @@ public class AseguradoHomeController implements Initializable, Controller {
         emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
         emailTableColumn.setCellValueFactory(new PropertyValueFactory("email"));
         tipoEmailTableColumn.setCellValueFactory(new PropertyValueFactory("tipo"));
+        notificarTableColumn.setCellValueFactory(new PropertyValueFactory("notificar"));
 
         fillTipoEmailComboBox();
 
@@ -457,7 +460,21 @@ public class AseguradoHomeController implements Initializable, Controller {
                 //crear display window para editar telefono y guardar cambios
                 //TODO: borrar telefono de la base de datos
             });
-            rowMenu.getItems().addAll(editItem, removeItem);
+            MenuItem notificarItem = new MenuItem("Cambiar Notificacion");
+            notificarItem.setOnAction((ActionEvent event) -> {
+                Email email = row.getItem();
+                boolean oldValue = email.isNotificar();
+                try {
+                    email.setNotificar(!oldValue);
+                    MainApp.getInstance().getBaseDeDatos().edit(email);
+                } catch (Exception ex) {
+                    email.setNotificar(oldValue);
+                    Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                emailTableView.getItems().clear();
+                emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
+            });
+            rowMenu.getItems().addAll(editItem, removeItem, notificarItem);
 
             // only display context menu for non-null items:
             row.contextMenuProperty().bind(
@@ -466,6 +483,13 @@ public class AseguradoHomeController implements Initializable, Controller {
                             .otherwise((ContextMenu) null));
             return row;
         });
+    }
+
+    private void actualizarEmail(Email email) throws Exception {
+        try {
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     private void borrarEmail(Email email) throws Exception {

@@ -9,7 +9,13 @@ import com.embuckets.controlcartera.ui.observable.ObservableNotificacionCumple;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.temporal.ChronoUnit;
+import static java.time.temporal.ChronoUnit.DAYS;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -40,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "NotificacionCumple.findByEnviado", query = "SELECT n FROM NotificacionCumple n WHERE n.enviado = :enviado"),
     @NamedQuery(name = "NotificacionCumple.findPendingWithin", query = "SELECT n FROM NotificacionCumple n WHERE n.estadonotificacion.estadonotificacion = :estado AND n.cliente.nacimiento BETWEEN :startDate AND :endDate"),
     @NamedQuery(name = "NotificacionCumple.findWithin", query = "SELECT n FROM NotificacionCumple n WHERE n.cliente.nacimiento BETWEEN :startDate AND :endDate")})
-public class NotificacionCumple implements Serializable, ObservableNotificacionCumple {
+public class NotificacionCumple implements Serializable, ObservableNotificacionCumple, Notificacion {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -78,10 +84,12 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
         this.idcliente = idcliente;
     }
 
+    @Override
     public LocalDateTime getEnviado() {
         return enviado;
     }
 
+    @Override
     public void setEnviado(LocalDateTime enviado) {
         this.enviado = enviado;
     }
@@ -94,16 +102,34 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
         this.cliente = cliente;
     }
 
+    @Override
     public EstadoNotificacion getEstadonotificacion() {
         return estadonotificacion;
     }
 
+    @Override
     public void setEstadonotificacion(EstadoNotificacion estadonotificacion) {
         this.estadonotificacion = estadonotificacion;
     }
 
     public String getNombreAsegurado() {
         return cliente.nombreProperty().get();
+    }
+
+    public boolean tieneEmail() {
+        return !cliente.getAsegurado().getEmailList().isEmpty();
+    }
+
+    public List<String> getEmailsDeNotificacion() {
+        List<Email> emails = cliente.getAsegurado().getEmailList();
+        List<String> emailsDeNotificacio = emails.stream().filter(e -> e.isNotificar()).map(e -> e.getEmailPK().getEmail()).collect(Collectors.toList());
+        if (!emailsDeNotificacio.isEmpty()) {
+            return emailsDeNotificacio;
+        } else {
+            ArrayList<String> first = new ArrayList<>();
+            first.add(emails.get(0).getEmailPK().getEmail());
+            return first;
+        }
     }
 
     @Override
@@ -143,8 +169,11 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
 
     @Override
     public StringProperty faltanProperty() {
-        LocalDate nacimiento = this.cliente.getNacimiento();
-        return new SimpleStringProperty("" + (nacimiento.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
+        LocalDate nacimiento = this.cliente.getNacimiento().withYear(Year.now().getValue());
+        long dias = DAYS.between(LocalDate.now(), nacimiento);
+//        long dias = nacimiento.until(LocalDate.now(), ChronoUnit.DAYS);
+        String faltan = dias > 0 ? dias + " días" : "hace " + Math.abs(dias);
+        return new SimpleStringProperty(faltan);
     }
 
     @Override

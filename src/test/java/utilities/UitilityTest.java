@@ -8,6 +8,8 @@ package utilities;
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.regex.Pattern;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -50,6 +52,18 @@ public class UitilityTest {
             phone += '-' + num1.charAt(i);
         }
         System.out.println(phone);
+    }
+
+    @Test
+    public void testDateUntil() {
+        LocalDate today = LocalDate.now();
+        LocalDate firstJan = LocalDate.of(2019, Month.JANUARY, 1);
+        LocalDate thirtyOneDic = LocalDate.of(2018, Month.DECEMBER, 31);
+        LocalDate firstDic = LocalDate.of(2018, Month.DECEMBER, 1);
+        System.out.println("today until firstJan = " + today.until(firstJan).toString());
+        System.out.println("firstJan until thirtyOneDic = " + firstJan.until(thirtyOneDic).toString());
+        System.out.println("thirtyOneDic until firstJan = " + thirtyOneDic.until(firstJan).toString());
+        System.out.println("firstDic until thirtyOneDic = " + firstDic.until(thirtyOneDic).toString());
     }
 
     @Test

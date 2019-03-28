@@ -7,6 +7,7 @@ package com.embuckets.controlcartera.entidades.globals;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 
 /**
  *
@@ -14,6 +15,15 @@ import java.text.DecimalFormat;
  */
 public class Globals {
 
+    public static LocalDate RECIBO_CUBRE_DESDE_INICIO_DEFAULT = LocalDate.now().minusMonths(1);
+    public static LocalDate RECIBO_CUBRE_DESDE_FIN_DEFAULT = LocalDate.now();
+    
+    public static LocalDate RENOVACION_ENTRE_START_DEFAULT = LocalDate.now();
+    public static LocalDate RENOVACION_ENTRE_END_DEFAULT = LocalDate.now().plusMonths(1);
+    
+    public static LocalDate CUMPLES_ENTRE_START_DEFAULT = LocalDate.now().minusDays(7);
+    public static LocalDate CUMPLES_ENTRE_END_DEFAULT = LocalDate.now().plusDays(7);
+    
     public static String DEFAULT_CONFIG_PATH = "config/default.config";
     public static String USER_CONFIG_PATH = "config/user.config";
     public static String SMTP_CONFIG_PATH = "config/smtp.config";
@@ -25,6 +35,7 @@ public class Globals {
     public static String DEFAULT_AGENTE_MATERNO = "Financiero";
     
     public static int DEFAULT_COBRANZA_DENTRO_PRIMEROS_DIAS = 20;
+    public static int DEFAULT_CUMPLE_DENTRO_PRIMEROS_DIAS = 10;
 
     public static String TIPO_PERSONA_MORAL = "Moral";
     public static String TIPO_PERSONA_FISICA = "Física";

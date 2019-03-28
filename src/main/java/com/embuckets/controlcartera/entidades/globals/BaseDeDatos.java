@@ -212,18 +212,9 @@ public class BaseDeDatos {
         }
     }
 
-    public List<NotificacionCumple> getCumplesProximos() {
+    public List<NotificacionCumple> getCumplesPendientesEntre(LocalDate start, LocalDate end) {
         try {
-            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesProximas();
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
-    }
-
-    public List<NotificacionCumple> getCumplesPendientes() {
-        try {
-            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesPendientes();
+            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesPendientesEntre(start, end);
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
@@ -242,6 +233,42 @@ public class BaseDeDatos {
     public List<NotificacionRecibo> getRecibosPendientesDentroDePrimerosDias() {
         try {
             return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientesDentroDePrimeros(Globals.DEFAULT_COBRANZA_DENTRO_PRIMEROS_DIAS);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<NotificacionRecibo> getRecibosPendientesEntre(LocalDate start, LocalDate end) {
+        try {
+            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientesEntre(start, end);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<NotificacionRecibo> getRecibosEntre(LocalDate start, LocalDate end) {
+        try {
+            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesEntre(start, end);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<Poliza> getRenovacionesEntre(LocalDate start, LocalDate end) {
+        try {
+            return ((PolizaJpaController) controllers.get(Poliza.class)).getRenovacionesEntre(start, end);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<NotificacionCumple> getCumplesPendientesDeHace() {
+        try {
+            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesPendientesDeHace(Globals.DEFAULT_CUMPLE_DENTRO_PRIMEROS_DIAS);
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;

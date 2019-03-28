@@ -32,6 +32,7 @@ import java.time.Month;
 import java.time.Year;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -302,6 +303,21 @@ public class BaseDeDatosTest {
      * Test of getById method, of class BaseDeDatos.
      */
     @Test
+    public void testNotificacionEdge() {
+        System.out.println("testNotificacionEdge");
+        List<NotificacionCumple> cumples = bd.getCumplesEntre(LocalDate.of(2019, Month.APRIL, 30), LocalDate.of(2019, Month.APRIL, 30));
+        for (NotificacionCumple c : cumples){
+            int d1 = c.getCliente().getNacimiento().getDayOfYear();
+            int d2 = LocalDate.of(2019, Month.MAY, 01).getDayOfYear();
+            System.out.println(c.getCliente().getNacimiento() + ": d1 = " + d1  + " - d2 = " + d2 + " -> " + (d1 <= d2));
+            System.out.println(c.getCliente().getNacimiento() + ": leap = " + c.getCliente().getNacimiento().isLeapYear());
+        }
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
     public void testGetPolizaAutoAndRemove() {
         System.out.println("testGetPolizaAutoAndRemove");
         int id = 16;
@@ -313,6 +329,16 @@ public class BaseDeDatosTest {
             Logger.getLogger(BaseDeDatosTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         assertNull(bd.getById(Poliza.class, id));
+//        assertNull(asegurado);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void getCumplesPendientesDeHace() {
+        System.out.println("getCumplesPendientesDeHace");
+        List<NotificacionCumple> notif = bd.getCumplesPendientesDeHace();
 //        assertNull(asegurado);
     }
 
@@ -359,14 +385,36 @@ public class BaseDeDatosTest {
      * Test of getById method, of class BaseDeDatos.
      */
     @Test
-    public void testGetNotificacionesCumplePendientes() {
-        System.out.println("testGetNotificacionesCumplePendientes");
-        List<NotificacionCumple> notificacionCumples = bd.getCumplesPendientes();
-        for (NotificacionCumple noti : notificacionCumples) {
-            assertNull(noti.getEnviado());
-            assertEquals(noti.getEstadonotificacion().getEstadonotificacion(), Globals.NOTIFICACION_ESTADO_PENDIENTE);
-        }
-//        assertNull(asegurado);
+    public void testGetCumplesPendientesEntre() {
+        System.out.println("testGetCumplesPendientesEntre");
+        List<NotificacionCumple> notificacionCumples = bd.getCumplesPendientesEntre(LocalDate.of(2019, Month.MARCH, 25), LocalDate.of(2019, Month.MARCH, 30));
+        assertEquals(notificacionCumples.size(), 2);
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testGetRecibosPendientesEntre() {
+        System.out.println("testGetRecibosPendientesEntre");
+        List<NotificacionRecibo> notificacionCumples = bd.getRecibosPendientesEntre(LocalDate.of(2019, Month.MARCH, 25), LocalDate.of(2019, Month.APRIL, 30));
+        notificacionCumples.stream().forEach(n -> System.out.println(n.getRecibo().getIdrecibo()));
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testRenovacionesEntre() {
+        System.out.println("testRenovacionesEntre");
+        LocalDate start = LocalDate.of(2019, Month.MARCH, 25);
+        LocalDate end = LocalDate.of(2019, Month.APRIL, 30);
+
+        List<Poliza> notificacionCumples = bd.getRenovacionesEntre(start, end);
+        Predicate<Poliza> predicate = (p) -> {
+            return p.getFinvigencia().isAfter(start) && p.getFinvigencia().isBefore(end) && p.getEstado().getEstado().equalsIgnoreCase(Globals.POLIZA_ESTADO_VIGENTE);
+        };
+        assertTrue(notificacionCumples.stream().allMatch(predicate));
     }
 
     /**

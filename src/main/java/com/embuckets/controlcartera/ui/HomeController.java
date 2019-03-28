@@ -17,7 +17,6 @@ import com.embuckets.controlcartera.ui.observable.ObservableRenovacion;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -49,7 +48,6 @@ import javafx.scene.input.KeyCode;
 public class HomeController implements Initializable, Controller {
 
     private String location = "/fxml/Home.fxml";
-    //TreeTableView 
     @FXML
     private TreeTableView<ObservableTreeItem> treeAsegurados;
     @FXML
@@ -136,10 +134,7 @@ public class HomeController implements Initializable, Controller {
                             Parent parent = loader.load();
                             AseguradoHomeController controller = loader.<AseguradoHomeController>getController();
                             controller.setAsegurado((Asegurado) obs);
-//            controller.setAseguradoId(id);
-//        loader.setController(controller);
                             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
-//mandar el id y que el controlador de AsegurdoHome lo tome de la base
                         } catch (IOException ex) {
                             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -149,10 +144,7 @@ public class HomeController implements Initializable, Controller {
                             Parent parent = loader.load();
                             PolizaHomeController controller = loader.<PolizaHomeController>getController();
                             controller.setPoliza((Poliza) obs);
-//            controller.setAseguradoId(id);
-//        loader.setController(controller);
                             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
-//mandar el id y que el controlador de AsegurdoHome lo tome de la base
                         } catch (IOException ex) {
                             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -169,7 +161,6 @@ public class HomeController implements Initializable, Controller {
             return row;
         });
 
-//        treeAsegurados.getSelectionModel().selectedItemProperty().addListener();
     }
 
     private TreeItem createTree() {
@@ -198,18 +189,6 @@ public class HomeController implements Initializable, Controller {
 
     }
 
-//    private List<ObservableTreeItem> createObservableAsegurados(List<Asegurado> list) {
-//        List<ObservableAsegurado> obsList = new ArrayList<>();
-//        for (Asegurado ase : list) {
-//            ObservableAsegurado obsAsegurdo = new ObservableAsegurado(ase);
-//            for (Poliza pol : ase.getPolizaList()) {
-//                ObservablePoliza obsPoliza = new ObservablePoliza(pol);
-//                obsAsegurdo.addObservablePoliza(obsPoliza);
-//            }
-//            obsList.add(obsAsegurdo);
-//        }
-//        return obsList;
-//    }
     /**
      * lee todos los asegurados de la base
      *
@@ -220,88 +199,23 @@ public class HomeController implements Initializable, Controller {
         return MainApp.getInstance().getBaseDeDatos().getAll(Asegurado.class);
     }
 
-    private ObservableList<NotificacionCumple> createCumple() {
+    private ObservableList<NotificacionCumple> getCumplesProximos() {
         return FXCollections.observableArrayList(getNotificacionesCumple());
-//        return createObservableClientes(getClientes());
     }
 
-//    private ObservableList<ObservableCliente> createObservableClientes(List<Cliente> clientes) {
-//        List<ObservableCliente> observableClientes = new ArrayList<>();
-//        clientes.stream().map((cliente) -> new ObservableCliente(cliente)).forEachOrdered((obvs) -> {
-//            observableClientes.add(obvs);
-//        });
-//        return FXCollections.observableArrayList(observableClientes);
-//    }
     private List<NotificacionCumple> getNotificacionesCumple() {
-        //TODO: pedir clientes que cumplan EN LOS PROXIMOS DIAS
-        return MainApp.getInstance().getBaseDeDatos().getCumplesProximos();
-//        return MainApp.getInstance().getBaseDeDatos().getCumplesEntre(LocalDate.now(), LocalDate.now().plusMonths(1));
-//        return createClientesFalsos();
+        return MainApp.getInstance().getBaseDeDatos().getCumplesEntre(Globals.CUMPLES_ENTRE_START_DEFAULT, Globals.CUMPLES_ENTRE_END_DEFAULT);
     }
 
-//    private List<Cliente> createClientesFalsos() {
-//        List<Asegurado> asegurados = createAseguradosFalsos();
-//        List<Cliente> clientes = new ArrayList<>();
-//        asegurados.forEach((asegurado) -> {
-//            clientes.add(asegurado.getCliente());
-//        });
-//        return clientes;
-//    }
     private void fillTablaRenovaciones() {
-        tableViewRenovaciones.setItems(createRenovaciones());
+        tableViewRenovaciones.setItems(getRenovacionesProximas());
 
         renovacionesAseguradoTableColumn.setCellValueFactory(new PropertyValueFactory("asegurado"));
         renovacionesPolizaTableColumn.setCellValueFactory(new PropertyValueFactory("numero"));
         renovacionesFinVigenciaTableColumn.setCellValueFactory(new PropertyValueFactory("finVigencia"));
         renovacionesFaltanTableColumn.setCellValueFactory(new PropertyValueFactory("faltan"));
-
-//        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-//        cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory<>("nacimiento"));
-//        colNotificar.setCellValueFactory(new Callback<CellDataFeatures<ObservableAsegurado, CheckBox>, ObservableValue<CheckBox>>() {
-//            //This callback tell the cell how to bind the data model 'Registered' property to
-//            //the cell, itself.
-//            @Override
-//            public ObservableValue<CheckBox> call(CellDataFeatures<ObservableAsegurado, CheckBox> param) {
-//                ObservableAsegurado asegurado = param.getValue();
-//                CheckBox checkbox = new CheckBox();
-//                checkbox.selectedProperty().setValue(asegurado.isNotificado());
-//                checkbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-//                    @Override
-//                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-//                        asegurado.setNotificado(newValue);
-////                        System.out.println(asegurado.nombreProperty + ", " + asegurado.notificarProperty);
-//                    }
-//                });
-//
-//                checkbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-//                    @Override
-//                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-//                        asegurado.setNotificado(checkNotificarCumple.isSelected());
-////                        checkbox.setSelected(asegurado.notificarProperty.getValue());
-//                    }
-//                });
-//
-//                return new SimpleObjectProperty<CheckBox>(checkbox);
-////                return param.getValue().notificarProperty();
-//            }
-//        });
-//        colNotificar.setCellFactory(CheckBoxTableCell.forTableColumn(colNotificar));
     }
 
-//    @FXML
-//    void notificarTodosCumple(ActionEvent event) {
-//        CheckBox checkBox = (CheckBox) event.getSource();
-//        ObservableList<ObservableAsegurado> asegurados = tableViewCumple.getItems();
-//        for (ObservableAsegurado asegurado : asegurados) {
-//            asegurado.setNotificado(checkBox.isSelected());
-//            colNotificar.getCellData(asegurado).setSelected(checkBox.isSelected());
-////            System.out.println(asegurado.nombreProperty + ", " + asegurado.notificarProperty);
-//
-//        }
-//
-//        tableViewCumple.setItems(asegurados);
-//
-//    }
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevoAsegurado.fxml");
     }
@@ -310,8 +224,13 @@ public class HomeController implements Initializable, Controller {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevaPoliza.fxml");
     }
 
+    @FXML
+    public void goToNotificaciones(ActionEvent event) throws IOException {
+        MainApp.getInstance().changeSceneContent(this, location, "/fxml/NotificacionHome.fxml");
+    }
+
     private void fillTablaCumple() {
-        tableViewCumple.setItems(createCumple());
+        tableViewCumple.setItems(getCumplesProximos());
 
         cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory("nombreCompleto"));
         cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory("nacimiento"));
@@ -320,7 +239,7 @@ public class HomeController implements Initializable, Controller {
     }
 
     private void fillTablaRecibos() {
-        tableViewRecibos.setItems(createRecibos());
+        tableViewRecibos.setItems(getRecibosProximos());
 
         recibosAseguradoTableColumn.setCellValueFactory(new PropertyValueFactory("asegurado"));
         recibosPolizaTableColumn.setCellValueFactory(new PropertyValueFactory("poliza"));
@@ -331,74 +250,22 @@ public class HomeController implements Initializable, Controller {
 
     }
 
-    private ObservableList<ObservableRenovacion> createRenovaciones() {
+    private ObservableList<ObservableRenovacion> getRenovacionesProximas() {
         return FXCollections.observableArrayList(getRenovaciones());
-//        return createObservableRenovacionesList();
     }
 
-//    private ObservableList<ObservablePoliza> createObservableRenovacionesList(List<Poliza> renovaciones) {
-//        List<ObservablePoliza> result = new ArrayList<>();
-//        for (Poliza poliza : renovaciones) {
-//            ObservablePoliza observablePoliza = new ObservablePoliza(poliza);
-//            result.add(observablePoliza);
-//        }
-//        return FXCollections.observableArrayList(result);
-//    }
     private List<? extends ObservableRenovacion> getRenovaciones() {
-        //TODO: get renovaciones de la base de datos DEL MES
-        return MainApp.getInstance().getBaseDeDatos().getRenovacionesProximos();
-//        return createRenovacionesFalsas();
+        return MainApp.getInstance().getBaseDeDatos().getRenovacionesEntre(Globals.RENOVACION_ENTRE_START_DEFAULT, Globals.RENOVACION_ENTRE_END_DEFAULT);
     }
 
-//    private List<Poliza> createRenovacionesFalsas() {
-//        List<Poliza> result = new ArrayList<>();
-//        List<Asegurado> asegurados = (List<Asegurado>) getAsegurados();
-//        for (Asegurado asegurado : asegurados) {
-//            List<Poliza> polizas = asegurado.getPolizaList();
-//            polizas.stream().forEach((p) -> result.add(p));
-//        }
-//        return result;
-//    }
-    private ObservableList<ObservableNotificacionRecibo> createRecibos() {
+    private ObservableList<ObservableNotificacionRecibo> getRecibosProximos() {
         return FXCollections.observableArrayList(getNotificacionesRecibos());
     }
 
     private List<NotificacionRecibo> getNotificacionesRecibos() {
-        //TODO: getNotifacaciones de la base de datos DEL MES
-        return MainApp.getInstance().getBaseDeDatos().getRecibosProximos();
-//        return createNotificacionesRecibosFalsos();
+        return MainApp.getInstance().getBaseDeDatos().getRecibosEntre(Globals.RECIBO_CUBRE_DESDE_INICIO_DEFAULT, Globals.RECIBO_CUBRE_DESDE_FIN_DEFAULT);
     }
 
-//    private ObservableList<ObservableNotificacionRecibo> createObservableNotificacionesRecibo(List<NotificacionRecibo> notificacionesRecibos) {
-//        List<ObservableNotificacionRecibo> result = new ArrayList<>();
-//        notificacionesRecibos.stream().map((notificacionRecibo) -> new ObservableNotificacionRecibo(notificacionRecibo)).forEachOrdered((obv) -> {
-//            result.add(obv);
-//        });
-//        return FXCollections.observableArrayList(result);
-//    }
-//    private List<NotificacionRecibo> createNotificacionesRecibosFalsos() {
-//        NotificacionRecibo notificacion1 = new NotificacionRecibo();
-//        notificacion1.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(2))));
-//        notificacion1.setIdrecibo(1);
-//        notificacion1.setRecibo(new Recibo(1, Date.from(Instant.parse("2018-12-01T00:00:01.00Z")), Date.from(Instant.parse("2018-12-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
-//        notificacion1.getRecibo().setIdpoliza(new Poliza());
-//        notificacion1.getRecibo().getIdpoliza().setNumero("numero1");
-//        notificacion1.getRecibo().getIdpoliza().setContratante(new Asegurado("Emilio", "Hernandez", "Segovia"));
-//
-//        NotificacionRecibo notificacion2 = new NotificacionRecibo();
-//        notificacion2.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(26))));
-//        notificacion2.setIdrecibo(2);
-//        notificacion2.setRecibo(new Recibo(2, Date.from(Instant.parse("2019-01-01T00:00:01.00Z")), Date.from(Instant.parse("2019-01-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
-//        notificacion2.getRecibo().setIdpoliza(new Poliza());
-//        notificacion2.getRecibo().getIdpoliza().setNumero("numero1");
-//        notificacion2.getRecibo().getIdpoliza().setContratante(new Asegurado("Daniel", "Hernandez", "Segovia"));
-//
-//        List<NotificacionRecibo> result = new ArrayList<>();
-//        result.add(notificacion1);
-//        result.add(notificacion2);
-//        return result;
-//
-//    }
     @Override
     public void setData(Object obj) {
         //do nothing

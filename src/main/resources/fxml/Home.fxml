@@ -59,6 +59,7 @@
                      <children>
                             <HBox alignment="CENTER_RIGHT" spacing="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <children>
+                              <Button mnemonicParsing="false" onAction="#goToNotificaciones" text="Notificaciones" />
                                     <Button fx:id="nuevoAseguradoButton" mnemonicParsing="false" onAction="#abrirSceneNuevoAsegurado" text="Nuevo Asegurado" />
                                     <Button fx:id="nuevaPolizaButton" mnemonicParsing="false" onAction="#abrirSceneNuevaPoliza" text="Nueva Poliza" />
                                 </children>

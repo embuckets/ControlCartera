@@ -64,7 +64,7 @@ public class TemplateGeneratorTest {
     @Test
     public void testGetCumpleMessage() {
         System.out.println("getCumpleMessage");
-        List<NotificacionCumple> notificaciones = bd.getCumplesPendientes();
+        List<NotificacionCumple> notificaciones = bd.getCumplesPendientesDeHace();//MAL
         for (NotificacionCumple notificacion : notificaciones){
             String message = TemplateGenerator.getCumpleMessage(notificacion);
             System.out.println("====================");

@@ -743,6 +743,25 @@ public class PolizaJpaController implements Serializable, JpaController {
             em.close();
         }
     }
+    
+    
+    public List<Poliza> getRenovacionesEntre(LocalDate start, LocalDate end) {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            //TODO: ESTA MAL
+            Query query = em.createQuery("SELECT p FROM Poliza p WHERE p.finvigencia BETWEEN :start AND :end AND p.estado.estado = :vigente");
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            query.setParameter("vigente", Globals.POLIZA_ESTADO_VIGENTE);
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
 
     public int getPolizaCount() {
         EntityManager em = getEntityManager();

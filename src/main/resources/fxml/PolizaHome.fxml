@@ -258,6 +258,7 @@
                                     <HBox alignment="BOTTOM_RIGHT" VBox.vgrow="ALWAYS">
                                        <children>
                                           <Button fx:id="regresarButton1" mnemonicParsing="false" onAction="#regresar" text="Regresar" />
+                                          <Button mnemonicParsing="false" onAction="#goHome" text="Home" />
                                        </children>
                                     </HBox>
                                  </children>

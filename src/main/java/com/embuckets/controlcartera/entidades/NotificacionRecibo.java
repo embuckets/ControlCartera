@@ -13,14 +13,19 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import static java.time.temporal.ChronoUnit.DAYS;
 import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -39,14 +44,21 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * -- recibos dentro de primeros 15 dias (0,15]
-select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} > 0 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} <= 15);
--- recibos dentro de (15,25]
-select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} > 15 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} <= 25);
--- recibos dentro de (25,30]
-select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} > 25 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} <= 30);
+ * -- recibos dentro de primeros 15 dias (0,15] select app.recibo.CUBREDESDE,
+ * {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as
+ * days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE,
+ * CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn
+ * TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} > 0 AND
+ * {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} <= 15);
+ * -- recibos dentro de (15,25]
+ * select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)}
+ * > 15 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE,
+ * CURRENT_TIMESTAMP)} <= 25);
+ * -- recibos dentro de (25,30]
+ * select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as days, {fn TIMESTAMPDIFF(SQL_TSI_HOUR, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)} as hours from app.recibo WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE, CURRENT_TIMESTAMP)}
+ * > 25 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDESDE,
+ * CURRENT_TIMESTAMP)} <= 30);
  */
-
 /**
  *
  * @author emilio
@@ -59,7 +71,7 @@ select app.recibo.CUBREDESDE, {fn TIMESTAMPDIFF(SQL_TSI_DAY, APP.RECIBO.CUBREDES
     @NamedQuery(name = "NotificacionRecibo.findByIdrecibo", query = "SELECT n FROM NotificacionRecibo n WHERE n.idrecibo = :idrecibo"),
     @NamedQuery(name = "NotificacionRecibo.findByEnviado", query = "SELECT n FROM NotificacionRecibo n WHERE n.enviado = :enviado")})
 //    @NamedQuery(name = "NotificacionRecibo.findDentro15DiasPendientes", query = "SELECT n FROM NotificacionRecibo n WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, n.recibo.cubredesde, CURRENT_TIMESTAMP)} > 0 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY,  n.recibo.cubredesde, CURRENT_TIMESTAMP)} <= 15) AND n.recibo.cobranza.cobranza = :pendiente")})
-public class NotificacionRecibo implements Serializable, ObservableNotificacionRecibo {
+public class NotificacionRecibo implements Serializable, ObservableNotificacionRecibo, Notificacion {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -97,18 +109,22 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         this.idrecibo = idrecibo;
     }
 
+    @Override
     public LocalDateTime getEnviado() {
         return enviado;
     }
 
+    @Override
     public void setEnviado(LocalDateTime enviado) {
         this.enviado = enviado;
     }
 
+    @Override
     public EstadoNotificacion getEstadonotificacion() {
         return estadonotificacion;
     }
 
+    @Override
     public void setEstadonotificacion(EstadoNotificacion estadonotificacion) {
         this.estadonotificacion = estadonotificacion;
     }
@@ -154,9 +170,16 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         return !recibo.getIdpoliza().getContratante().getEmailList().isEmpty();
     }
 
-    public String getEmail() {
+    public List<String> getEmailsDeNotificacion() {
         List<Email> emails = recibo.getIdpoliza().getContratante().getEmailList();
-        return emails.stream().sorted((o1, o2) -> o1.getTipoemail().getTipoemail().compareTo(o2.getTipoemail().getTipoemail())).findFirst().get().getEmailPK().getEmail();
+        List<String> emailsDeNotificacio = emails.stream().filter(e -> e.isNotificar()).map(e -> e.getEmailPK().getEmail()).collect(Collectors.toList());
+        if (!emailsDeNotificacio.isEmpty()) {
+            return emailsDeNotificacio;
+        } else {
+            ArrayList<String> first = new ArrayList<>();
+            first.add(emails.get(0).getEmailPK().getEmail());
+            return first;
+        }
     }
 
     @Override
@@ -237,6 +260,12 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
     @Override
     public StringProperty documentoProperty() {
         return new SimpleStringProperty("");
+    }
+
+    public StringProperty diasDesdeProperty() {
+        long dias = DAYS.between(recibo.getCubredesde(), LocalDate.now());
+        String faltan = dias > 0 ? "" + dias : "faltan " + Math.abs(dias);
+        return new SimpleStringProperty(faltan);
     }
 
 }

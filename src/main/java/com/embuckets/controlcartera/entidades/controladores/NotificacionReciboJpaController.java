@@ -272,6 +272,39 @@ public class NotificacionReciboJpaController implements Serializable, JpaControl
         }
     }
 
+    public List<NotificacionRecibo> getNotificacionesPendientesEntre(LocalDate start, LocalDate end) {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubredesde BETWEEN :start AND :end AND n.recibo.cobranza.cobranza = :cobranza");
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            query.setParameter("cobranza", Globals.RECIBO_COBRANZA_PENDIENTE);
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
+    public List<NotificacionRecibo> getNotificacionesEntre(LocalDate start, LocalDate end) {
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubredesde BETWEEN :start AND :end");
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            return query.getResultList();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
     public List<NotificacionRecibo> getNotificacionesPendientesDentroDePrimeros(int dias) {
         EntityManager em = null;
         try {
