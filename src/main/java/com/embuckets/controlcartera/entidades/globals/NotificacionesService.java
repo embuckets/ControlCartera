@@ -33,21 +33,21 @@ public class NotificacionesService {
 
     public void enviarRecibosPendientes() {
         List<NotificacionRecibo> notificaciones = BaseDeDatos.getInstance().getRecibosPendientesDentroDePrimerosDias();
-        mailService.enviarNotificacionesCobranza(notificaciones);
+//        mailService.enviarNotificacionesCobranza(notificaciones);
 //        mailService.clearColaMensajesRecibos();
     }
 
     public void enviarRecibosPendientes(List<NotificacionRecibo> notificaciones) {
-        mailService.enviarNotificacionesCobranza(notificaciones);
+//        mailService.enviarNotificacionesCobranza(notificaciones);
 //        mailService.clearColaMensajesRecibos();
     }
 
     public void enviarCumplesPendientes() {
         List<NotificacionCumple> notificaciones = BaseDeDatos.getInstance().getCumplesPendientesDeHace();
-        mailService.enviarNotificacionesCumple(notificaciones);
+//        mailService.enviarNotificacionesCumple(notificaciones);
     }
 
     public void enviarCumplesPendientes(List<NotificacionCumple> notificaciones) {
-        mailService.enviarNotificacionesCumple(notificaciones);
+//        mailService.enviarNotificacionesCumple(notificaciones);
     }
 }

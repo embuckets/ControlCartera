@@ -212,46 +212,62 @@ public class NotificacionHomeController implements Initializable {
     private void notificarRecibos(ActionEvent event) {
         Stream<NotificacionReciboWrapper> wrappers = recibosTableView.getItems().stream().filter(w -> w.getSelectedProperty().get());
         List<NotificacionRecibo> recibos = wrappers.map(w -> w.getNotificacionRecibo()).collect(Collectors.toList());
-        NotificacionesService service = NotificacionesService.getInstance();
-        service.enviarRecibosPendientes(recibos);
+        EnviarNotificacionesTask task = new EnviarNotificacionesTask(recibos);
 
-        //refeshlist
-        recibosTableView.getItems().clear();
-        recibosTableView.setItems(FXCollections.observableArrayList(getNotificacionReciboWrappers()));
-    }
-
-    @FXML
-    private void notificarCumples(ActionEvent event) {
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                for (int i = 0; i < 10; i++) {
-                        updateProgress(i, 10);
-                        Thread.sleep(200);
-                    }
-                    updateProgress(10, 10);
-                    return null ;
-            }
-        };
-        
         ProgressForm form = new ProgressForm();
         form.activateProgressBar(task);
         task.setOnSucceeded((e) -> {
             form.getDialogStage().close();
             System.out.println("===FINISHED SENDING EMAILS");
         });
-        
+
         form.getDialogStage().show();
         Thread t = new Thread(task);
         t.start();
-        
+        while (t.isAlive()) {
+//            try {
+//                Thread.sleep(recibos.size() * 1000);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(NotificacionHomeController.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+        }
+        recibosTableView.getItems().clear();
+        recibosTableView.setItems(FXCollections.observableArrayList(getNotificacionReciboWrappers()));
+
+//        NotificacionesService service = NotificacionesService.getInstance();
+//        service.enviarRecibosPendientes(recibos);
+//
+//        //refeshlist
+//        recibosTableView.getItems().clear();
+//        recibosTableView.setItems(FXCollections.observableArrayList(getNotificacionReciboWrappers()));
+    }
+
+    @FXML
+    private void notificarCumples(ActionEvent event) {
+        Stream<NotificacionCumpleWrapper> wrappers = cumpleTableView.getItems().stream().filter(w -> w.getSelectedProperty().get());
+        List<NotificacionCumple> cumples = wrappers.map(n -> n.getNotificacionCumple()).collect(Collectors.toList());
+        EnviarNotificacionesTask task = new EnviarNotificacionesTask(cumples);
+
+        ProgressForm form = new ProgressForm();
+        form.activateProgressBar(task);
+        task.setOnSucceeded((e) -> {
+            form.getDialogStage().close();
+            System.out.println("===FINISHED SENDING EMAILS");
+        });
+
+        form.getDialogStage().show();
+        Thread t = new Thread(task);
+        t.start();
+
+        cumpleTableView.getItems().clear();
+        cumpleTableView.setItems(FXCollections.observableArrayList(getNotificacionCumpleWrappers()));
         //
 //        Stream<NotificacionCumpleWrapper> wrappers = cumpleTableView.getItems().stream().filter(w -> w.getSelectedProperty().get());
 //        List<NotificacionCumple> cumples = wrappers.map(n -> n.getNotificacionCumple()).collect(Collectors.toList());
 //        NotificacionesService.getInstance().enviarCumplesPendientes(cumples);
-//
 //        cumpleTableView.getItems().clear();
 //        cumpleTableView.setItems(FXCollections.observableArrayList(getNotificacionCumpleWrappers()));
+//
     }
 
     @FXML

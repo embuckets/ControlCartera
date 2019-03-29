@@ -166,10 +166,12 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         return null;
     }
 
+    @Override
     public boolean tieneEmail() {
         return !recibo.getIdpoliza().getContratante().getEmailList().isEmpty();
     }
 
+    @Override
     public List<String> getEmailsDeNotificacion() {
         List<Email> emails = recibo.getIdpoliza().getContratante().getEmailList();
         List<String> emailsDeNotificacio = emails.stream().filter(e -> e.isNotificar()).map(e -> e.getEmailPK().getEmail()).collect(Collectors.toList());

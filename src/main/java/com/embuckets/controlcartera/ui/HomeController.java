@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.ui;
 
+import com.embuckets.controlcartera.entidades.Agente;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.NotificacionCumple;
@@ -18,6 +19,7 @@ import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -247,6 +249,26 @@ public class HomeController implements Initializable, Controller {
         recibosHastaTableColumn.setCellValueFactory(new PropertyValueFactory("cubreHasta"));
         recibosImporteTableColumn.setCellValueFactory(new PropertyValueFactory("importe"));
         recibosUltimaNotificacionTableColumn.setCellValueFactory(new PropertyValueFactory("enviado"));
+
+    }
+
+    @FXML
+    public void editarAgente(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/Agente.fxml"), null, new JavaFXBuilderFactory());
+            Parent parent = loader.load();
+            AgenteController controller = loader.getController();
+            Optional<Agente> agente = controller.getDialog().showAndWait();
+            agente.ifPresent((present) -> {
+                present.guardar();
+            });
+        } catch (IOException ex) {
+            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @FXML
+    public void importarCartera(ActionEvent event) {
 
     }
 

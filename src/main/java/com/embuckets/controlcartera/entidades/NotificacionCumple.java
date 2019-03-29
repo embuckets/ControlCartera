@@ -116,10 +116,12 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
         return cliente.nombreProperty().get();
     }
 
+    @Override
     public boolean tieneEmail() {
         return !cliente.getAsegurado().getEmailList().isEmpty();
     }
 
+    @Override
     public List<String> getEmailsDeNotificacion() {
         List<Email> emails = cliente.getAsegurado().getEmailList();
         List<String> emailsDeNotificacio = emails.stream().filter(e -> e.isNotificar()).map(e -> e.getEmailPK().getEmail()).collect(Collectors.toList());

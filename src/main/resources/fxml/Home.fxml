@@ -34,14 +34,14 @@
    <children>
           <MenuBar>
               <menus>
-                  <Menu mnemonicParsing="false" text="File">
+                  <Menu mnemonicParsing="false" text="Agente">
                       <items>
-                          <MenuItem mnemonicParsing="false" text="Close" />
+                          <MenuItem mnemonicParsing="false" onAction="#editarAgente" text="Datos" />
                       </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Edit">
+                  <Menu mnemonicParsing="false" text="Cartera">
                       <items>
-                          <MenuItem mnemonicParsing="false" text="Delete" />
+                          <MenuItem mnemonicParsing="false" onAction="#importarCartera" text="Importar" />
                       </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">
@@ -59,7 +59,7 @@
                      <children>
                             <HBox alignment="CENTER_RIGHT" spacing="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <children>
-                              <Button mnemonicParsing="false" onAction="#goToNotificaciones" text="Notificaciones" />
+                              <Button mnemonicParsing="false" onAction="#goToNotificaciones" styleClass="my-button" stylesheets="@../styles/style.css" text="Notificaciones" />
                                     <Button fx:id="nuevoAseguradoButton" mnemonicParsing="false" onAction="#abrirSceneNuevoAsegurado" text="Nuevo Asegurado" />
                                     <Button fx:id="nuevaPolizaButton" mnemonicParsing="false" onAction="#abrirSceneNuevaPoliza" text="Nueva Poliza" />
                                 </children>

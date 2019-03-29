@@ -7,8 +7,12 @@ package com.embuckets.controlcartera.entidades;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +29,7 @@ public class Agente {
     private String apellidoMaterno;
     private String email;
     private String password;
+    private Properties users;
 
     private Agente() {
         loadUserProperties();
@@ -35,7 +40,7 @@ public class Agente {
                 InputStream inUsers = new FileInputStream("config/user.config")) {
             Properties defaults = new Properties();
             defaults.load(inDefaults);
-            Properties users = new Properties(defaults);
+            users = new Properties(defaults);
             users.load(inUsers);
             this.nombre = users.getProperty("nombre");
             this.apellidoPaterno = users.getProperty("paterno");
@@ -62,6 +67,7 @@ public class Agente {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+        users.setProperty("nombre", nombre);
     }
 
     public String getApellidoPaterno() {
@@ -70,6 +76,7 @@ public class Agente {
 
     public void setApellidoPaterno(String apellidoPaterno) {
         this.apellidoPaterno = apellidoPaterno;
+        users.put("paterno", apellidoPaterno);
     }
 
     public String getApellidoMaterno() {
@@ -78,6 +85,7 @@ public class Agente {
 
     public void setApellidoMaterno(String apellidoMaterno) {
         this.apellidoMaterno = apellidoMaterno;
+        users.put("materno", apellidoMaterno);
     }
 
     public String getEmail() {
@@ -86,6 +94,7 @@ public class Agente {
 
     public void setEmail(String email) {
         this.email = email;
+        users.put("email", email);
     }
 
     public String getPassword() {
@@ -94,6 +103,7 @@ public class Agente {
 
     public void setPassword(String password) {
         this.password = password;
+        users.put("password", password);
     }
 
     public String getNombreCompleto() {
@@ -104,6 +114,16 @@ public class Agente {
         sb.append(" ");
         sb.append(apellidoMaterno);
         return sb.toString();
+    }
+
+    public void guardar() {
+        try (OutputStream output = new FileOutputStream("config/user.config")) {
+            users.store(output, "Actualizado: " + LocalDateTime.now());
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Agente.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Agente.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

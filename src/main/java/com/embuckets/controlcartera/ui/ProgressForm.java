@@ -33,7 +33,7 @@ public class ProgressForm {
         dialogStage.initModality(Modality.APPLICATION_MODAL);
 
         // PROGRESS BAR
-        final Label label = new Label();
+        final Label label = new Label("Enviando emails");
         label.setText("alerto");
 
         pb.setProgress(-1F);
@@ -42,13 +42,15 @@ public class ProgressForm {
         final HBox hb = new HBox();
         hb.setSpacing(5);
         hb.setAlignment(Pos.CENTER);
-        hb.getChildren().addAll(pb, pin);
+        hb.getChildren().addAll(label, pb, pin);
 
         Scene scene = new Scene(hb);
         dialogStage.setScene(scene);
     }
 
     public void activateProgressBar(final Task<?> task) {
+        pb.setProgress(task.getProgress());
+        pin.setProgress(task.getProgress());
         pb.progressProperty().bind(task.progressProperty());
         pin.progressProperty().bind(task.progressProperty());
         dialogStage.show();

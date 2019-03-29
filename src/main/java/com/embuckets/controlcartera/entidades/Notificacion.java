@@ -6,6 +6,7 @@
 package com.embuckets.controlcartera.entidades;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -20,4 +21,8 @@ public interface Notificacion {
     LocalDateTime getEnviado();
 
     EstadoNotificacion getEstadonotificacion();
+
+    boolean tieneEmail();
+
+    List<String> getEmailsDeNotificacion();
 }
