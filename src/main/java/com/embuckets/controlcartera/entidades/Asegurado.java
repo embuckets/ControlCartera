@@ -174,6 +174,10 @@ public class Asegurado implements Serializable, ObservableTreeItem, ObservableCl
         return cliente;
     }
 
+    public String getNombreCompleto() {
+        return cliente.nombreProperty().get();
+    }
+
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
         if (cliente.getIdcliente() != null) {

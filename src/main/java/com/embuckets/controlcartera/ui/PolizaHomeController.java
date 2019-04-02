@@ -209,7 +209,7 @@ public class PolizaHomeController implements Initializable, Controller {
         primaTextField.setText(poliza.primaProperty().get());
         notaTextArea.setText(poliza.getNota());
 
-        renovarPolizaButton.disableProperty().bind(Bindings.not(estadoTextField.textProperty().isNotEqualTo(Globals.POLIZA_ESTADO_RENOVADA)));
+        renovarPolizaButton.disableProperty().bind(Bindings.not(estadoTextField.textProperty().isEqualTo(Globals.POLIZA_ESTADO_VIGENTE)));
         cancelarPolizaButton.disableProperty().bind(Bindings.not(estadoTextField.textProperty().isEqualTo(Globals.POLIZA_ESTADO_VIGENTE)));
 
         llenarCamposEspeciales();
@@ -290,7 +290,7 @@ public class PolizaHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+//        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField descripcionField = new TextField();
         TextField marcaField = new TextField();
@@ -447,7 +447,7 @@ public class PolizaHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+//        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField descripcionField = new TextField(auto.getDescripcion());
         TextField marcaField = new TextField(auto.getMarca());
@@ -711,7 +711,7 @@ public class PolizaHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+//        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField nombreField = new TextField();
         TextField paternoField = new TextField();
@@ -812,7 +812,7 @@ public class PolizaHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+//        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField nombreField = new TextField(cliente.getNombre());
         TextField paternoField = new TextField(cliente.getApellidopaterno());

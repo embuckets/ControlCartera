@@ -377,7 +377,7 @@ public class AseguradoHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+//        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField telefonoField = new TextField();
         telefonoField.setText(telefono.telefonoProperty().get());
@@ -536,7 +536,7 @@ public class AseguradoHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+//        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField emailField = new TextField();
         emailField.setText(email.getEmailPK().getEmail());
@@ -976,7 +976,7 @@ public class AseguradoHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+//        grid.setPadding(new Insets(20, 150, 10, 10));
 
         Label paternoLabel = new Label("Apellido Paterno");
         Label maternoLabel = new Label("Apellido Materno");
@@ -1141,7 +1141,6 @@ public class AseguradoHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField calleField = new TextField(domicilio.getCalle());
         TextField exteriorField = new TextField(domicilio.getExterior());
@@ -1216,7 +1215,6 @@ public class AseguradoHomeController implements Initializable, Controller {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField calleField = new TextField();
         TextField exteriorField = new TextField();

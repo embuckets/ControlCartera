@@ -42,6 +42,7 @@
                   <Menu mnemonicParsing="false" text="Cartera">
                       <items>
                           <MenuItem mnemonicParsing="false" onAction="#importarCartera" text="Importar" />
+                  <MenuItem mnemonicParsing="false" onAction="#exportarPlantilla" text="Exportar plantilla" />
                       </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">
@@ -59,7 +60,7 @@
                      <children>
                             <HBox alignment="CENTER_RIGHT" spacing="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <children>
-                              <Button mnemonicParsing="false" onAction="#goToNotificaciones" styleClass="my-button" stylesheets="@../styles/style.css" text="Notificaciones" />
+                              <Button mnemonicParsing="false" onAction="#goToNotificaciones" text="Notificaciones" />
                                     <Button fx:id="nuevoAseguradoButton" mnemonicParsing="false" onAction="#abrirSceneNuevoAsegurado" text="Nuevo Asegurado" />
                                     <Button fx:id="nuevaPolizaButton" mnemonicParsing="false" onAction="#abrirSceneNuevaPoliza" text="Nueva Poliza" />
                                 </children>

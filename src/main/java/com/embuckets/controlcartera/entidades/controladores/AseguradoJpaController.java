@@ -59,9 +59,15 @@ public class AseguradoJpaController implements Serializable, JpaController {
     public void create(Object object) throws EntityExistsException, Exception {
         Asegurado asegurado = (Asegurado) object;
         EntityManager em = null;
+        boolean isSubTransaction = false;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
             Cliente cliente = asegurado.getCliente();
             //save cliente
             em.persist(cliente);
@@ -103,23 +109,46 @@ public class AseguradoJpaController implements Serializable, JpaController {
                 doc.getDocumentoAseguradoPK().setIdcliente(cliente.getIdcliente());
                 em.persist(doc);
             }
+            PolizaJpaController polizaJpaController = new PolizaJpaController();
+            for (Poliza poliza : asegurado.getPolizaList()){
+                polizaJpaController.create(poliza);
+            }
 
-            em.getTransaction().commit();
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
 
         } catch (Exception ex) {
-//            if (findAsegurado(asegurado.getIdcliente()) != null) {
-//                throw new PreexistingEntityException("Asegurado " + asegurado + " already exists.", ex);
-//            }
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
             throw ex;
         }
-//        finally {
-//            if (em != null) {
-//                em.close();
-//            }
-//        }
+    }
+
+    public void importarAsegurados(List<Asegurado> asegurados) throws Exception {
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+            for (Asegurado a : asegurados) {
+                create(a);
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
     }
 
     @Override
@@ -276,7 +305,7 @@ public class AseguradoJpaController implements Serializable, JpaController {
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The asegurado with id " + id + " no longer exists.", enfe);
             }
-            
+
             List<String> illegalOrphanMessages = null;
             List<Email> emailListOrphanCheck = asegurado.getEmailList();
             for (Email emailListOrphanCheckEmail : emailListOrphanCheck) {

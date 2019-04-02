@@ -122,7 +122,7 @@ public class AgregarClienteController implements Initializable {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+//        grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField nombreFieldLocal = new TextField();
         TextField paternoFieldLocal = new TextField();

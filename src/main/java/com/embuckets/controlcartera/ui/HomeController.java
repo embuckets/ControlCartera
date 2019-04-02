@@ -12,12 +12,19 @@ import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.excel.ExcelImporter;
 import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import com.embuckets.controlcartera.ui.observable.ObservableRenovacion;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -32,8 +39,12 @@ import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
@@ -41,6 +52,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 /**
  * FXML Controller class
@@ -269,7 +282,45 @@ public class HomeController implements Initializable, Controller {
 
     @FXML
     public void importarCartera(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Elige un Documento");
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XLSX", "*.xlsx"));
+        File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
+        if (file != null) {
+            try {
+                List<Asegurado> asegurados = new ExcelImporter().importar(file);
+                MainApp.getInstance().getBaseDeDatos().importarAsegurados(asegurados);
+            } catch (Exception e) {
+                TextArea textArea = new TextArea(e.getMessage());
+                textArea.setEditable(false);
+                Dialog dialog = new Dialog();
+                dialog.setTitle("Error al importar");
+                DialogPane pane = new DialogPane();
+                pane.setContent(textArea);
+                dialog.setDialogPane(pane);
+                dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+                dialog.showAndWait();
+            }
+        }
+    }
 
+    @FXML
+    public void exportarPlantilla(ActionEvent event) {
+        final DirectoryChooser chooser = new DirectoryChooser();
+        final File directory = chooser.showDialog(MainApp.getInstance().getStage());
+        if (directory != null) {
+            try (InputStream in = new FileInputStream(Globals.TEMPLATE_EXCEL)) {
+                File targetFile = new File(directory.getAbsolutePath() + "/plantilla-cartera.xlsx");
+                File plantilla = new File(Globals.TEMPLATE_EXCEL);
+                byte[] bytes = Files.readAllBytes(plantilla.toPath());
+                Files.write(targetFile.toPath(), bytes);
+                Desktop.getDesktop().open(targetFile.getParentFile());
+            } catch (IOException ex) {
+                Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
     }
 
     private ObservableList<ObservableRenovacion> getRenovacionesProximas() {

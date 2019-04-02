@@ -403,7 +403,7 @@ public class NuevaPolizaController implements Initializable, Controller {
     @FXML
     private void buscarTitular(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/BuscarCliente.fxml"), null, new JavaFXBuilderFactory());
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AgregarCliente.fxml"), null, new JavaFXBuilderFactory());
             BuscarClienteController buscarController = new BuscarClienteController();
             loader.setController(buscarController);
             Parent parent = loader.load();

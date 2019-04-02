@@ -29,6 +29,7 @@ public class Globals {
     public static String SMTP_CONFIG_PATH = "config/smtp.config";
     public static String TEMPLATE_CUMPLE_PATH = "templates/cumple.html";
     public static String TEMPLATE_COBRANZA_PATH = "templates/cobranza.html";
+    public static String TEMPLATE_EXCEL = "./templates/plantilla-cartera.xlsx";
 
     public static String DEFAULT_AGENTE_NOMBRE = "Su";
     public static String DEFAULT_AGENTE_PATERNO = "Asesor";

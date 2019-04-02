@@ -639,7 +639,7 @@ public class PolizaJpaController implements Serializable, JpaController {
             PolizaVida polizaVidaOrphanCheck = poliza.getPolizaVida();
             if (polizaVidaOrphanCheck != null) {
                 BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
-                for (Cliente cliente : polizaVidaOrphanCheck.getClienteList()){
+                for (Cliente cliente : polizaVidaOrphanCheck.getClienteList()) {
                     beneficiarioJpaController.remove(new Beneficiario(cliente, polizaVidaOrphanCheck));
                 }
                 polizaVidaOrphanCheck.setPoliza(null);
@@ -648,7 +648,7 @@ public class PolizaJpaController implements Serializable, JpaController {
             PolizaGmm polizaGmmOrphanCheck = poliza.getPolizaGmm();
             if (polizaGmmOrphanCheck != null) {
                 DependienteJpaController dependienteJpaController = new DependienteJpaController();
-                for (Cliente cliente : polizaGmmOrphanCheck.getClienteList()){
+                for (Cliente cliente : polizaGmmOrphanCheck.getClienteList()) {
                     dependienteJpaController.remove(new Dependiente(cliente, polizaGmmOrphanCheck));
                 }
                 polizaGmmOrphanCheck.setPoliza(null);
@@ -743,8 +743,7 @@ public class PolizaJpaController implements Serializable, JpaController {
             em.close();
         }
     }
-    
-    
+
     public List<Poliza> getRenovacionesEntre(LocalDate start, LocalDate end) {
         EntityManager em = null;
         try {
@@ -791,8 +790,8 @@ public class PolizaJpaController implements Serializable, JpaController {
             }
 
             em.persist(poliza);
-            
-            if (poliza.getCaratula() != null){
+
+            if (poliza.getCaratula() != null) {
                 Caratula caratula = poliza.getCaratula();
                 caratula.setPoliza(poliza);
                 caratula.setIdpoliza(poliza.getId());
@@ -838,11 +837,14 @@ public class PolizaJpaController implements Serializable, JpaController {
                     query.executeUpdate();
                 }
             }
-            Asegurado contratante = poliza.getContratante();
-            contratante.getPolizaList().add(poliza);
-            contratante = em.merge(contratante);
+//                Asegurado contratante = poliza.getContratante();
+//                contratante.getPolizaList().add(poliza);//TODO: POSIBLE ERROR
+//                contratante = em.merge(contratante);
 
             if (!isSubTransaction) {
+                Asegurado contratante = poliza.getContratante();
+                contratante.getPolizaList().add(poliza);//TODO: POSIBLE ERROR
+                contratante = em.merge(contratante);
                 em.getTransaction().commit();
             }
         } catch (Exception ex) {

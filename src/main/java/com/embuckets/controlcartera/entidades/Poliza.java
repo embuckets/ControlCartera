@@ -175,6 +175,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 
     public void setIniciovigencia(LocalDate iniciovigencia) {
         this.iniciovigencia = iniciovigencia;
+        this.finvigencia = iniciovigencia.plusMonths(12);
     }
 
 //    public void setIniciovigencia(LocalDate iniciovigencia) {
@@ -186,6 +187,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 
     public void setFinvigencia(LocalDate finvigencia) {
         this.finvigencia = finvigencia;
+        this.iniciovigencia = finvigencia.minusMonths(12);
     }
 
 //    public void setFinvigencia(LocalDate finvigencia) {
@@ -291,20 +293,24 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     private void crearSubPoliza() {
         if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_AUTOS) || this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_FLOTILLA)) {
             this.polizaAuto = new PolizaAuto(idpoliza);
+            polizaAuto.setIdpoliza(this.idpoliza);
+            polizaAuto.setPoliza(this);
             polizaVida = null;
             polizaGmm = null;
         }
         if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_VIDA)) {
             this.polizaVida = new PolizaVida(idpoliza);
+            polizaVida.setIdpoliza(this.idpoliza);
+            polizaVida.setPoliza(this);
             polizaAuto = null;
             polizaGmm = null;
-
         }
         if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_GM)) {
             this.polizaGmm = new PolizaGmm(idpoliza);
+            polizaGmm.setIdpoliza(this.idpoliza);
+            polizaGmm.setPoliza(this);
             polizaVida = null;
             polizaAuto = null;
-
         }
     }
 

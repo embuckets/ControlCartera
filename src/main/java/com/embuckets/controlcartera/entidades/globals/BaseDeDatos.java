@@ -292,6 +292,16 @@ public class BaseDeDatos {
             throw ex;
         }
     }
+    
+    public void importarAsegurados(List<Asegurado> asegurados) throws Exception{
+        try {
+            ((AseguradoJpaController) controllers.get(Asegurado.class)).importarAsegurados(asegurados);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+        
+    }
 
     private Map<Class, JpaController> createControllers() {
         Map<Class, JpaController> map = new HashMap<>();
