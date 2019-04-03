@@ -254,6 +254,10 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         }
     }
 
+    public StringProperty conductoProperty() {
+        return new SimpleStringProperty(recibo.getIdpoliza().getConductocobro().getConductocobro());
+    }
+
     @Override
     public StringProperty cobranzaProperty() {
         return recibo.cobranzaProperty();

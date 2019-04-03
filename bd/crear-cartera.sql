@@ -694,6 +694,7 @@ INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Assurant');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Atradius');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('AXA');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Berkley International');
+INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Best Doctors');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('BUPA');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Cardif');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Chubb');

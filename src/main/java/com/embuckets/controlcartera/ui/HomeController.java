@@ -7,6 +7,7 @@ package com.embuckets.controlcartera.ui;
 
 import com.embuckets.controlcartera.entidades.Agente;
 import com.embuckets.controlcartera.entidades.Asegurado;
+import com.embuckets.controlcartera.entidades.Aseguradora;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
@@ -25,11 +26,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -40,11 +46,13 @@ import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
@@ -122,7 +130,21 @@ public class HomeController implements Initializable, Controller {
 
     //Botones
     @FXML
-    private Button buttonNuevo;
+    private Button nuevoAseguradoButton;
+    @FXML
+    private Button nuevaPolizaButton;
+    @FXML
+    private TextField nombreField;
+    @FXML
+    private TextField paternoField;
+    @FXML
+    private TextField maternoField;
+    @FXML
+    private TextField numeroPolizaField;
+    @FXML
+    private ComboBox<String> aseguradoraCombo;
+    @FXML
+    private ComboBox<String> ramoCombo;
 
     /**
      * Initializes the controller class.
@@ -133,6 +155,7 @@ public class HomeController implements Initializable, Controller {
         fillTablaRecibos();
         fillTablaCumple();
         fillTablaAsegurados();
+        llenarComboFiltros();
     }
 
     private void fillTablaAsegurados() {
@@ -231,10 +254,12 @@ public class HomeController implements Initializable, Controller {
         renovacionesFaltanTableColumn.setCellValueFactory(new PropertyValueFactory("faltan"));
     }
 
+    @FXML
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevoAsegurado.fxml");
     }
 
+    @FXML
     public void abrirSceneNuevaPoliza(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevaPoliza.fxml");
     }
@@ -291,6 +316,7 @@ public class HomeController implements Initializable, Controller {
             try {
                 List<Asegurado> asegurados = new ExcelImporter().importar(file);
                 MainApp.getInstance().getBaseDeDatos().importarAsegurados(asegurados);
+                fillTablaAsegurados();
             } catch (Exception e) {
                 TextArea textArea = new TextArea(e.getMessage());
                 textArea.setEditable(false);
@@ -347,6 +373,96 @@ public class HomeController implements Initializable, Controller {
     @Override
     public Object getData() {
         return null;
+    }
+
+    @FXML
+    private void filtrarAsegurados(ActionEvent event) {
+        //
+        List<ObservableTreeItem> observableAsegurados = (List<ObservableTreeItem>) filtrarAseguradorsAsItems(nombreField.getText(), paternoField.getText(), maternoField.getText());
+        //make root item
+        TreeItem root = new TreeItem(new Asegurado("Control Cartera", "", ""));
+        root.setExpanded(true);
+
+        //agrega los asegurados a root
+        observableAsegurados.stream().forEach((asegurado) -> {
+            TreeItem aseguradoItem = new TreeItem(asegurado);
+            root.getChildren().add(aseguradoItem);
+            asegurado.getPolizaListProperty().stream().forEach((poliza) -> {
+                aseguradoItem.getChildren().add(new TreeItem(poliza));
+            });
+        });
+//        treeAsegurados.getRoot().getChildren().clear();
+        treeAsegurados.setRoot(root);
+    }
+
+    private List<? extends ObservableTreeItem> filtrarAseguradorsAsItems(String nombre, String paterno, String materno) {
+        return MainApp.getInstance().getBaseDeDatos().buscarAseguradosPorNombre(nombre, paterno, materno);
+    }
+
+    @FXML
+    private void quitarFiltros(ActionEvent event) {
+        //
+        List<ObservableTreeItem> observableAsegurados = (List<ObservableTreeItem>) getAsegurados();
+        //make root item
+        TreeItem root = new TreeItem(new Asegurado("Control Cartera", "", ""));
+        root.setExpanded(true);
+
+        //agrega los asegurados a root
+        observableAsegurados.stream().forEach((asegurado) -> {
+            TreeItem aseguradoItem = new TreeItem(asegurado);
+            root.getChildren().add(aseguradoItem);
+            asegurado.getPolizaListProperty().stream().forEach((poliza) -> {
+                aseguradoItem.getChildren().add(new TreeItem(poliza));
+            });
+        });
+//        treeAsegurados.getRoot().getChildren().clear();
+        treeAsegurados.setRoot(root);
+        nombreField.setText("");
+        paternoField.setText("");
+        maternoField.setText("");
+
+        numeroPolizaField.setText("");
+        aseguradoraCombo.getSelectionModel().clearSelection();
+        ramoCombo.getSelectionModel().clearSelection();
+    }
+
+    @FXML
+    private void filtrarPolizas(ActionEvent event) {
+        List<Poliza> polizas = MainApp.getInstance().getBaseDeDatos().buscarPolizasPor(numeroPolizaField.getText(), aseguradoraCombo.getValue(), ramoCombo.getValue());
+
+        Map<Asegurado, List<Poliza>> mapped = new HashMap<>();
+        polizas.forEach((poliza) -> {
+            if (mapped.containsKey(poliza.getContratante())) {
+                mapped.get(poliza.getContratante()).add(poliza);
+            } else {
+                mapped.put(poliza.getContratante(), new ArrayList<>());
+                mapped.get(poliza.getContratante()).add(poliza);
+            }
+        });
+        TreeItem root = new TreeItem(new Asegurado("Control Cartera", "", ""));
+        root.setExpanded(true);
+
+        //agrega los asegurados a root
+        mapped.keySet().stream().forEach((k) -> {
+            TreeItem aseguradoItem = new TreeItem(k);
+            root.getChildren().add(aseguradoItem);
+            mapped.get(k).forEach((poliza) -> {
+                aseguradoItem.getChildren().add(new TreeItem(poliza));
+            });
+        });
+        treeAsegurados.setRoot(root);
+    }
+
+    private List<? extends ObservableTreeItem> filterPolizas(String numeroPoliza, String aseguradora, String ramo) {
+        return MainApp.getInstance().getBaseDeDatos().buscarPolizasPor(numeroPoliza, aseguradora, ramo);
+    }
+
+    private void llenarComboFiltros() {
+        List<Aseguradora> aseguradoras = MainApp.getInstance().getBaseDeDatos().getAll(Aseguradora.class);
+        List<String> aseguradorasStrings = aseguradoras.stream().map(a -> a.getAseguradora()).collect(Collectors.toList());
+        aseguradoraCombo.setItems(FXCollections.observableArrayList(aseguradorasStrings));
+
+        ramoCombo.setItems(FXCollections.observableArrayList(Globals.getAllRamos()));
     }
 
 }

@@ -135,107 +135,32 @@ public class BuscarAseguradoController implements Initializable {
     @FXML
     private void buscarAsegurado(KeyEvent event) {
         //TODO: buscar asegurado con campos del nombre incomplentos
+        if (!nombreField.getText().isEmpty() || !parternoField.getText().isEmpty() || !maternoField.getText().isEmpty()) {
+            List<Asegurado> asegurados = MainApp.getInstance().getBaseDeDatos().buscarAseguradosPorNombre(nombreField.getText(), parternoField.getText(), maternoField.getText());
+            clienteTableView.setItems(FXCollections.observableArrayList(asegurados));
+        } else {
+            clienteTableView.getItems().clear();
+            clienteTableView.setItems(FXCollections.observableArrayList(getAllAsegurados()));
+        }
     }
 
     @FXML
     private void seleccionar(ActionEvent event) {
 
     }
-    
-    public Dialog<Asegurado> getDialog(){
+//
+//    @FXML
+//    private void quitarFiltros(ActionEvent event) {
+//        nombreField.setText("");
+//        parternoField.setText("");
+//        maternoField.setText("");
+//        clienteTableView.getItems().clear();
+//        clienteTableView.setItems(FXCollections.observableArrayList(getAllAsegurados()));
+//
+//    }
+
+    public Dialog<Asegurado> getDialog() {
         return dialog;
-    }
-
-    private List<Asegurado> createAseguradosFalsos() {
-        Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
-        asegurado1.setIdcliente(1);
-        asegurado1.getCliente().setIdcliente(1);
-        asegurado1.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 2));
-        asegurado1.setTipopersona(new TipoPersona("Fisica"));
-        Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
-        asegurado2.getCliente().setNacimiento(LocalDate.of(1994, Month.MARCH, 3));
-        asegurado2.setIdcliente(2);
-        asegurado2.getCliente().setIdcliente(2);
-        asegurado2.setTipopersona(new TipoPersona("Fisica"));
-
-        Poliza poliza1 = new Poliza();
-        poliza1.setIdpoliza(1);
-        poliza1.setNumero("numeor1");
-        poliza1.setAseguradora(new Aseguradora("GNP"));
-        poliza1.setRamo(new Ramo("vida"));
-        poliza1.setProducto("producto");
-        poliza1.setPlan("plan");
-        poliza1.setPrima(new BigDecimal(21456));
-        poliza1.setPrimamoneda(new Moneda("pesos"));
-        poliza1.setIniciovigencia(LocalDate.now());
-        poliza1.setFinvigencia(LocalDate.now().plusMonths(12));
-        poliza1.setEstado(new EstadoPoliza("Vigente"));
-        poliza1.setConductocobro(new ConductoCobro("agente"));
-        poliza1.setFormapago(new FormaPago("mensual"));
-        Cliente benef = new Cliente("beneficiario1", "hijo", "hijo");
-        benef.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
-        poliza1.setPolizaVida(new PolizaVida(1));
-        poliza1.getPolizaVida().setSumaasegurada(BigDecimal.valueOf(50000));
-        poliza1.getPolizaVida().setSumaaseguradamoneda(new Moneda("Dolares"));
-        poliza1.getPolizaVida().getClienteList().add(benef);
-        poliza1.generarRecibos(3, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        Poliza poliza2 = new Poliza();
-        poliza2.setIdpoliza(2);
-        poliza2.setNumero("numeor2");
-        poliza2.setAseguradora(new Aseguradora("GNP"));
-        poliza2.setRamo(new Ramo("autos"));
-        poliza2.setProducto("producto");
-        poliza2.setPlan("plan");
-        poliza2.setPrima(new BigDecimal(54789));
-        poliza2.setPrimamoneda(new Moneda("pesos"));
-        poliza2.setIniciovigencia(LocalDate.now());
-        poliza2.setFinvigencia(LocalDate.now().plusMonths(12));
-        poliza2.setEstado(new EstadoPoliza("Cancelada"));
-        poliza2.setPolizaAuto(new PolizaAuto(2));
-        poliza2.getPolizaAuto().setSumaaseguradaauto(new SumaAseguradaAuto("Factura"));
-        poliza2.getPolizaAuto().getAutoList().add(new Auto(2, "STD 4PT RL", "VW", "Jetta", Year.of(2016)));
-        poliza2.setConductocobro(new ConductoCobro("agente"));
-        poliza2.setFormapago(new FormaPago("mensual"));
-        poliza2.generarRecibos(4, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        poliza1.setContratante(asegurado1);
-        poliza1.setTitular(asegurado1.getCliente());
-        poliza2.setContratante(asegurado1);
-        poliza2.setTitular(asegurado1.getCliente());
-        asegurado1.getPolizaList().add(poliza1);
-        asegurado1.getPolizaList().add(poliza2);
-
-        Poliza poliza3 = new Poliza();
-        poliza3.setIdpoliza(3);
-        poliza3.setNumero("numeor3");
-        poliza3.setAseguradora(new Aseguradora("PLAN SEGURO"));
-        poliza3.setRamo(new Ramo("gastos medicos"));
-        poliza3.setProducto("producto");
-        poliza3.setPlan("plan");
-        poliza3.setPrima(new BigDecimal(12456));
-        poliza3.setPrimamoneda(new Moneda("PESOS"));
-        poliza3.setIniciovigencia(LocalDate.now());
-        poliza3.setFinvigencia(LocalDate.now().plusMonths(12));
-        poliza3.setEstado(new EstadoPoliza("No vigente"));
-        poliza3.setConductocobro(new ConductoCobro("agente"));
-        poliza3.setFormapago(new FormaPago(Globals.FORMA_PAGO_TRIMESTRAL));
-        poliza3.setPolizaGmm(new PolizaGmm(3, BigDecimal.valueOf(79654.12), "100000000", (short) 10));
-        poliza3.getPolizaGmm().setDeduciblemoneda(new Moneda("PESOS"));
-        poliza3.getPolizaGmm().setSumaaseguradamondeda(new Moneda("PESOS"));
-        Cliente depend = new Cliente("beneficiario1", "hijo", "hijo");
-        depend.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
-        poliza3.getPolizaGmm().getClienteList().add(depend);
-        poliza3.generarRecibos(2, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        poliza3.setContratante(asegurado2);
-        poliza3.setTitular(asegurado2.getCliente());
-        asegurado2.getPolizaList().add(poliza3);
-
-        List<Asegurado> list = new ArrayList<>();
-        list.add(asegurado1);
-        list.add(asegurado2);
-        return list;
     }
 
 }

@@ -20,6 +20,7 @@ import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
 import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -39,6 +40,58 @@ public class ClienteJpaController implements Serializable, JpaController {
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
+    }
+
+    public List<Cliente> getByName(String nombre, String paterno, String materno) {
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+//            if (em.getTransaction().isActive()) {
+//                isSubTransaction = true;
+//            }
+//            if (!isSubTransaction) {
+//                em.getTransaction().begin();
+//            }
+
+            StringBuilder sb = new StringBuilder("SELECT a FROM Cliente a WHERE ");
+            if (nombre != null && !nombre.isEmpty()) {
+                sb.append("a.nombre LIKE :nombre ");
+            }
+            if (paterno != null && !paterno.isEmpty()) {
+                if (nombre != null && !nombre.isEmpty()){
+                    sb.append("AND ");
+                }
+                sb.append("a.apellidopaterno LIKE :paterno ");
+            }
+            if (materno != null && !materno.isEmpty()) {
+                if ((nombre != null && !nombre.isEmpty()) || (paterno != null && !paterno.isEmpty())){
+                    sb.append("AND ");
+                }
+                sb.append("a.apellidomaterno LIKE :materno ");
+            }
+
+            Query query = em.createQuery(sb.toString());
+            if (nombre != null && !nombre.isEmpty()) {
+                query.setParameter("nombre", "%" + nombre + "%");
+            }
+            if (paterno != null && !paterno.isEmpty()) {
+                query.setParameter("paterno", "%" + paterno + "%");
+            }
+            if (materno != null && !materno.isEmpty()) {
+                query.setParameter("materno", "%" + materno + "%");
+            }
+            return query.getResultList();
+
+//            if (!isSubTransaction) {
+//                em.getTransaction().commit();
+//            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
     }
 
     public void create(Cliente cliente) {

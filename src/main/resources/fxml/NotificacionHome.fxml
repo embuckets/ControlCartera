@@ -79,6 +79,7 @@
                                     <TableColumn fx:id="recibosDesdeTableColumn" minWidth="165.0" prefWidth="-1.0" text="Cubre Desde" />
                                     <TableColumn fx:id="recibosHastaTableColumn" minWidth="165.0" prefWidth="-1.0" text="Cubre Hasta" />
                                     <TableColumn fx:id="recibosImporteTableColumn" minWidth="165.0" prefWidth="-1.0" text="Importe" />
+                                    <TableColumn fx:id="recibosConductoTableColumn" minWidth="165.0" prefWidth="-1.0" text="Conducto de Cobro" />
                                     <TableColumn fx:id="recibosUltimaNotificacionTableColumn" minWidth="165.0" prefWidth="-1.0" text="Última Notificacion" />
                                     <TableColumn fx:id="diasDesdeTableColumn" minWidth="165.0" prefWidth="-1.0" text="Dias desde inicio cobertura" />
                                 </columns>

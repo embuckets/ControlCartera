@@ -907,6 +907,31 @@ public class AseguradoHomeController implements Initializable, Controller {
 //        }
     }
 
+    @FXML
+    private void eliminarAsegurado(ActionEvent e) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Eliminar asegurado");
+        alert.setHeaderText("Seguro que quieres eliminar al asegurado?");
+        alert.setContentText("Esta acción elimina el asegurado junto con todas sus polizas y documentos.\nQuieres continuar?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            removeAsegurado();
+        }
+    }
+
+    private void removeAsegurado() {
+        try {
+            MainApp.getInstance().getBaseDeDatos().remove(asegurado);
+            MainApp.getInstance().goHome();
+        } catch (IOException ex) {
+            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            Utilities.makeAlert(ex, "Error al eliminar asegurado");
+        } catch (Exception ex) {
+            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            Utilities.makeAlert(ex, "Error al eliminar asegurado");
+        }
+    }
+
     private void goPolizaHomeScene(Poliza poliza) {
         try {
             FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/PolizaHome.fxml"), null, new JavaFXBuilderFactory());

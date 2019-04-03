@@ -66,6 +66,9 @@ public class AgregarClienteController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        Platform.runLater(() -> {
+            llenarCliente();
+        });
         llenarTablaAsegurados();
         crearDialog();
     }
@@ -85,6 +88,12 @@ public class AgregarClienteController implements Initializable {
             });
             return row;
         });
+    }
+
+    private void llenarCliente() {
+        if (cliente != null) {
+            clienteSelectedField.setText(cliente.nombreProperty().get());
+        }
     }
 
     private void crearDialog() {
@@ -170,6 +179,14 @@ public class AgregarClienteController implements Initializable {
     @FXML
     private void buscarCliente(KeyEvent event) {
         //TODO: buscar asegurado con campos del nombre incomplentos
+        //TODO: buscar asegurado con campos del nombre incomplentos
+        if (!nombreField.getText().isEmpty() || !parternoField.getText().isEmpty() || !maternoField.getText().isEmpty()) {
+            List<Cliente> asegurados = MainApp.getInstance().getBaseDeDatos().buscarClientesPor(nombreField.getText(), parternoField.getText(), maternoField.getText());
+            clienteTableView.setItems(FXCollections.observableArrayList(asegurados));
+        } else {
+            clienteTableView.getItems().clear();
+            clienteTableView.setItems(FXCollections.observableArrayList(getAllClientes()));
+        }
     }
 
     @FXML
@@ -184,6 +201,10 @@ public class AgregarClienteController implements Initializable {
 
     public Dialog<Cliente> getDialog() {
         return dialog;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
 }

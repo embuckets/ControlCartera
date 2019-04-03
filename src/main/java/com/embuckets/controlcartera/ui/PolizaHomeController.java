@@ -22,6 +22,7 @@ import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.entidades.globals.Utilities;
+import com.sun.webkit.dom.HTMLUListElementImpl;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -226,6 +227,8 @@ public class PolizaHomeController implements Initializable, Controller {
     }
 
     private void llenarCamposAuto(PolizaAuto polizaAuto) {
+        secondColumnVBox.getChildren().clear();
+
         GridPane sumaAseguradaPane = new GridPane();
 
         ColumnConstraints firstColumnConstraints = new ColumnConstraints(10, 100, Control.USE_COMPUTED_SIZE, Priority.SOMETIMES, HPos.LEFT, true);
@@ -516,6 +519,9 @@ public class PolizaHomeController implements Initializable, Controller {
     }
 
     private void llenarCamposGastosMedicos(PolizaGmm polizaGmm) {
+
+        secondColumnVBox.getChildren().clear();
+
         GridPane datosGastosMedicosPane = new GridPane();
         ColumnConstraints firstColumnConstraints = new ColumnConstraints(10, 100, Control.USE_COMPUTED_SIZE, Priority.SOMETIMES, HPos.LEFT, true);
         ColumnConstraints secondColumnConstraints = new ColumnConstraints(10, 100, Control.USE_COMPUTED_SIZE, Priority.SOMETIMES, HPos.RIGHT, true);
@@ -615,6 +621,8 @@ public class PolizaHomeController implements Initializable, Controller {
     }
 
     private void llenarCamposVida(PolizaVida polizaVida) {
+        secondColumnVBox.getChildren().clear();
+
         GridPane sumaAseguradPane = new GridPane();
         ColumnConstraints firstColumnConstraints = new ColumnConstraints(10, 100, Control.USE_COMPUTED_SIZE, Priority.SOMETIMES, HPos.LEFT, true);
         ColumnConstraints secondColumnConstraints = new ColumnConstraints(10, 100, Control.USE_COMPUTED_SIZE, Priority.SOMETIMES, HPos.RIGHT, true);
@@ -1228,6 +1236,92 @@ public class PolizaHomeController implements Initializable, Controller {
             return null;
         });
 
+        return dialog;
+    }
+
+    @FXML
+    private void editarTitular(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AgregarCliente.fxml"), null, new JavaFXBuilderFactory());
+            Parent parent = loader.load();
+            AgregarClienteController agregarClienteController = loader.getController();
+            agregarClienteController.setCliente(poliza.getTitular());
+            Optional<Cliente> titular = agregarClienteController.getDialog().showAndWait();
+            titular.ifPresent((present) -> {
+                cambiarTitular(present);
+            });
+        } catch (IOException ex) {
+            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void cambiarTitular(Cliente nuevo) {
+        if (!nuevo.equals(poliza.getTitular())) {
+            Cliente oldTitular = poliza.getTitular();
+            try {
+                poliza.setTitular(nuevo);
+                MainApp.getInstance().getBaseDeDatos().cambiarTitular(poliza);
+            } catch (Exception ex) {
+                Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                Utilities.makeAlert(ex, "Error al cambiar de titular");
+                poliza.setTitular(oldTitular);
+            }
+            llenarDatosPoliza();
+        }
+    }
+
+    @FXML
+    private void editarDatosPlan(ActionEvent event) {
+        //<producto, plan>
+        Optional<Pair<String, String>> pair = editPlanDialog(poliza.getProducto(), poliza.getPlan()).showAndWait();
+        pair.ifPresent(p -> {
+            String oldProducto = poliza.getProducto();
+            String oldPlan = poliza.getPlan();
+            if (!p.getKey().equals(poliza.getProducto()) || !p.getValue().equals(poliza.getPlan())) {
+                try {
+                    poliza.setProducto(p.getKey());
+                    poliza.setPlan(p.getValue());
+                    MainApp.getInstance().getBaseDeDatos().edit(poliza);
+                } catch (Exception ex) {
+                    Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    Utilities.makeAlert(ex, "Error al editar datos del plan").showAndWait();
+                    poliza.setProducto(oldProducto);
+                    poliza.setPlan(oldPlan);
+                }
+            }
+            llenarDatosPoliza();
+        });
+    }
+
+    private Dialog<Pair<String, String>> editPlanDialog(String producto, String plan) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Editar Datos del plan");
+        //set the button types
+        ButtonType guardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(guardar, ButtonType.CANCEL);
+
+        //create labels and fields
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+//        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField productoField = new TextField(producto);
+        TextField planField = new TextField(plan);
+
+        grid.add(new Label("Producto"), 0, 0);
+        grid.add(productoField, 1, 0);
+        grid.add(new Label("Plan"), 0, 1);
+        grid.add(planField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == guardar) {
+                Pair<String, String> pair = new Pair<>(productoField.getText(), planField.getText());
+                return new Pair<>(productoField.getText(), planField.getText());
+            }
+            return null;
+        });
         return dialog;
     }
 

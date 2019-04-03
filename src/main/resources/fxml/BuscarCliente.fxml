@@ -7,18 +7,18 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<DialogPane fx:id="dialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="399.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<DialogPane fx:id="dialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <content>
       <VBox prefHeight="401.0" prefWidth="640.0" spacing="10.0">
          <children>
             <HBox spacing="10.0">
                <children>
-                  <TextField fx:id="nombreField" onKeyTyped="#buscarAsegurado" promptText="Nombre" />
-                  <TextField fx:id="parternoField" onKeyTyped="#buscarAsegurado" promptText="Apellido Paterno" />
-                  <TextField fx:id="maternoField" onKeyTyped="#buscarAsegurado" promptText="Apellido Materno" />
+                  <TextField fx:id="nombreField" onKeyReleased="#buscarAsegurado" promptText="Nombre" />
+                  <TextField fx:id="parternoField" onKeyReleased="#buscarAsegurado" promptText="Apellido Paterno" />
+                  <TextField fx:id="maternoField" onKeyReleased="#buscarAsegurado" promptText="Apellido Materno" />
                </children>
             </HBox>
-            <TableView fx:id="clienteTableView" prefHeight="250.0">
+            <TableView fx:id="clienteTableView">
               <columns>
                 <TableColumn fx:id="nombreColumn" prefWidth="75.0" text="Nombre" />
                 <TableColumn fx:id="paternoColumn" prefWidth="75.0" text="Apellido Paterno" />

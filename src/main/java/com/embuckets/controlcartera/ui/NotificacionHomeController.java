@@ -61,6 +61,8 @@ public class NotificacionHomeController implements Initializable {
     @FXML
     private TableColumn<?, ?> recibosImporteTableColumn;
     @FXML
+    private TableColumn<?, ?> recibosConductoTableColumn;
+    @FXML
     private TableColumn<?, ?> recibosUltimaNotificacionTableColumn;
     @FXML
     private TableColumn<?, ?> diasDesdeTableColumn;
@@ -130,6 +132,7 @@ public class NotificacionHomeController implements Initializable {
         recibosDesdeTableColumn.setCellValueFactory(new PropertyValueFactory<>("cubreDesde"));
         recibosHastaTableColumn.setCellValueFactory(new PropertyValueFactory<>("cubreHasta"));
         recibosImporteTableColumn.setCellValueFactory(new PropertyValueFactory<>("importe"));
+        recibosConductoTableColumn.setCellValueFactory(new PropertyValueFactory<>("conducto"));
         recibosUltimaNotificacionTableColumn.setCellValueFactory(new PropertyValueFactory<>("enviado"));
         diasDesdeTableColumn.setCellValueFactory(new PropertyValueFactory<>("diasDesde"));
         recibosCheckBoxColumn.setCellValueFactory(new PropertyValueFactory<>("selected"));

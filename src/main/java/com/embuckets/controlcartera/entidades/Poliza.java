@@ -117,6 +117,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaGmm polizaGmm;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idpoliza", fetch = FetchType.LAZY)
+//    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "idpoliza", fetch = FetchType.LAZY)
     private List<Recibo> reciboList;
 
     public Poliza() {

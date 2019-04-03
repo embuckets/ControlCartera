@@ -17,6 +17,8 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.junit.After;
@@ -70,6 +72,26 @@ public class AseguradoJpaControllerTest {
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getEntityManager method, of class AseguradoJpaController.
+     */
+    @Test
+    public void testBuscarPorNombre() {
+        System.out.println("testBuscarPorNombre");
+        String nombre = "ados";
+        String paterno = "";
+        String materno = "";
+        try {
+            List<Asegurado> asegurados = bd.buscarAseguradosPorNombre(nombre, paterno, materno);
+            assertFalse(asegurados.isEmpty());
+            System.out.println("====RESULT===");
+            asegurados.stream().forEach(a -> System.out.println(a));
+        } catch (Exception ex) {
+            Logger.getLogger(AseguradoJpaControllerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     /**

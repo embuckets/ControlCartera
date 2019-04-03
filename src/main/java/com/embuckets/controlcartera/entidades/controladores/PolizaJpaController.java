@@ -775,6 +775,40 @@ public class PolizaJpaController implements Serializable, JpaController {
         }
     }
 
+    public void editarTitular(Poliza poliza) throws Exception {
+        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+
+            Cliente titular = poliza.getTitular();
+            List<Cliente> clientes = null;
+            clientes = new ClienteJpaController().getByName(titular.getNombre(), titular.getApellidopaterno(), titular.getApellidomaterno());
+            if (clientes.isEmpty()) {
+                em.persist(titular);
+            } else if (clientes.size() == 1) {
+                poliza.setTitular(clientes.get(0));
+            }
+            poliza = em.merge(poliza);
+
+            //averigua si existe y son distintos
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+
     @Override
     public void create(Object object) throws PreexistingEntityException, Exception {
         Poliza poliza = (Poliza) object;
@@ -788,6 +822,23 @@ public class PolizaJpaController implements Serializable, JpaController {
             if (!isSubTransaction) {
                 em.getTransaction().begin();
             }
+
+            Cliente titular = poliza.getTitular();
+            List<Cliente> clientes = null;
+            clientes = new ClienteJpaController().getByName(titular.getNombre(), titular.getApellidopaterno(), titular.getApellidomaterno());
+            if (clientes.isEmpty()) {
+                em.persist(titular);
+            } else if (clientes.size() == 1) {
+                poliza.setTitular(clientes.get(0));
+            }
+//            Asegurado contratante = poliza.getContratante();
+//            List<Asegurado> contratantes = null;
+//            contratantes = new AseguradoJpaController().getByName(contratante.getNombre(), contratante.getApellidoPaterno(), contratante.getApellidoMaterno());
+//            if (contratantes.isEmpty()) {
+//                em.persist(contratante);
+//            } else if (contratantes.size() == 1) {
+//                poliza.setContratante(contratantes.get(0));
+//            }
 
             em.persist(poliza);
 
@@ -847,6 +898,48 @@ public class PolizaJpaController implements Serializable, JpaController {
                 contratante = em.merge(contratante);
                 em.getTransaction().commit();
             }
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
+    public List<Poliza> getBy(String numeroPoliza, String aseguradora, String ramo){
+//        boolean isSubTransaction = false;
+        EntityManager em = null;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+           
+            StringBuilder sb = new StringBuilder("SELECT a FROM Poliza a WHERE ");
+            if (numeroPoliza != null && !numeroPoliza.isEmpty()) {
+                sb.append("a.numero LIKE :numero ");
+            }
+            if (aseguradora != null && !aseguradora.isEmpty()) {
+                if (numeroPoliza != null && !numeroPoliza.isEmpty()) {
+                    sb.append("AND ");
+                }
+                sb.append("a.aseguradora.aseguradora LIKE :aseguradora ");
+            }
+            if (ramo != null && !ramo.isEmpty()) {
+                if ((numeroPoliza != null && !numeroPoliza.isEmpty()) || (aseguradora != null && !aseguradora.isEmpty())) {
+                    sb.append("AND ");
+                }
+                sb.append("a.ramo.ramo LIKE :ramo ");
+            }
+
+            Query query = em.createQuery(sb.toString());
+            if (numeroPoliza != null && !numeroPoliza.isEmpty()) {
+                query.setParameter("numero", "%" + numeroPoliza + "%");
+            }
+            if (aseguradora != null && !aseguradora.isEmpty()) {
+                query.setParameter("aseguradora", "%" + aseguradora + "%");
+            }
+            if (ramo != null && !ramo.isEmpty()) {
+                query.setParameter("ramo", "%" + ramo + "%");
+            }
+            return query.getResultList();
+            
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

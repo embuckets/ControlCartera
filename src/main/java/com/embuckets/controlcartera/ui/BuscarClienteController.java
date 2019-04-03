@@ -21,6 +21,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 
@@ -117,6 +118,14 @@ public class BuscarClienteController implements Initializable {
     @FXML
     private void buscarAsegurado(KeyEvent event) {
         //TODO: buscar asegurado con campos del nombre incomplentos
+    }
+
+    @FXML
+    private void quitarFiltros(KeyEvent event) {
+        //TODO: buscar asegurado con campos del nombre incomplentos
+        clienteTableView.getItems().clear();
+        clienteTableView.setItems(FXCollections.observableArrayList(getAllClientes()));
+
     }
 
     public Dialog<Cliente> getDialog() {

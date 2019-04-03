@@ -404,10 +404,9 @@ public class NuevaPolizaController implements Initializable, Controller {
     private void buscarTitular(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AgregarCliente.fxml"), null, new JavaFXBuilderFactory());
-            BuscarClienteController buscarController = new BuscarClienteController();
-            loader.setController(buscarController);
             Parent parent = loader.load();
-            Optional<Cliente> asegurado = buscarController.getDialog().showAndWait();
+            AgregarClienteController agregarClienteController = loader.getController();
+            Optional<Cliente> asegurado = agregarClienteController.getDialog().showAndWait();
             asegurado.ifPresent((present) -> {
                 this.titular = present;
                 this.titularField.setText(present.nombreProperty().get());

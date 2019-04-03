@@ -14,6 +14,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -48,7 +49,15 @@
                   <HBox minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="NEVER">
                      <children>
                         <Label fx:id="nombreAseguradoLabel" text="Nombre Cliente" />
+                        <AnchorPane HBox.hgrow="ALWAYS">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#eliminarAsegurado" text="Eliminar" AnchorPane.rightAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
                      </children>
+                     <padding>
+                        <Insets bottom="10.0" top="10.0" />
+                     </padding>
                   </HBox>
                   <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                     <tabs>

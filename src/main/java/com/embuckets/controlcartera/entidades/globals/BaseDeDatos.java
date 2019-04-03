@@ -151,6 +151,15 @@ public class BaseDeDatos {
         }
     }
 
+    public void cambiarTitular(Poliza poliza) throws Exception {
+        try {
+            ((PolizaJpaController) controllers.get(Poliza.class)).editarTitular(poliza);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
     public void remove(Object object) throws Exception {
         try {
             controllers.get(object.getClass()).remove(object);
@@ -292,15 +301,42 @@ public class BaseDeDatos {
             throw ex;
         }
     }
-    
-    public void importarAsegurados(List<Asegurado> asegurados) throws Exception{
+
+    public void importarAsegurados(List<Asegurado> asegurados) throws Exception {
         try {
             ((AseguradoJpaController) controllers.get(Asegurado.class)).importarAsegurados(asegurados);
         } catch (Exception ex) {
             Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
         }
-        
+
+    }
+
+    public List<Asegurado> buscarAseguradosPorNombre(String nombre, String paterno, String materno) {
+        try {
+            return ((AseguradoJpaController) controllers.get(Asegurado.class)).getByName(nombre, paterno, materno);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+    
+    public List<Cliente> buscarClientesPor(String nombre, String paterno, String materno) {
+        try {
+            return ((ClienteJpaController) controllers.get(Cliente.class)).getByName(nombre, paterno, materno);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+    }
+
+    public List<Poliza> buscarPolizasPor(String numeroPoliza, String aseguradora, String ramo) {
+        try {
+            return ((PolizaJpaController) controllers.get(Poliza.class)).getBy(numeroPoliza, aseguradora, ramo);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
     }
 
     private Map<Class, JpaController> createControllers() {
@@ -340,5 +376,7 @@ public class BaseDeDatos {
         map.put(Dependiente.class, new DependienteJpaController());
         return map;
     }
+
+    
 
 }

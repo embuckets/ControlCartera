@@ -72,6 +72,10 @@ public class NotificacionReciboWrapper {
         return notificacion.diasDesdeProperty();
     }
 
+    public StringProperty conductoProperty() {
+        return notificacion.conductoProperty();
+    }
+
     public BooleanProperty selectedProperty() {
         return selectedProperty;
     }

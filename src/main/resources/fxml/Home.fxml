@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -20,11 +19,7 @@
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
 <!--<?import ui.HomeController?>-->
@@ -72,81 +67,61 @@
                               <top>
                                   <TabPane minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
                                       <tabs>
-                                          <Tab text="Clientes">
-                                              <content>
-                                                  <GridPane hgap="10.0" vgap="10.0">
-                                                      <columnConstraints>
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                      </columnConstraints>
-                                                      <rowConstraints>
-                                                          <RowConstraints vgrow="NEVER" />
-                                                          <RowConstraints vgrow="NEVER" />
-                                                          <RowConstraints vgrow="NEVER" />
-                                                          <RowConstraints vgrow="NEVER" />
-                                                      </rowConstraints>
-                                                      <children>
-                                                          <Label text="Nombre" />
-                                                          <Label text="Apellido Paterno" GridPane.columnIndex="1" />
-                                                          <Label text="Apellido Materno" GridPane.columnIndex="2" />
-                                                          <TextField GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER" />
-                                                          <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                          <TextField GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                          <TilePane alignment="BOTTOM_RIGHT" hgap="20.0" prefColumns="2" prefRows="1" tileAlignment="CENTER_RIGHT" GridPane.columnSpan="2147483647" GridPane.hgrow="NEVER" GridPane.rowIndex="3" GridPane.vgrow="NEVER">
-                                                              <children>
-                                                                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Filtrar" />
-                                                                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Quitar filtros" />
-                                                              </children>
-                                                              <GridPane.margin>
-                                                                  <Insets top="20.0" />
-                                                              </GridPane.margin>
-                                                              <BorderPane.margin>
-                                                                  <Insets />
-                                                              </BorderPane.margin>
-                                                          </TilePane>
-                                                      </children>
-                                                      <padding>
-                                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                      </padding>
-                                                  </GridPane>
-                                              </content>
+                                          <Tab text="Asegurados">
+                                       <content>
+                                          <VBox spacing="10.0">
+                                             <children>
+                                                <HBox spacing="10.0">
+                                                   <children>
+                                                                <TextField fx:id="nombreField" promptText="Nombre" />
+                                                                <TextField fx:id="paternoField" promptText="Apellido Paterno" />
+                                                                <TextField fx:id="maternoField" promptText="Apellido Materno" />
+                                                   </children>
+                                                </HBox>
+                                                <AnchorPane VBox.vgrow="ALWAYS">
+                                                   <children>
+                                                      <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                                         <children>
+                                                                        <Button mnemonicParsing="false" onAction="#filtrarAsegurados" text="Filtrar" />
+                                                                        <Button mnemonicParsing="false" onAction="#quitarFiltros" text="Quitar filtros" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </AnchorPane>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
+                                             </padding>
+                                          </VBox>
+                                       </content>
                                           </Tab>
                                           <Tab text="Polizas">
-                                              <content>
-                                                  <GridPane hgap="10.0" vgap="10.0">
-                                                      <columnConstraints>
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                      </columnConstraints>
-                                                      <rowConstraints>
-                                                          <RowConstraints vgrow="NEVER" />
-                                                          <RowConstraints vgrow="NEVER" />
-                                                          <RowConstraints vgrow="NEVER" />
-                                                      </rowConstraints>
-                                                      <padding>
-                                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                      </padding>
-                                                      <children>
-                                                          <Label text="Numero" />
-                                                          <Label text="Aseguradora" GridPane.columnIndex="1" />
-                                                          <Label text="Ramo" GridPane.columnIndex="2" />
-                                                          <TextField GridPane.rowIndex="1" />
-                                                          <ComboBox GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.rowIndex="1" />
-                                                          <ComboBox GridPane.columnIndex="2" GridPane.hgrow="NEVER" GridPane.rowIndex="1" />
-                                                          <TilePane alignment="BOTTOM_RIGHT" hgap="20.0" prefColumns="2" prefRows="1" tileAlignment="CENTER_RIGHT" GridPane.columnSpan="2147483647" GridPane.hgrow="NEVER" GridPane.rowIndex="2" GridPane.vgrow="NEVER">
-                                                              <children>
-                                                                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Filtrar" />
-                                                                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Quitar filtros" />
-                                                              </children>
-                                                              <GridPane.margin>
-                                                                  <Insets top="20.0" />
-                                                              </GridPane.margin>
-                                                          </TilePane>
-                                                      </children>
-                                                  </GridPane>
-                                              </content>
+                                       <content>
+                                          <VBox spacing="10.0">
+                                             <children>
+                                                <HBox spacing="10.0">
+                                                   <children>
+                                                                <TextField fx:id="numeroPolizaField" promptText="Número de Poliza" />
+                                                                <ComboBox fx:id="aseguradoraCombo" promptText="Aseguradora" />
+                                                                <ComboBox fx:id="ramoCombo" promptText="Ramo" />
+                                                   </children>
+                                                </HBox>
+                                                <AnchorPane VBox.vgrow="ALWAYS">
+                                                   <children>
+                                                      <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                                         <children>
+                                                                        <Button mnemonicParsing="false" onAction="#filtrarPolizas" text="Filtrar" />
+                                                                        <Button mnemonicParsing="false" onAction="#quitarFiltros" text="Quitar filtros" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </AnchorPane>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
+                                             </padding>
+                                          </VBox>
+                                       </content>
                                           </Tab>
                                       </tabs>
                                   </TabPane>

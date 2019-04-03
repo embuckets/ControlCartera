@@ -24,6 +24,8 @@ import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
 import com.embuckets.controlcartera.entidades.TipoPersona;
+import com.embuckets.controlcartera.excel.ExcelImporter;
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
@@ -83,6 +85,20 @@ public class BaseDeDatosTest {
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getInstance method, of class BaseDeDatos.
+     */
+    @Test
+    public void testFiltrarPolizas() {
+        System.out.println("testFiltrarPolizas");
+        String numeroPoliza = "123";
+        String aseguradora = "Axa";
+        String ramo = "Autos";
+        List<Poliza> polizas = bd.buscarPolizasPor(numeroPoliza, aseguradora, ramo);
+        polizas.stream().forEach(p -> System.out.println(p));
+        
     }
 
     /**
@@ -149,6 +165,20 @@ public class BaseDeDatosTest {
         List<Asegurado> asegurados = bd.getAll(Asegurado.class);
         assertNotNull(asegurados);
         // TODO review the generated test code and remove the default call to fail.
+    }
+
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testImportar() {
+        System.out.println("testImportar");
+        try {
+            List<Asegurado> importados = new ExcelImporter().importar(new File("C:/Users/emilio/Desktop/plantilla-cartera-copy.xlsx"));
+            bd.importarAsegurados(importados);
+        } catch (Exception ex) {
+            Logger.getLogger(BaseDeDatosTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -306,10 +336,10 @@ public class BaseDeDatosTest {
     public void testNotificacionEdge() {
         System.out.println("testNotificacionEdge");
         List<NotificacionCumple> cumples = bd.getCumplesEntre(LocalDate.of(2019, Month.APRIL, 30), LocalDate.of(2019, Month.APRIL, 30));
-        for (NotificacionCumple c : cumples){
+        for (NotificacionCumple c : cumples) {
             int d1 = c.getCliente().getNacimiento().getDayOfYear();
             int d2 = LocalDate.of(2019, Month.MAY, 01).getDayOfYear();
-            System.out.println(c.getCliente().getNacimiento() + ": d1 = " + d1  + " - d2 = " + d2 + " -> " + (d1 <= d2));
+            System.out.println(c.getCliente().getNacimiento() + ": d1 = " + d1 + " - d2 = " + d2 + " -> " + (d1 <= d2));
             System.out.println(c.getCliente().getNacimiento() + ": leap = " + c.getCliente().getNacimiento().isLeapYear());
         }
     }

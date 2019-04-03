@@ -418,11 +418,10 @@ public class RenovarPolizaController implements Initializable, Controller {
     @FXML
     private void buscarTitular(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/BuscarCliente.fxml"), null, new JavaFXBuilderFactory());
-            BuscarClienteController buscarController = new BuscarClienteController();
-            loader.setController(buscarController);
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AgregarCliente.fxml"), null, new JavaFXBuilderFactory());
             Parent parent = loader.load();
-            Optional<Cliente> asegurado = buscarController.getDialog().showAndWait();
+            AgregarClienteController agregarClienteController = loader.getController();
+            Optional<Cliente> asegurado = agregarClienteController.getDialog().showAndWait();
             asegurado.ifPresent((present) -> {
                 this.titular = present;
                 this.titularField.setText(present.nombreProperty().get());
