@@ -1,4 +1,4 @@
-package com.embuckets.controlcartera.entidades.controladores.exceptions;
+package com.embuckets.controlcartera.exceptions;
 
 import java.util.ArrayList;
 import java.util.List;

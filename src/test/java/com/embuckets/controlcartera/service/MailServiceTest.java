@@ -5,6 +5,8 @@
  */
 package com.embuckets.controlcartera.service;
 
+import com.embuckets.controlcartera.mail.TemplateGenerator;
+import com.embuckets.controlcartera.mail.MailService;
 import com.embuckets.controlcartera.entidades.Agente;
 import com.embuckets.controlcartera.entidades.EstadoNotificacion;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;

@@ -64,20 +64,6 @@ public class AseguradoJpaControllerTest {
      * Test of getEntityManager method, of class AseguradoJpaController.
      */
     @Test
-    public void testGetEntityManager() {
-        System.out.println("getEntityManager");
-        AseguradoJpaController instance = null;
-        EntityManager expResult = null;
-        EntityManager result = instance.getEntityManager();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getEntityManager method, of class AseguradoJpaController.
-     */
-    @Test
     public void testBuscarPorNombre() {
         System.out.println("testBuscarPorNombre");
         String nombre = "ados";
@@ -91,7 +77,24 @@ public class AseguradoJpaControllerTest {
         } catch (Exception ex) {
             Logger.getLogger(AseguradoJpaControllerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
 
+    /**
+     * Test of getEntityManager method, of class AseguradoJpaController.
+     */
+    @Test
+    public void testCreateFail() {
+        System.out.println("testCreateFail");
+        String nombre = "";
+        String paterno = "";
+        String materno = "";
+        Asegurado aseguradoToFail = new Asegurado(nombre, paterno, materno);
+        try {
+            bd.create(aseguradoToFail);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -194,191 +197,6 @@ public class AseguradoJpaControllerTest {
         instance.edit(asegurado);
         // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of edit method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testCreateAndEdit() throws Exception {
-        System.out.println("edit");
-        int random = new Random().nextInt(20);
-        Asegurado asegurado = new Asegurado();
-        asegurado.setCliente(new Cliente());
-        asegurado.getCliente().setNombre("Cliente" + random);
-        asegurado.getCliente().setApellidopaterno("Paterno" + random);
-        asegurado.getCliente().setApellidomaterno("Materno" + random);
-        asegurado.getCliente().setNacimiento(LocalDate.of(1993, Month.MARCH, 22));
-        asegurado.setTipopersona(new TipoPersona("Fisica"));
-        AseguradoJpaController controller = new AseguradoJpaController();
-        controller.create(asegurado);
-        Asegurado retrieved = controller.findAsegurado(asegurado.getId());
-        retrieved.setNota("nueva nota");
-        Asegurado edited = controller.edit(retrieved);
-        System.out.println(edited);
-        assertEquals(retrieved, edited);
-    }
-
-    /**
-     * Test of edit method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testRetrieveAndEdit() throws Exception {
-        System.out.println("edit");
-        AseguradoJpaController controller = new AseguradoJpaController();
-        Asegurado retrieved = controller.findAsegurado(1504);
-        System.out.println(retrieved.nombreProperty());
-        System.out.println(retrieved.getTipopersona().getTipopersona());
-//        Email email = new Email(retrieved.getId(), "correo@correo.com");
-//        email.setTipoemail(new TipoEmail(Globals.EMAIL_TIPO_PERSONAL));
-//        retrieved.agregarEmail(email);
-//        Asegurado edited = controller.edit(retrieved);
-//        System.out.println(edited);
-//        assertEquals(retrieved, edited);
-    }
-
-    /**
-     * Test of destroy method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testDestroy() throws Exception {
-        System.out.println("destroy");
-        Integer id = null;
-        AseguradoJpaController instance = null;
-        instance.destroy(id);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of findAseguradoEntities method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testFindAseguradoEntities_0args() {
-        System.out.println("findAseguradoEntities");
-        AseguradoJpaController instance = null;
-        List<Asegurado> expResult = null;
-        List<Asegurado> result = instance.findAseguradoEntities();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of findAseguradoEntities method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testFindAseguradoEntities_int_int() {
-        System.out.println("findAseguradoEntities");
-        int maxResults = 10;
-        int firstResult = 0;
-//        AseguradoJpaController instance = new AseguradoJpaController();
-//        List<Asegurado> expResult = null;
-//        List<Asegurado> result = instance.findAllAsegurados();
-//        for (Asegurado asegurado : result) {
-//            System.out.println(asegurado.toString());
-//            if (asegurado.getPolizaList1() != null) {
-//                for (Poliza poliza : asegurado.getPolizaList1()) {
-//                    System.out.println(poliza.toString());
-//                }
-//            }
-//            System.out.println();
-//        }
-        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of findAsegurado method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testFindAsegurado() {
-        System.out.println("findAsegurado");
-        Integer id = null;
-        AseguradoJpaController instance = null;
-        Asegurado expResult = null;
-        Asegurado result = instance.findAsegurado(id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of findAsegurado method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testfindAseguradoCompleto() {
-        System.out.println("findAseguradoCompleto");
-        AseguradoJpaController instance = new AseguradoJpaController();
-//        em = instance.getEntityManager();
-        Asegurado expResult = instance.findAseguradoCompleto(1504);
-//        Asegurado expResult = instance.findAseguradoCompletoConApi(1504);
-//        Asegurado expResult = em.find(Asegurado.class, 1504);
-        assertNotNull(expResult.getCliente().nombreProperty().get());
-        for (Telefono tel : expResult.getTelefonoList()) {
-            assertNotNull(tel);
-        }
-        for (Email tel : expResult.getEmailList()) {
-            assertNotNull(tel);
-        }
-        assertNotNull(expResult.getTipopersona());
-//        assertNotNull(expResult.getEmailList());
-//        assertNull(expResult.getIddomicilio());
-        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of findAsegurado method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testfindAseguradoCompletoConEntityManager() {
-        System.out.println("findAseguradoCompleto");
-        AseguradoJpaController instance = new AseguradoJpaController();
-        em = instance.getEntityManager();
-//        Asegurado expResult = instance.findAseguradoCompleto(1504);
-//        Asegurado expResult = instance.findAseguradoCompletoConApi(1504);
-        Asegurado expResult = em.find(Asegurado.class, 1504);
-        assertNotNull(expResult.getCliente().nombreProperty().get());
-        for (Telefono tel : expResult.getTelefonoList()) {
-            assertNotNull(tel);
-        }
-        for (Email tel : expResult.getEmailList()) {
-            assertNotNull(tel);
-        }
-        assertNotNull(expResult.getTipopersona());
-//        assertNotNull(expResult.getEmailList());
-//        assertNull(expResult.getIddomicilio());
-        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of findAsegurado method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testfindAseguradoConCliente() {
-        System.out.println("findAseguradoConCliente");
-        AseguradoJpaController instance = new AseguradoJpaController();
-        Asegurado expResult = instance.findAseguradoConCliente(1504);
-//        Asegurado expResult = instance.findAseguradoCompletoConApi(1504);
-        assertNotNull(expResult.getCliente().nombreProperty());
-        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getAseguradoCount method, of class AseguradoJpaController.
-     */
-    @Test
-    public void testGetAseguradoCount() {
-        System.out.println("getAseguradoCount");
-        AseguradoJpaController instance = null;
-        int expResult = 0;
-        int result = instance.getAseguradoCount();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
 }

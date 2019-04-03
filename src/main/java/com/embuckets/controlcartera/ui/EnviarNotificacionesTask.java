@@ -10,7 +10,7 @@ import com.embuckets.controlcartera.entidades.Notificacion;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
-import com.embuckets.controlcartera.service.MailService;
+import com.embuckets.controlcartera.mail.MailService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ import javax.mail.Transport;
 import javax.mail.event.TransportEvent;
 import javax.mail.event.TransportListener;
 import javax.mail.internet.MimeMessage;
-import com.embuckets.controlcartera.service.EmailSender;
+import com.embuckets.controlcartera.mail.EmailSender;
 
 /**
  *

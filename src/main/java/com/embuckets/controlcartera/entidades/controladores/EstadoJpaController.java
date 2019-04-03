@@ -10,7 +10,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import com.embuckets.controlcartera.entidades.Estado;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.exceptions.PreexistingEntityException;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

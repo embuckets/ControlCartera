@@ -1,5 +1,5 @@
 
-package com.embuckets.controlcartera.service;
+package com.embuckets.controlcartera.mail;
 
 import com.embuckets.controlcartera.ui.EnviarNotificacionesTask;
 import java.util.logging.Level;

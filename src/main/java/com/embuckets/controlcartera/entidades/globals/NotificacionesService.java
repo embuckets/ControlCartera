@@ -7,7 +7,7 @@ package com.embuckets.controlcartera.entidades.globals;
 
 import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
-import com.embuckets.controlcartera.service.MailService;
+import com.embuckets.controlcartera.mail.MailService;
 import java.util.List;
 
 /**

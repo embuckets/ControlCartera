@@ -83,6 +83,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import org.apache.logging.log4j.LogManager;
 import org.hibernate.Hibernate;
 
 /**
@@ -91,6 +92,8 @@ import org.hibernate.Hibernate;
  * @author emilio
  */
 public class AseguradoHomeController implements Initializable, Controller {
+
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(AseguradoHomeController.class);
 
     @FXML
     private Label nombreAseguradoLabel;

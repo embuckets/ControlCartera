@@ -14,7 +14,7 @@ import com.embuckets.controlcartera.entidades.Delegacion;
 import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Domicilio;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.embuckets.controlcartera.entidades.controladores.exceptions;
+package com.embuckets.controlcartera.exceptions;
 
 public class NonexistentEntityException extends Exception {
     public NonexistentEntityException(String message, Throwable cause) {

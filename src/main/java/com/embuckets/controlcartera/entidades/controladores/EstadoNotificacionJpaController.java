@@ -15,9 +15,9 @@ import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import java.util.ArrayList;
 import java.util.List;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.exceptions.IllegalOrphanException;
+import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.exceptions.PreexistingEntityException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 

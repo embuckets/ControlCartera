@@ -5,7 +5,7 @@
  */
 package com.embuckets.controlcartera.entidades.controladores;
 
-import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.util.List;
 import javax.persistence.EntityExistsException;

@@ -1,4 +1,4 @@
-package com.embuckets.controlcartera.entidades.controladores.exceptions;
+package com.embuckets.controlcartera.exceptions;
 
 public class PreexistingEntityException extends Exception {
     public PreexistingEntityException(String message, Throwable cause) {

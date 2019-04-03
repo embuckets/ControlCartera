@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.embuckets.controlcartera.service;
+package com.embuckets.controlcartera.mail;
 
 import com.embuckets.controlcartera.entidades.Agente;
 import com.embuckets.controlcartera.entidades.Asegurado;

@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
@@ -46,8 +46,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MainApp extends Application {
+
+    private static final Logger logger = LogManager.getLogger(MainApp.class);
 
     private Stage mainStage;
     private static MainApp instance;
@@ -87,8 +91,10 @@ public class MainApp extends Application {
             primaryStage.setTitle("Control de Cartera");
             primaryStage.setMaximized(true);
             primaryStage.show();
+            logger.info("Application started");
         } catch (Exception ex) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Error al correr aplicacion: ", ex);
+//            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -157,6 +163,7 @@ public class MainApp extends Application {
     public void stop() throws Exception {
         System.out.println("Closing control cartera");
         bd.close();
+        LogManager.shutdown();
         super.stop(); //To change body of generated methods, choose Tools | Templates.
     }
 
