@@ -37,7 +37,7 @@ import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.logging.Level;
+
 //import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -49,7 +49,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class MainApp extends Application {
+public final class MainApp extends Application {
 
     private static final Logger logger = LogManager.getLogger(MainApp.class);
 
@@ -64,7 +64,12 @@ public class MainApp extends Application {
         instance = this;
         windowStack = new ArrayDeque<>();
         this.bd = BaseDeDatos.getInstance();
-        this.agente = Agente.getInstance();
+        try {
+            this.agente = Agente.getInstance();
+        } catch (IOException ex) {
+            logger.fatal("Error al cargar al cliente", ex);
+            this.stop();
+        }
     }
 
     public static MainApp getInstance() {
@@ -81,9 +86,6 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-
-            //si existe base de datos ve a home.fxml
-            // si no existe base de datos mostrar dialogo para importar de excel
             mainStage = primaryStage;
             Parent page = FXMLLoader.load(getClass().getResource("/fxml/Home.fxml"));
             Scene scene = new Scene(page);
@@ -94,7 +96,6 @@ public class MainApp extends Application {
             logger.info("Application started");
         } catch (Exception ex) {
             logger.error("Error al correr aplicacion: ", ex);
-//            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -160,11 +161,10 @@ public class MainApp extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
-        System.out.println("Closing control cartera");
+    public void stop() {
+        logger.info("Stopping Control de Cartera");
         bd.close();
         LogManager.shutdown();
-        super.stop(); //To change body of generated methods, choose Tools | Templates.
     }
 
     public Stage getStage() {

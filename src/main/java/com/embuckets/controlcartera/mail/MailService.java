@@ -6,22 +6,15 @@
 package com.embuckets.controlcartera.mail;
 
 import com.embuckets.controlcartera.entidades.Agente;
-import com.embuckets.controlcartera.entidades.EstadoNotificacion;
 import com.embuckets.controlcartera.entidades.Notificacion;
 import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
-import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
-import com.embuckets.controlcartera.ui.EnviarNotificacionesTask;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
-import java.io.File;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,30 +23,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.activation.DataHandler;
-import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.event.TransportEvent;
-import javax.mail.event.TransportListener;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author emilio
  */
 public class MailService {
+
+    private static final Logger logger = LogManager.getLogger(MailService.class);
 
     private static MailService mailService;
     private String mailHost;
@@ -64,183 +56,49 @@ public class MailService {
     private Set<Message> sentMessages;
     private Session session;
 
-    public MailService() {
+    private MailService() throws Exception {
         loadProperties();
         scheduledNotificaciones = Collections.synchronizedMap(new HashMap<>());
         sentMessages = Collections.synchronizedSet(new HashSet<>());
     }
 
-    public static MailService getInstance() {
+    public static MailService getInstance() throws Exception {
         if (mailService == null) {
             mailService = new MailService();
         }
         return mailService;
     }
 
-    private void loadProperties() {
+    private void loadProperties() throws Exception {
         try (InputStream input = new FileInputStream(Globals.SMTP_CONFIG_PATH)) {
             from = Agente.getInstance().getEmail();
             password = Agente.getInstance().getPassword();
+            if (from == null || from.isEmpty() || password == null || password.isEmpty()) {
+                throw new Exception("No hay email o password registrado para enviar correos");
+            }
             Properties smtpProperties = new Properties();
             smtpProperties.load(input);
             setMailHostAndPort(smtpProperties);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
         } catch (IOException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
         }
     }
 
-    private void setMailHostAndPort(Properties properties) {
-        String smtp = from.split("@")[1].split("\\.")[0];
-        mailHost = properties.getProperty(smtp).split(",")[0];
-        port = Integer.valueOf(properties.getProperty(smtp).split(",")[1]);
+    public void refresh() throws Exception {
+        loadProperties();
     }
 
-    public void sendMail(String messageText, String to, String subject) throws NoSuchProviderException, MessagingException {
+    private void setMailHostAndPort(Properties properties) throws Exception {
         try {
-            MimeMessage message = new MimeMessage(createSession());
-            message.setFrom(new InternetAddress(from));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
-            message.setHeader("X-Mailer", "sendhtml");
-            message.setSubject(subject);
-            message.setSentDate(new Date());
-
-            // Now set the actual message
-            message.setDataHandler(new DataHandler(new ByteArrayDataSource(messageText, "text/html")));
-
-            Transport.send(message, from, password);
-
-        } catch (NoSuchProviderException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        } catch (MessagingException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        } catch (IOException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
+            String smtp = from.split("@")[1].split("\\.")[0];
+            mailHost = properties.getProperty(smtp).split(",")[0];
+            port = Integer.valueOf(properties.getProperty(smtp).split(",")[1]);
+        } catch (Exception ex) {
+            throw new Exception("Email inválido. No se pudo encontrar el servidor de correo", ex);
         }
     }
-
-    public void sendMail(String messageText, String to, String subject, File file) throws NoSuchProviderException, MessagingException, IOException {
-        try {
-            MimeMessage message = new MimeMessage(createSession());
-
-            message.setFrom(new InternetAddress(from));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            message.setSubject(subject);
-            message.setHeader("X-Mailer", "sendhtml");
-            //text bodyPart
-            MimeBodyPart textBodyPart = new MimeBodyPart();
-            textBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(messageText, "text/html")));
-            //attachemnt bodyPart
-            MimeBodyPart attachmentBodyPart = new MimeBodyPart();
-            attachmentBodyPart.attachFile(file);
-
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(textBodyPart);
-            multipart.addBodyPart(attachmentBodyPart);
-
-            message.setSentDate(new Date());
-
-            message.setContent(multipart);
-
-            Transport.send(message, from, password);
-
-        } catch (NoSuchProviderException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        } catch (MessagingException | IOException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
-    }
-
-//    public void enviarNotificacionesCobranza(List<NotificacionRecibo> notificaciones) {
-//        Session session = createSession();
-//        try (Transport transport = session.getTransport("smtp")) {
-//            transport.connect(mailHost, from, password);
-//            List<Thread> threads = Collections.synchronizedList(new ArrayList<Thread>());
-//            for (NotificacionRecibo notificacion : notificaciones) {
-//                if (!notificacion.tieneEmail()) {
-//                    continue;
-//                }
-//                MimeMessage mimeMessage = createMimeMessage(notificacion, session);
-//                scheduledNotificaciones.put(mimeMessage, notificacion);
-//                Thread t = new Thread(new EmailSender(transport, mimeMessage, createAddressArray(notificacion.getEmailsDeNotificacion())));
-//                threads.add(t);
-//                t.start();
-//            }
-//            while (threads.stream().anyMatch(t -> t.isAlive())) {
-//            }
-//            for (Message mess : sentMessages) {
-//                Notificacion notif = scheduledNotificaciones.get(mess);
-//                LocalDateTime oldEnviado = notif.getEnviado();
-//                String oldEstado = notif.getEstadonotificacion().getEstadonotificacion();
-//                try {
-//                    notif.setEnviado(LocalDateTime.now());
-//                    notif.setEstadonotificacion(new EstadoNotificacion(Globals.NOTIFICACION_ESTADO_ENVIADO));
-//                    BaseDeDatos.getInstance().edit(notif);
-//                } catch (Exception ex) {
-//                    Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//                    notif.setEnviado(oldEnviado);
-//                    notif.setEstadonotificacion(new EstadoNotificacion(oldEstado));
-//                }
-//            }
-//            scheduledNotificaciones.clear();
-//            sentMessages.clear(); //TODO: no borra antes de enviar todos los correos
-//        } catch (NoSuchProviderException ex) {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (MessagingException | IOException ex) {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
-//    public void enviarNotificacionesCumple(List<NotificacionCumple> notificaciones) {
-//        Session session = createSession();
-//        List<Thread> threads = Collections.synchronizedList(new ArrayList<Thread>());
-//        try (Transport transport = session.getTransport("smtp")) {
-//            transport.connect(mailHost, from, password);
-//            for (NotificacionCumple notificacion : notificaciones) {
-//                if (!notificacion.tieneEmail()) {
-//                    continue;
-//                }
-//                MimeMessage mimeMessage = createMimeMessage(notificacion, session);
-//                scheduledNotificaciones.put(mimeMessage, notificacion);
-//                Thread t = new Thread(new EmailSender(transport, mimeMessage, createAddressArray(notificacion.getEmailsDeNotificacion())));
-//                threads.add(t);
-//                t.start();
-//            }
-//            while (threads.stream().anyMatch(t -> t.isAlive())) {
-//            }
-//            for (Message mess : sentMessages) {
-//                Notificacion notif = scheduledNotificaciones.get(mess);
-//                LocalDateTime oldEnviado = notif.getEnviado();
-//                String oldEstado = notif.getEstadonotificacion().getEstadonotificacion();
-//                try {
-//                    notif.setEnviado(LocalDateTime.now());
-//                    notif.setEstadonotificacion(new EstadoNotificacion(Globals.NOTIFICACION_ESTADO_ENVIADO));
-//                    BaseDeDatos.getInstance().edit(notif);
-//                } catch (Exception ex) {
-//                    Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//                    notif.setEnviado(oldEnviado);
-//                    notif.setEstadonotificacion(new EstadoNotificacion(oldEstado));
-//                }
-//            }
-//            scheduledNotificaciones.clear();
-//            sentMessages.clear();
-//        } catch (NoSuchProviderException ex) {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (MessagingException | IOException ex) {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
-//    public void clearColaMensajesRecibos() {
-//        scheduledNotificaciones.clear();
-//    }
-//
-//    public void clearColaMensajesCumple() {
-//        scheduledNotificaciones.clear();
-//    }
 
     public Transport connect() throws NoSuchProviderException, MessagingException {
         try {
@@ -250,11 +108,12 @@ public class MailService {
             transport.connect(mailHost, from, password);
             return transport;
         } catch (NoSuchProviderException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            throw ex;
         } catch (MessagingException ex) {
-            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            throw ex;
         }
-        return null;
     }
 
     public MimeMessage createMimeMessage(Notificacion notificacion) throws IOException, MessagingException {
@@ -298,7 +157,7 @@ public class MailService {
         return message;
     }
 
-    public MimeMessage createMimeMessage(NotificacionCumple notificacionRecibo) throws IOException, MessagingException {
+    public MimeMessage createMimeMessage(NotificacionCumple notificacionRecibo) throws AddressException, MessagingException, IOException {
         MimeMessage message = new MimeMessage(session);
 
         message.setFrom(new InternetAddress(from));
@@ -317,13 +176,12 @@ public class MailService {
     }
 
     public InternetAddress[] createAddressArray(List<String> emails) {
-        List<InternetAddress> addresses = new ArrayList<>();
         InternetAddress[] result = new InternetAddress[emails.size()];
         for (int i = 0; i < result.length; i++) {
             try {
                 result[i] = new InternetAddress(emails.get(i));
             } catch (AddressException ex) {
-                Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(Logging.Exception_MESSAGE, ex);
             }
         }
         return result;
@@ -332,6 +190,14 @@ public class MailService {
     private Session createSession() {
         Properties props = System.getProperties();
         props.put("mail.smtp.host", mailHost);
+        //certificados de confianza
+        props.put("mail.smtp.ssl.trust", mailHost);
+//        props.put("mail.smtp.ssl.trust", "smtp.live.com");
+//        props.put("mail.smtp.ssl.trust", "smtp.office365.com");
+//        props.put("mail.smtp.ssl.trust", "smtp.mail.yahoo.com");
+//        props.put("mail.smtp.ssl.trust", "smtp.live.com");
+//        props.put("mail.smtp.ssl.trust", "fortimail.aarco.com.mx");
+
 //        props.put("mail.smtp.port", port);
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.starttls.enable", "true");
@@ -387,88 +253,5 @@ public class MailService {
 
     public void setSentMessages(Set<Message> sentMessages) {
         this.sentMessages = sentMessages;
-    }
-//
-//    public Address[] createAddressArray(List<String> emailsDeNotificacion, EnviarNotificacionesTask aThis) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-
-//    @Override
-//    public void messageDelivered(TransportEvent e) {
-//        System.out.println("Mensaje enviado" + Thread.currentThread().getName());
-//        try {
-//            NotificacionRecibo notificacionRecibo = scheduledNotificacionesRecibo.get(e.getMessage());
-//            notificacionRecibo.setEnviado(LocalDateTime.now());
-//            notificacionRecibo.setEstadonotificacion(new EstadoNotificacion(Globals.NOTIFICACION_ESTADO_ENVIADO));
-//            BaseDeDatos.getInstance().edit(notificacionRecibo);
-//        } catch (Exception ex) {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
-//
-//    @Override
-//    public void messageNotDelivered(TransportEvent e) {
-//        try {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, "No se envio el mensaje para " + Arrays.toString(e.getMessage().getAllRecipients()));
-//        } catch (MessagingException ex) {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//
-//    }
-//
-//    @Override
-//    public void messagePartiallyDelivered(TransportEvent e) {
-//        try {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, "parcialmente enviado el mensaje para " + Arrays.toString(e.getMessage().getAllRecipients()));
-//        } catch (MessagingException ex) {
-//            Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
-    private class EmailSender implements TransportListener, Runnable {
-
-        private Transport transport;
-        private MimeMessage message;
-        private Address[] addresses;
-
-        public EmailSender(Transport transport, MimeMessage message, Address[] addresses) {
-            this.transport = transport;
-            this.message = message;
-            this.addresses = addresses;
-        }
-
-        @Override
-        public void run() {
-            transport.addTransportListener(this);
-            try {
-                transport.sendMessage(this.message, this.addresses);
-            } catch (MessagingException ex) {
-                Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        @Override
-        public void messageDelivered(TransportEvent e) {
-            sentMessages.add(e.getMessage());
-        }
-
-        @Override
-        public void messageNotDelivered(TransportEvent e) {
-            try {
-                Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, "No se envio el mensaje para " + Arrays.toString(e.getMessage().getAllRecipients()));
-            } catch (MessagingException ex) {
-                Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-
-        @Override
-        public void messagePartiallyDelivered(TransportEvent e) {
-            try {
-                Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, "parcialmente enviado el mensaje para " + Arrays.toString(e.getMessage().getAllRecipients()));
-            } catch (MessagingException ex) {
-                Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
     }
 }

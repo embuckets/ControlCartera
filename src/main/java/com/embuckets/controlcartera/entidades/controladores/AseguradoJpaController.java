@@ -35,10 +35,8 @@ import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.entidades.globals.Logging;
-import com.embuckets.controlcartera.exceptions.BaseDeDatosException;
-import javax.persistence.EntityExistsException;
+import java.util.ArrayList;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,7 +52,7 @@ public class AseguradoJpaController implements Serializable, JpaController {
     }
 
     @Override
-    public void create(Object object) throws BaseDeDatosException {
+    public void create(Object object) throws Exception {
         Asegurado asegurado = (Asegurado) object;
         EntityManager em = null;
         boolean isSubTransaction = false;
@@ -106,33 +104,11 @@ public class AseguradoJpaController implements Serializable, JpaController {
             }
 
         } //end try
-        catch (IllegalStateException ex) {
+        catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            logger.error(Logging.IllegalStateException_MESSAGE, ex);
-            throw new BaseDeDatosException(Logging.IllegalStateException_MESSAGE, ex);
-        } catch (EntityExistsException ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw new BaseDeDatosException(Logging.EntityExistsException_MESSAGE, ex);
-        } catch (IllegalArgumentException ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw new BaseDeDatosException(Logging.EntityExistsException_MESSAGE, ex);
-        } catch (PersistenceException ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw new BaseDeDatosException(Logging.EntityExistsException_MESSAGE, ex);
-        } catch (Exception ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            logger.error(Logging.Exception_MESSAGE, ex);
-            throw new BaseDeDatosException(Logging.Exception_MESSAGE, ex);
+            throw ex;
         }
     }
 
@@ -244,11 +220,6 @@ public class AseguradoJpaController implements Serializable, JpaController {
                 polizaJpaController.remove(polizaListOrphanCheckPoliza);
             }
 
-//            List<Poliza> polizaListOrphanCheck = asegurado.getPolizaList();
-//            PolizaJpaController polizaJpaController = new PolizaJpaController();
-//            for (Poliza polizaListOrphanCheckPoliza : polizaListOrphanCheck) {
-//                polizaJpaController.remove(polizaListOrphanCheckPoliza);
-//            }
             List<DocumentoAsegurado> documentoAseguradoListOrphanCheck = asegurado.getDocumentoAseguradoList();
             for (DocumentoAsegurado documentoAseguradoListOrphanCheckDocumentoAsegurado : documentoAseguradoListOrphanCheck) {
                 documentoAseguradoListOrphanCheckDocumentoAsegurado.setAsegurado(null);
@@ -375,16 +346,9 @@ public class AseguradoJpaController implements Serializable, JpaController {
     }
 
     public List<Asegurado> getByName(String nombre, String paterno, String materno) {
-        boolean isSubTransaction = false;
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-//            if (em.getTransaction().isActive()) {
-//                isSubTransaction = true;
-//            }
-//            if (!isSubTransaction) {
-//                em.getTransaction().begin();
-//            }
 
             StringBuilder sb = new StringBuilder("SELECT a FROM Asegurado a WHERE ");
             if (nombre != null && !nombre.isEmpty()) {
@@ -414,15 +378,13 @@ public class AseguradoJpaController implements Serializable, JpaController {
                 query.setParameter("materno", "%" + materno + "%");
             }
             return query.getResultList();
-//            if (!isSubTransaction) {
-//                em.getTransaction().commit();
-//            }
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw ex;
+            logger.error(Logging.Exception_MESSAGE, ex);
         }
+        return new ArrayList<>();
     }
 
     @Override

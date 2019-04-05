@@ -9,12 +9,14 @@ import com.embuckets.controlcartera.entidades.Cliente;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TableColumn;
@@ -73,10 +75,11 @@ public class BuscarClienteController implements Initializable {
         clienteTableView.setRowFactory((TableView<Cliente> param) -> {
             final TableRow<Cliente> row = new TableRow<>();
             row.setOnMouseClicked((event) -> {
-                cliente = row.getItem();
-                clienteSelectedField.setText(cliente.nombreProperty().get());
+                if (row.getItem() != null) {
+                    cliente = row.getItem();
+                    clienteSelectedField.setText(cliente.nombreProperty().get());
+                }
             });
-//            row.onMouseClickedProperty().bind(Bindings.when(Bindings.isNotNull(row.itemProperty())));
 
             return row; //To change body of generated lambdas, choose Tools | Templates.
         });

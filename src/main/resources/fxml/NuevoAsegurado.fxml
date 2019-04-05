@@ -171,8 +171,8 @@
                               <Label text="Colonia" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                               <Label text="Delegacion" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                               <Label text="Estado" GridPane.rowIndex="3" />
-                              <ComboBox fx:id="estadoComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <ComboBox fx:id="delegacionComboBox" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                              <ComboBox fx:id="estadoComboBox" promptText="Estado" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <ComboBox fx:id="delegacionComboBox" promptText="Delegacion" GridPane.columnIndex="5" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
                         <HBox VBox.vgrow="NEVER">

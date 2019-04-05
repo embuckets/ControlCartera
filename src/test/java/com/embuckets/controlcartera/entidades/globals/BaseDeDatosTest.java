@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.logging.Level;
+
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import org.junit.After;
@@ -366,16 +367,6 @@ public class BaseDeDatosTest {
      * Test of getById method, of class BaseDeDatos.
      */
     @Test
-    public void getCumplesPendientesDeHace() {
-        System.out.println("getCumplesPendientesDeHace");
-        List<NotificacionCumple> notif = bd.getCumplesPendientesDeHace();
-//        assertNull(asegurado);
-    }
-
-    /**
-     * Test of getById method, of class BaseDeDatos.
-     */
-    @Test
     public void testCreateAuto() {
         System.out.println("testCreateAuto");
         int id = 5;
@@ -447,17 +438,6 @@ public class BaseDeDatosTest {
         assertTrue(notificacionCumples.stream().allMatch(predicate));
     }
 
-    /**
-     * Test of getById method, of class BaseDeDatos.
-     */
-    @Test
-    public void testGetNotificacioneRecibosDentro15Dias() {
-        System.out.println("testGetNotificacioneRecibosDentro15Dias");
-        List<NotificacionRecibo> notificacionRecibos = bd.getRecibosPendientesDentroDePrimerosDias();
-        assertNotNull(notificacionRecibos);
-
-//        assertNull(asegurado);
-    }
 
     /**
      * Test of getById method, of class BaseDeDatos.

@@ -6,34 +6,9 @@
 package com.embuckets.controlcartera.ui;
 
 import com.embuckets.controlcartera.entidades.Asegurado;
-import com.embuckets.controlcartera.entidades.Aseguradora;
-import com.embuckets.controlcartera.entidades.Auto;
-import com.embuckets.controlcartera.entidades.Cliente;
-import com.embuckets.controlcartera.entidades.ConductoCobro;
-import com.embuckets.controlcartera.entidades.EstadoPoliza;
-import com.embuckets.controlcartera.entidades.FormaPago;
-import com.embuckets.controlcartera.entidades.Moneda;
-import com.embuckets.controlcartera.entidades.Poliza;
-import com.embuckets.controlcartera.entidades.PolizaAuto;
-import com.embuckets.controlcartera.entidades.PolizaGmm;
-import com.embuckets.controlcartera.entidades.PolizaVida;
-import com.embuckets.controlcartera.entidades.Ramo;
-import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
-import com.embuckets.controlcartera.entidades.TipoPersona;
-import com.embuckets.controlcartera.entidades.globals.Globals;
-import java.math.BigDecimal;
 import java.net.URL;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.util.ArrayList;
-import java.sql.Date;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.beans.binding.Binding;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -148,16 +123,6 @@ public class BuscarAseguradoController implements Initializable {
     private void seleccionar(ActionEvent event) {
 
     }
-//
-//    @FXML
-//    private void quitarFiltros(ActionEvent event) {
-//        nombreField.setText("");
-//        parternoField.setText("");
-//        maternoField.setText("");
-//        clienteTableView.getItems().clear();
-//        clienteTableView.setItems(FXCollections.observableArrayList(getAllAsegurados()));
-//
-//    }
 
     public Dialog<Asegurado> getDialog() {
         return dialog;

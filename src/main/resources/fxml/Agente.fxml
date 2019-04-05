@@ -28,6 +28,7 @@
                   <RowConstraints vgrow="SOMETIMES" />
                   <RowConstraints vgrow="SOMETIMES" />
                   <RowConstraints vgrow="SOMETIMES" />
+                  <RowConstraints vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label text="Nombre" />
@@ -35,17 +36,18 @@
                   <Label text="Apellido Materno" GridPane.rowIndex="2" />
                   <Label text="Apellido Paterno" GridPane.rowIndex="1" />
                   <Label text="Email" GridPane.rowIndex="3" />
-                  <Label text="Contraseña" GridPane.rowIndex="4" />
+                  <Label text="Contraseña" GridPane.rowIndex="5" />
                   <TextField fx:id="paternoField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <TextField fx:id="maternoField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                  <TextField fx:id="emailField" onKeyReleased="#validarEmail" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <children>
                         <PasswordField fx:id="passwordField" />
                         <Button mnemonicParsing="false" onMousePressed="#show" onMouseReleased="#hide" text="Ver" />
                      </children>
                   </HBox>
-                  <Label fx:id="passwordLabel" text="passwordField" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <Label fx:id="passwordLabel" text="passwordLabel" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <Label fx:id="emailLabel" style="-fx-text-fill: red;" text="email no válido" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                </children>
             </GridPane>
          </children>

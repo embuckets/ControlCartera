@@ -78,20 +78,21 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.RollbackException;
-import org.hibernate.HibernateException;
-import org.hibernate.JDBCException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author emilio
  */
 public class BaseDeDatos {
+
+    private static final Logger logger = LogManager.getLogger(BaseDeDatos.class);
 
     private static BaseDeDatos bd;
     private EntityManagerFactory emf;
@@ -115,38 +116,39 @@ public class BaseDeDatos {
         return em;
     }
 
+    private void clearAndFlush() {
+        em.clear();
+        if (em.getTransaction().isActive()) {
+            em.flush();
+        }
+    }
+
     public void create(Object object) throws Exception {
         try {
             controllers.get(object.getClass()).create(object);
+        } catch (EntityExistsException ex) {
+            logger.error(Logging.Exception_MESSAGE, ex);
+//            clearAndFlush();
+            throw ex;
         } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
             throw ex;
         }
     }
 
     public <T> List<T> getAll(Class clazz) {
-        try {
-            return controllers.get(clazz).getAll();
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return controllers.get(clazz).getAll();
     }
 
     public <T> T getById(Class clazz, int id) {
-        try {
-            return controllers.get(clazz).getById(id);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return controllers.get(clazz).getById(id);
     }
 
     public <T> T edit(Object object) throws Exception {
         try {
             return controllers.get(object.getClass()).edit(object);
         } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
             throw ex;
         }
     }
@@ -155,7 +157,7 @@ public class BaseDeDatos {
         try {
             ((PolizaJpaController) controllers.get(Poliza.class)).editarTitular(poliza);
         } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
             throw ex;
         }
     }
@@ -163,8 +165,12 @@ public class BaseDeDatos {
     public void remove(Object object) throws Exception {
         try {
             controllers.get(object.getClass()).remove(object);
+        } catch (IllegalArgumentException ex) {
+            logger.error(Logging.Exception_MESSAGE, ex);
+//            clearAndFlush();
+            throw ex;
         } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
             throw ex;
         }
     }
@@ -175,7 +181,7 @@ public class BaseDeDatos {
                 try {
                     em.getTransaction().commit();
                 } catch (RollbackException ex) {
-                    Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(Logging.Exception_MESSAGE, ex);
                 }
             }
             em.close();
@@ -195,10 +201,10 @@ public class BaseDeDatos {
                 // Note that for single database shutdown, the expected
                 // SQL state is "08006", and the error code is 45000.
             } else {
+                logger.error("Error al apagar Base de datos", ex);
                 // if the error code or SQLState is different, we have
                 // an unexpected exception (shutdown failed)
-//                System.err.println("Derby did not shut down normally");
-                Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+                //                System.err.println("Derby did not shut down normally");
             }
         }
     }
@@ -207,7 +213,7 @@ public class BaseDeDatos {
         try {
             ((PolizaJpaController) controllers.get(Poliza.class)).renovar(vieja, nueva);
         } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
             throw ex;
         }
     }
@@ -216,127 +222,47 @@ public class BaseDeDatos {
         try {
             return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesEntre(start, end);
         } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
             throw ex;
         }
     }
 
     public List<NotificacionCumple> getCumplesPendientesEntre(LocalDate start, LocalDate end) {
-        try {
-            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesPendientesEntre(start, end);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
-    }
-
-    public List<NotificacionRecibo> getRecibosPendientes() {
-        try {
-            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientes();
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
-    }
-
-    public List<NotificacionRecibo> getRecibosPendientesDentroDePrimerosDias() {
-        try {
-            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientesDentroDePrimeros(Globals.DEFAULT_COBRANZA_DENTRO_PRIMEROS_DIAS);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
+        return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesPendientesEntre(start, end);
     }
 
     public List<NotificacionRecibo> getRecibosPendientesEntre(LocalDate start, LocalDate end) {
-        try {
-            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientesEntre(start, end);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
+        return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientesEntre(start, end);
     }
 
     public List<NotificacionRecibo> getRecibosEntre(LocalDate start, LocalDate end) {
-        try {
-            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesEntre(start, end);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
+        return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesEntre(start, end);
     }
 
     public List<Poliza> getRenovacionesEntre(LocalDate start, LocalDate end) {
-        try {
-            return ((PolizaJpaController) controllers.get(Poliza.class)).getRenovacionesEntre(start, end);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
-    }
-
-    public List<NotificacionCumple> getCumplesPendientesDeHace() {
-        try {
-            return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesPendientesDeHace(Globals.DEFAULT_CUMPLE_DENTRO_PRIMEROS_DIAS);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
-    }
-
-    public List<NotificacionRecibo> getRecibosProximos() {
-        try {
-            return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesProximas();
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
-    }
-
-    public List<Poliza> getRenovacionesProximos() {
-        try {
-            return ((PolizaJpaController) controllers.get(Poliza.class)).getRenovacionesProximas();
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
+        return ((PolizaJpaController) controllers.get(Poliza.class)).getRenovacionesEntre(start, end);
     }
 
     public void importarAsegurados(List<Asegurado> asegurados) throws Exception {
         try {
             ((AseguradoJpaController) controllers.get(Asegurado.class)).importarAsegurados(asegurados);
         } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
             throw ex;
         }
 
     }
 
     public List<Asegurado> buscarAseguradosPorNombre(String nombre, String paterno, String materno) {
-        try {
-            return ((AseguradoJpaController) controllers.get(Asegurado.class)).getByName(nombre, paterno, materno);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
+        return ((AseguradoJpaController) controllers.get(Asegurado.class)).getByName(nombre, paterno, materno);
     }
-    
+
     public List<Cliente> buscarClientesPor(String nombre, String paterno, String materno) {
-        try {
-            return ((ClienteJpaController) controllers.get(Cliente.class)).getByName(nombre, paterno, materno);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
+        return ((ClienteJpaController) controllers.get(Cliente.class)).getByName(nombre, paterno, materno);
     }
 
     public List<Poliza> buscarPolizasPor(String numeroPoliza, String aseguradora, String ramo) {
-        try {
-            return ((PolizaJpaController) controllers.get(Poliza.class)).getBy(numeroPoliza, aseguradora, ramo);
-        } catch (Exception ex) {
-            Logger.getLogger(BaseDeDatos.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
-        }
+        return ((PolizaJpaController) controllers.get(Poliza.class)).getBy(numeroPoliza, aseguradora, ramo);
     }
 
     private Map<Class, JpaController> createControllers() {
@@ -376,7 +302,5 @@ public class BaseDeDatos {
         map.put(Dependiente.class, new DependienteJpaController());
         return map;
     }
-
-    
 
 }

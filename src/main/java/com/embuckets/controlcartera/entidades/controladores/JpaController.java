@@ -5,12 +5,14 @@
  */
 package com.embuckets.controlcartera.entidades.controladores;
 
-import com.embuckets.controlcartera.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import com.embuckets.controlcartera.entidades.globals.Logging;
+import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -18,7 +20,9 @@ import javax.persistence.Query;
  */
 public interface JpaController {
 
-    default void create(Object object) throws EntityExistsException, Exception {
+    static final Logger logger = LogManager.getLogger(JpaController.class);
+
+    default void create(Object object) throws Exception {
         boolean isSubTransaction = false;
         EntityManager em = null;
         try {
@@ -50,11 +54,12 @@ public interface JpaController {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw ex;
+            logger.error(Logging.Exception_MESSAGE, ex);
         }
+        return new ArrayList<>();
     }
 
-    default <T> T getById(int id) throws Exception {
+    default <T> T getById(int id) {
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
@@ -65,11 +70,12 @@ public interface JpaController {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw ex;
+            logger.error(Logging.Exception_MESSAGE, ex);
         }
+        return null;
     }
 
-    default <T> List<T> getAllById(int id) throws Exception {
+    default <T> List<T> getAllById(int id) {
         EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
@@ -80,8 +86,9 @@ public interface JpaController {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw ex;
+            logger.error(Logging.Exception_MESSAGE, ex);
         }
+        return new ArrayList<>();
     }
 
     default <T> T edit(Object object) throws Exception {

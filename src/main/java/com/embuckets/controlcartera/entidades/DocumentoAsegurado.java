@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.io.Serializable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -25,8 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -44,6 +46,8 @@ import java.util.logging.Logger;
     @NamedQuery(name = "DocumentoAsegurado.findByActualizado", query = "SELECT d FROM DocumentoAsegurado d WHERE d.actualizado = :actualizado")})
 public class DocumentoAsegurado implements Serializable, ObservableDocumento {
 
+    private static final Logger logger = LogManager.getLogger(DocumentoAsegurado.class);
+    
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected DocumentoAseguradoPK documentoAseguradoPK;
@@ -68,18 +72,8 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
         this.documentoAseguradoPK = new DocumentoAseguradoPK();
         this.tipoDocumentoAsegurado = new TipoDocumentoAsegurado();
     }
-//
-//    public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK) {
-//        this.documentoAseguradoPK = documentoAseguradoPK;
-//    }
-//
-//    public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK, String extension, byte[] archivo) {
-//        this.documentoAseguradoPK = documentoAseguradoPK;
-//        this.extension = extension;
-//        this.archivo = archivo;
-//    }
 
-    public DocumentoAsegurado(File file, String tipoDocumentoAsegurado) {
+    public DocumentoAsegurado(File file, String tipoDocumentoAsegurado) throws IOException {
         this.documentoAseguradoPK = new DocumentoAseguradoPK();
         String[] tokens = file.getName().split("\\.");
         this.documentoAseguradoPK.setNombre(tokens[0]);
@@ -90,13 +84,10 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
         try {
             this.archivo = Files.readAllBytes(file.toPath());
         } catch (IOException ex) {
-            Logger.getLogger(DocumentoAsegurado.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            throw ex;
         }
     }
-//
-//    public DocumentoAsegurado(int idcliente, String nombre, String tipodocumento) {
-//        this.documentoAseguradoPK = new DocumentoAseguradoPK(idcliente, nombre, tipodocumento);
-//    }
 
     public DocumentoAseguradoPK getDocumentoAseguradoPK() {
         return documentoAseguradoPK;

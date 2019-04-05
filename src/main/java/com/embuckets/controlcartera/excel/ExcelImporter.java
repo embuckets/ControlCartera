@@ -16,6 +16,7 @@ import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,14 +30,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import java.util.stream.Collectors;
-import javafx.scene.control.Cell;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -47,6 +47,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @author emilio
  */
 public class ExcelImporter {
+
+    private static final Logger logger = LogManager.getLogger(ExcelImporter.class);
 
     private final int NOMBRE = 0;
     private final int PATERNO = 1;
@@ -255,7 +257,7 @@ public class ExcelImporter {
             }
             return asegurados.values().stream().collect(Collectors.toList());
         } catch (IOException ex) {
-            Logger.getLogger(ExcelImporter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
             throw ex;
         }
     }

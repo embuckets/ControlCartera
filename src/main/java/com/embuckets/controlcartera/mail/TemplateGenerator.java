@@ -6,19 +6,16 @@
 package com.embuckets.controlcartera.mail;
 
 import com.embuckets.controlcartera.entidades.Agente;
-import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
-import com.embuckets.controlcartera.entidades.Poliza;
-import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.format.DateTimeFormatter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -26,7 +23,9 @@ import java.util.logging.Logger;
  */
 public class TemplateGenerator {
 
-    public static String getCobranzaMessage(NotificacionRecibo notificacionRecibo) {
+    private static final Logger logger = LogManager.getLogger(TemplateGenerator.class);
+
+    public static String getCobranzaMessage(NotificacionRecibo notificacionRecibo) throws IOException {
         try {
             byte[] encoded = Files.readAllBytes(Paths.get(Globals.TEMPLATE_COBRANZA_PATH));
             String template = new String(encoded, Charset.forName("utf-8"));
@@ -41,21 +40,21 @@ public class TemplateGenerator {
             template = template.replace("{firma}", Agente.getInstance().getNombreCompleto());
             return template;
         } catch (IOException ex) {
-            Logger.getLogger(TemplateGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            throw ex;
         }
-        return "";
     }
 
-    public static String getCumpleMessage(NotificacionCumple notificacionCumple) {
+    public static String getCumpleMessage(NotificacionCumple notificacionCumple) throws IOException {
         try {
             byte[] encoded = Files.readAllBytes(Paths.get(Globals.TEMPLATE_CUMPLE_PATH));
             String template = new String(encoded, Charset.forName("utf-8"));
             template = template.replace("{asegurado.nombre}", notificacionCumple.getNombreAsegurado());
             return template;
         } catch (IOException ex) {
-            Logger.getLogger(TemplateGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            throw ex;
         }
-        return "";
     }
 
 }

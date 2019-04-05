@@ -68,8 +68,6 @@ public class Domicilio implements Serializable {
     private List<Asegurado> aseguradoList;
 
     public Domicilio() {
-        this.delegacion = new Delegacion();
-        this.estado = new Estado();
     }
 
     public Domicilio(Integer iddomicilio) {

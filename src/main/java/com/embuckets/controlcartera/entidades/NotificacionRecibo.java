@@ -6,25 +6,19 @@
 package com.embuckets.controlcartera.entidades;
 
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Year;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import static java.time.temporal.ChronoUnit.DAYS;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -39,9 +33,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * -- recibos dentro de primeros 15 dias (0,15] select app.recibo.CUBREDESDE,
@@ -73,6 +67,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 //    @NamedQuery(name = "NotificacionRecibo.findDentro15DiasPendientes", query = "SELECT n FROM NotificacionRecibo n WHERE ({fn TIMESTAMPDIFF(SQL_TSI_DAY, n.recibo.cubredesde, CURRENT_TIMESTAMP)} > 0 AND {fn TIMESTAMPDIFF(SQL_TSI_DAY,  n.recibo.cubredesde, CURRENT_TIMESTAMP)} <= 15) AND n.recibo.cobranza.cobranza = :pendiente")})
 public class NotificacionRecibo implements Serializable, ObservableNotificacionRecibo, Notificacion {
 
+    private static final Logger logger = LogManager.getLogger(NotificacionRecibo.class);
+    
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -153,14 +149,15 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         return recibo.getDocumentoRecibo() != null ? recibo.getDocumentoRecibo().getArchivo() : null;
     }
 
-    public File getArchivo() {
+    public File getArchivo() throws IOException {
         if (tieneArchivo()) {
             try {
                 Path temp = Files.createTempFile(getNombreArchivo(), getExtensionArchivo());
                 Files.write(temp, getArchivoBytes());
                 return temp.toFile();
             } catch (IOException ex) {
-                Logger.getLogger(NotificacionRecibo.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(Logging.Exception_MESSAGE, ex);
+                throw ex;
             }
         }
         return null;

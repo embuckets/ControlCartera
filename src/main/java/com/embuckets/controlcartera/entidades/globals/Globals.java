@@ -14,7 +14,7 @@ import java.time.LocalDate;
  * @author emilio
  */
 public class Globals {
-
+    
     public static LocalDate RECIBO_CUBRE_DESDE_INICIO_DEFAULT = LocalDate.now().minusMonths(1);
     public static LocalDate RECIBO_CUBRE_DESDE_FIN_DEFAULT = LocalDate.now();
     

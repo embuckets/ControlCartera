@@ -20,6 +20,8 @@ import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Logging;
+import com.embuckets.controlcartera.entidades.globals.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -30,7 +32,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -63,6 +65,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * FXML Controller class
@@ -70,6 +74,8 @@ import javafx.util.StringConverter;
  * @author emilio
  */
 public class NuevaPolizaController implements Initializable, Controller {
+
+    private static final Logger logger = LogManager.getLogger(NuevaPolizaController.class);
 
     private String location = "/fxml/NuevaPoliza.fxml";
     @FXML
@@ -396,7 +402,8 @@ public class NuevaPolizaController implements Initializable, Controller {
                 this.contratanteField.setText(present.nombreProperty().get());
             });
         } catch (IOException ex) {
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, Logging.CAMBIAR_VENTANA_MESSAGE, "").showAndWait();
         }
     }
 
@@ -412,7 +419,8 @@ public class NuevaPolizaController implements Initializable, Controller {
                 this.titularField.setText(present.nombreProperty().get());
             });
         } catch (IOException ex) {
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, Logging.CAMBIAR_VENTANA_MESSAGE, "").showAndWait();
         }
     }
 
@@ -434,10 +442,14 @@ public class NuevaPolizaController implements Initializable, Controller {
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
         if (file != null) {
-            caratula = new Caratula(file, poliza);
-            poliza.setCaratula(caratula);
-            caratulaTableView.getItems().add(caratula);
-//            agregarCaratulaButton.setDisable(true);
+            try {
+                caratula = new Caratula(file, poliza);
+                poliza.setCaratula(caratula);
+                caratulaTableView.getItems().add(caratula);
+            } catch (IOException ex) {
+                logger.error(Logging.Exception_MESSAGE, ex);
+                Utilities.makeAlert(Alert.AlertType.ERROR, "Error al leer el archivo", "").showAndWait();
+            }
         }
     }
 
@@ -504,23 +516,19 @@ public class NuevaPolizaController implements Initializable, Controller {
                 controller.setPoliza(poliza);
                 MainApp.getInstance().changeSceneContent(this, location, parent, loader);
             } catch (IOException ex) {
-                Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(Logging.Exception_MESSAGE, ex);
+                Utilities.makeAlert(Alert.AlertType.ERROR, Logging.CAMBIAR_VENTANA_MESSAGE, "").showAndWait();
             } catch (Exception ex) {
-                Logger.getLogger(NuevaPolizaController.class.getName()).log(Level.SEVERE, null, ex);
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Error al guardar poliza");
-                alert.setContentText(ex.getCause().getLocalizedMessage());
-                alert.showAndWait();
+                logger.error(Logging.Exception_MESSAGE, ex);
+                Utilities.makeAlert(Alert.AlertType.ERROR, "Error al gardar la poliza", "").showAndWait();
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error al guardar poliza");
-            String mensaje = "";
-            mensaje = errores.stream().map((error) -> error + "\n").reduce(mensaje, String::concat);
-            alert.setContentText(mensaje);
-            alert.showAndWait();
+            StringBuilder mensaje = new StringBuilder();
+            errores.stream().forEach(e -> mensaje.append(e.concat("\n")));
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al guardar la poliza", mensaje.toString());
         }
     }
 

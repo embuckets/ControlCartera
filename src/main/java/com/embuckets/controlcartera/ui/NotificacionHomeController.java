@@ -10,7 +10,8 @@ import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.globals.Globals;
-import com.embuckets.controlcartera.entidades.globals.NotificacionesService;
+import com.embuckets.controlcartera.entidades.globals.Logging;
+import com.embuckets.controlcartera.entidades.globals.Utilities;
 import com.embuckets.controlcartera.ui.observable.NotificacionCumpleWrapper;
 import com.embuckets.controlcartera.ui.observable.NotificacionReciboWrapper;
 import java.io.IOException;
@@ -18,8 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.application.Platform;
@@ -34,6 +34,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * FXML Controller class
@@ -41,6 +43,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
  * @author emilio
  */
 public class NotificacionHomeController implements Initializable {
+
+    private static final Logger logger = LogManager.getLogger(NotificacionHomeController.class);
 
     private TableView<NotificacionCumpleWrapper> aseguradosTableView;
     private TableColumn<NotificacionCumpleWrapper, Boolean> checkBoxTableColumn;
@@ -197,7 +201,7 @@ public class NotificacionHomeController implements Initializable {
     }
 
     private List<Poliza> getRenovaciones() {
-        return MainApp.getInstance().getBaseDeDatos().getRenovacionesProximos();
+        return MainApp.getInstance().getBaseDeDatos().getRenovacionesEntre(Globals.RENOVACION_ENTRE_START_DEFAULT, Globals.RENOVACION_ENTRE_END_DEFAULT);
     }
 
     private void llenarDatePickers() {
@@ -213,64 +217,76 @@ public class NotificacionHomeController implements Initializable {
 
     @FXML
     private void notificarRecibos(ActionEvent event) {
-        Stream<NotificacionReciboWrapper> wrappers = recibosTableView.getItems().stream().filter(w -> w.getSelectedProperty().get());
-        List<NotificacionRecibo> recibos = wrappers.map(w -> w.getNotificacionRecibo()).collect(Collectors.toList());
-        EnviarNotificacionesTask task = new EnviarNotificacionesTask(recibos);
+        try {
+            Stream<NotificacionReciboWrapper> wrappers = recibosTableView.getItems().stream().filter(w -> w.getSelectedProperty().get());
+            List<NotificacionRecibo> recibos = wrappers.map(w -> w.getNotificacionRecibo()).collect(Collectors.toList());
+            EnviarNotificacionesTask task = new EnviarNotificacionesTask(recibos);
 
-        ProgressForm form = new ProgressForm();
-        form.activateProgressBar(task);
-        task.setOnSucceeded((e) -> {
-            form.getDialogStage().close();
-            System.out.println("===FINISHED SENDING EMAILS");
-        });
+            ProgressForm form = new ProgressForm();
+            form.activateProgressBar(task);
+            task.setOnSucceeded((e) -> {
+                form.getDialogStage().close();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Exito");
+                alert.setHeaderText("Se han enviado las notificaciones");
+                alert.showAndWait();
+            });
+            task.setOnFailed(e -> {
+                form.getDialogStage().close();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("No se pudo enviar las notificaciones");
+                alert.setContentText("Hubo un error al conectarse con el servidor de correos");
+                alert.showAndWait();
+            });
 
-        form.getDialogStage().show();
-        Thread t = new Thread(task);
-        t.start();
-        while (t.isAlive()) {
-//            try {
-//                Thread.sleep(recibos.size() * 1000);
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(NotificacionHomeController.class.getName()).log(Level.SEVERE, null, ex);
-//            }
+            form.getDialogStage().show();
+            Thread t = new Thread(task);
+            t.start();
+            while (t.isAlive()) {
+            }
+            recibosTableView.getItems().clear();
+            recibosTableView.setItems(FXCollections.observableArrayList(getNotificacionReciboWrappers()));
+
+        } catch (Exception ex) {
+            Utilities.makeAlert(ex, "Error al enviar notificaciones").showAndWait();
         }
-        recibosTableView.getItems().clear();
-        recibosTableView.setItems(FXCollections.observableArrayList(getNotificacionReciboWrappers()));
-
-//        NotificacionesService service = NotificacionesService.getInstance();
-//        service.enviarRecibosPendientes(recibos);
-//
-//        //refeshlist
-//        recibosTableView.getItems().clear();
-//        recibosTableView.setItems(FXCollections.observableArrayList(getNotificacionReciboWrappers()));
     }
 
     @FXML
     private void notificarCumples(ActionEvent event) {
-        Stream<NotificacionCumpleWrapper> wrappers = cumpleTableView.getItems().stream().filter(w -> w.getSelectedProperty().get());
-        List<NotificacionCumple> cumples = wrappers.map(n -> n.getNotificacionCumple()).collect(Collectors.toList());
-        EnviarNotificacionesTask task = new EnviarNotificacionesTask(cumples);
+        try {
+            Stream<NotificacionCumpleWrapper> wrappers = cumpleTableView.getItems().stream().filter(w -> w.getSelectedProperty().get());
+            List<NotificacionCumple> cumples = wrappers.map(n -> n.getNotificacionCumple()).collect(Collectors.toList());
+            EnviarNotificacionesTask task = new EnviarNotificacionesTask(cumples);
 
-        ProgressForm form = new ProgressForm();
-        form.activateProgressBar(task);
-        task.setOnSucceeded((e) -> {
-            form.getDialogStage().close();
-            System.out.println("===FINISHED SENDING EMAILS");
-        });
+            ProgressForm form = new ProgressForm();
+            form.activateProgressBar(task);
+            task.setOnSucceeded((e) -> {
+                form.getDialogStage().close();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Exito");
+                alert.setHeaderText("Se han enviado las notificaciones");
+                alert.showAndWait();
+            });
+            task.setOnFailed(e -> {
+                form.getDialogStage().close();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("No se pudo enviar las notificaciones");
+                alert.setContentText("Hubo un error al conectarse con el servidor de correos");
+                alert.showAndWait();
+            });
 
-        form.getDialogStage().show();
-        Thread t = new Thread(task);
-        t.start();
+            form.getDialogStage().show();
+            Thread t = new Thread(task);
+            t.start();
 
-        cumpleTableView.getItems().clear();
-        cumpleTableView.setItems(FXCollections.observableArrayList(getNotificacionCumpleWrappers()));
-        //
-//        Stream<NotificacionCumpleWrapper> wrappers = cumpleTableView.getItems().stream().filter(w -> w.getSelectedProperty().get());
-//        List<NotificacionCumple> cumples = wrappers.map(n -> n.getNotificacionCumple()).collect(Collectors.toList());
-//        NotificacionesService.getInstance().enviarCumplesPendientes(cumples);
-//        cumpleTableView.getItems().clear();
-//        cumpleTableView.setItems(FXCollections.observableArrayList(getNotificacionCumpleWrappers()));
-//
+            cumpleTableView.getItems().clear();
+            cumpleTableView.setItems(FXCollections.observableArrayList(getNotificacionCumpleWrappers()));
+        } catch (Exception ex) {
+            Utilities.makeAlert(ex, "Error al enviar notificaciones").showAndWait();
+        }
     }
 
     @FXML
@@ -278,7 +294,8 @@ public class NotificacionHomeController implements Initializable {
         try {
             MainApp.getInstance().goHome();
         } catch (IOException ex) {
-            Logger.getLogger(NotificacionHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al cambiar de ventana", "").showAndWait();
         }
     }
 

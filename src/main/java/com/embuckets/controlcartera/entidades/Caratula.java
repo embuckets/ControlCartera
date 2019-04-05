@@ -5,14 +5,13 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -26,9 +25,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -44,6 +43,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Caratula.findByExtension", query = "SELECT c FROM Caratula c WHERE c.extension = :extension"),
     @NamedQuery(name = "Caratula.findByActualizado", query = "SELECT c FROM Caratula c WHERE c.actualizado = :actualizado")})
 public class Caratula implements Serializable, ObservableDocumento {
+
+    private static final Logger logger = LogManager.getLogger(Caratula.class);
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -70,18 +71,7 @@ public class Caratula implements Serializable, ObservableDocumento {
     public Caratula() {
     }
 
-//    public Caratula(Integer idpoliza) {
-//        this.idpoliza = idpoliza;
-//    }
-//
-//    public Caratula(Integer idpoliza, String nombre, String extension, Serializable archivo) {
-//        this.idpoliza = idpoliza;
-//        this.nombre = nombre;
-//        this.extension = extension;
-//        this.archivo = archivo;
-//    }
-    
-    public Caratula(File file, Poliza poliza){
+    public Caratula(File file, Poliza poliza) throws IOException {
         this.poliza = poliza;
         this.idpoliza = poliza.getIdpoliza();
         String[] tokens = file.getName().split("\\.");
@@ -90,8 +80,9 @@ public class Caratula implements Serializable, ObservableDocumento {
         this.actualizado = LocalDateTime.now();
         try {
             this.archivo = Files.readAllBytes(file.toPath());
-        } catch (Exception e) {
-            Logger.getLogger(DocumentoRecibo.class.getName()).log(Level.SEVERE, null, e);
+        } catch (IOException e) {
+            logger.error(Logging.Exception_MESSAGE, e);
+            throw e;
         }
     }
 
@@ -119,11 +110,11 @@ public class Caratula implements Serializable, ObservableDocumento {
         this.extension = extension;
     }
 
-    public byte [] getArchivo() {
+    public byte[] getArchivo() {
         return archivo;
     }
 
-    public void setArchivo(byte [] archivo) {
+    public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 

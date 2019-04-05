@@ -30,6 +30,8 @@ public class Logging {
     public static final String EntityExistsException_MESSAGE = "Error al guardar porque el valor ya existe";
     public static final String IllegalStateException_MESSAGE = "Ha ocurrido un error inesperado";
     public static final String Exception_MESSAGE = "Ha ocurrido una error";
+    public static final String CAMBIAR_VENTANA_MESSAGE = "Error al cambiar de ventana";
+    public static final String ABRIR_VENTANA_MESSAGE = "Error al abrir ventana";
 
     private Logging() {
         createSQLStates();

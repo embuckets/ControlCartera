@@ -14,14 +14,17 @@ import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author emilio
  */
 public class Agente {
+
+    private static final Logger logger = LogManager.getLogger(Agente.class);
 
     private static Agente agente;
     private String nombre;
@@ -31,11 +34,11 @@ public class Agente {
     private String password;
     private Properties users;
 
-    private Agente() {
+    private Agente() throws IOException {
         loadUserProperties();
     }
 
-    private void loadUserProperties() {
+    private void loadUserProperties() throws FileNotFoundException, IOException {
         try (InputStream inDefaults = new FileInputStream("config/default.config");
                 InputStream inUsers = new FileInputStream("config/user.config")) {
             Properties defaults = new Properties();
@@ -47,14 +50,10 @@ public class Agente {
             this.apellidoMaterno = users.getProperty("materno");
             this.email = users.getProperty("email");
             this.password = users.getProperty("password");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Agente.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Agente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static Agente getInstance() {
+    public static Agente getInstance() throws IOException {
         if (agente == null) {
             agente = new Agente();
         }
@@ -120,9 +119,9 @@ public class Agente {
         try (OutputStream output = new FileOutputStream("config/user.config")) {
             users.store(output, "Actualizado: " + LocalDateTime.now());
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(Agente.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Error al guardar agente", ex);
         } catch (IOException ex) {
-            Logger.getLogger(Agente.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Error al guardar agente", ex);
         }
     }
 

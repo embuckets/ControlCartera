@@ -21,6 +21,7 @@ import com.embuckets.controlcartera.entidades.PolizaGmm;
 import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import com.embuckets.controlcartera.entidades.globals.Utilities;
 import com.sun.webkit.dom.HTMLUListElementImpl;
 import java.awt.Desktop;
@@ -31,12 +32,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Year;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -79,6 +81,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * FXML Controller class
@@ -86,6 +90,8 @@ import javafx.util.Pair;
  * @author emilio
  */
 public class PolizaHomeController implements Initializable, Controller {
+
+    private static final Logger logger = LogManager.getLogger(PolizaHomeController.class);
 
     @FXML
     private Label numeroPolizaLabel;
@@ -635,23 +641,9 @@ public class PolizaHomeController implements Initializable, Controller {
         sumaAseguradPane.add(sumaAseguradaVidaTextField, 1, 0);
 
         Button agregarBeneficiarioButton = new Button("Agregar");
-        agregarBeneficiarioButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                showAgregarBeneficiarioDialog();
+        agregarBeneficiarioButton.setOnAction((ActionEvent event) -> {
+            showAgregarBeneficiarioDialog();
 
-//            Optional<Cliente> beneficiario = createAgregarClienteDialog().showAndWait();
-//            beneficiario.ifPresent(present -> {
-//                try {
-//                    //TODO
-//                    MainApp.getInstance().getBaseDeDatos().create(new Beneficiario(present, polizaVida));
-//                    polizaVida.getClienteList().add(present);
-//                    clientesTableView.getItems().add(present);
-//                } catch (Exception e) {
-//                    Utilities.makeAlert(e, "Error al agregar beneficiario").showAndWait();
-//                }
-//            });
-            }
         });
 
         GridPane tableBeneficiariosGridPane = new GridPane();
@@ -676,13 +668,13 @@ public class PolizaHomeController implements Initializable, Controller {
                     poliza.getPolizaVida().getClienteList().add(present);
                     clientesTableView.getItems().add(present);
                 } catch (Exception ex) {
-                    Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
-                    Utilities.makeAlert(ex, "Error al agregar beneficiario").showAndWait();
+                    logger.error(Logging.Exception_MESSAGE, ex);
+                    Utilities.makeAlert(Alert.AlertType.ERROR, "Error al guardar beneficiario", "").showAndWait();
                 }
             });
-        } catch (Exception e) {
-            Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, e);
-            Utilities.makeAlert(e, "Error al agregar beneficiario").showAndWait();
+        } catch (IOException e) {
+            logger.error(Logging.Exception_MESSAGE, e);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Al abrir ventana", "").showAndWait();
         }
     }
 
@@ -698,13 +690,13 @@ public class PolizaHomeController implements Initializable, Controller {
                     poliza.getPolizaGmm().getClienteList().add(present);
                     clientesTableView.getItems().add(present);
                 } catch (Exception e) {
-                    Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, e);
-                    Utilities.makeAlert(e, "Error al agregar dependiente").showAndWait();
+                    logger.error(Logging.Exception_MESSAGE, e);
+                    Utilities.makeAlert(Alert.AlertType.ERROR, "Error al guardar dependiente", "").showAndWait();
                 }
             });
-        } catch (Exception ex) {
-            Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
-            Utilities.makeAlert(ex, "Error al agregar dependiente").showAndWait();
+        } catch (IOException ex) {
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al abrir la ventana", "").showAndWait();
         }
     }
 
@@ -780,8 +772,16 @@ public class PolizaHomeController implements Initializable, Controller {
                 Cliente cliente = row.getItem();
                 try {
                     MainApp.getInstance().getBaseDeDatos().remove(new Beneficiario(cliente, polizaVida));
-                    polizaVida.getClienteList().remove(row.getItem());
-                    clientesTableView.getItems().remove(row.getItem());
+//                    polizaVida.getClienteList().remove(row.getItem());
+//                    clientesTableView.getItems().remove(row.getItem());
+                    Cliente unproxy = Utilities.initializeAndUnproxy(row.getItem());
+                    List<Cliente> unproxyList = Utilities.initializeAndUnproxy(polizaVida.getClienteList());
+                    unproxyList.remove(cliente);
+//                    unproxyList.remove(unproxy);
+//                    polizaVida.getClienteList().remove(unproxy);
+                    clientesTableView.getItems().clear();
+                    clientesTableView.setItems(FXCollections.observableArrayList(unproxyList));
+//                    clientesTableView.setItems(FXCollections.observableArrayList(polizaVida.getClienteList()));
                 } catch (Exception e) {
                     Utilities.makeAlert(e, "Error al borrar beneficiario").showAndWait();
                 }
@@ -897,20 +897,20 @@ public class PolizaHomeController implements Initializable, Controller {
             Path temp = Files.createTempFile(caratula.getNombre(), caratula.getExtension());
             Files.write(temp, caratula.getArchivo());
             if (!Desktop.isDesktopSupported()) {
-                Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, "Desktop not supported");
+                Utilities.makeAlert(Alert.AlertType.ERROR, "Desktop no soportado", "").showAndWait();
             }
             if (temp.toFile().exists()) {
                 try {
                     Desktop.getDesktop().open(temp.toFile());
                 } catch (IOException ex) {
-                    Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-                    Utilities.makeAlert(ex, "Error al ver documento").showAndWait();
+                    logger.error(Logging.Exception_MESSAGE, ex);
+                    Utilities.makeAlert(Alert.AlertType.ERROR, "Error al abrir el archivo", "").showAndWait();
                 }
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-            Utilities.makeAlert(ex, "Error al ver documento").showAndWait();
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al abrir el archivo", "").showAndWait();
         }
     }
 
@@ -926,23 +926,25 @@ public class PolizaHomeController implements Initializable, Controller {
     }
 
     private void editarCaratula(Caratula caratula) {
-        Caratula actual = this.poliza.getCaratula();
-        String oldNombre = actual.getNombre();
-        String oldExtension = actual.getExtension();
-        byte[] oldArchivo = actual.getArchivo();
-        try {
-            actual.setNombre(caratula.getNombre());
-            actual.setExtension(caratula.getExtension());
-            actual.setArchivo(caratula.getArchivo());
-            MainApp.getInstance().getBaseDeDatos().edit(actual);
-        } catch (Exception e) {
-            actual.setNombre(oldNombre);
-            actual.setExtension(oldExtension);
-            actual.setArchivo(oldArchivo);
-            Utilities.makeAlert(e, "error al editar caratula").showAndWait();
+        if (!poliza.getCaratula().archivoProperty().get().equalsIgnoreCase(caratula.archivoProperty().get())) {
+            Caratula actual = this.poliza.getCaratula();
+            String oldNombre = actual.getNombre();
+            String oldExtension = actual.getExtension();
+            byte[] oldArchivo = actual.getArchivo();
+            try {
+                actual.setNombre(caratula.getNombre());
+                actual.setExtension(caratula.getExtension());
+                actual.setArchivo(caratula.getArchivo());
+                MainApp.getInstance().getBaseDeDatos().edit(actual);
+            } catch (Exception e) {
+                actual.setNombre(oldNombre);
+                actual.setExtension(oldExtension);
+                actual.setArchivo(oldArchivo);
+                Utilities.makeAlert(e, "error al editar caratula").showAndWait();
+            }
+            caratulaTableView.getItems().clear();
+            caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));
         }
-        caratulaTableView.getItems().clear();
-        caratulaTableView.setItems(FXCollections.observableArrayList(poliza.getCaratula()));
     }
 
     private Dialog<Caratula> createDialogEditarDocumento(Caratula caratula) {
@@ -957,7 +959,7 @@ public class PolizaHomeController implements Initializable, Controller {
         grid.setHgap(10);
         grid.setVgap(10);
 
-        TextField archivoField = new TextField(caratula.getNombre());
+        TextField archivoField = new TextField(caratula.archivoProperty().get());
         archivoField.setEditable(false);
         archivoField.setPrefColumnCount(50);
         Button selectButton = new Button("Seleccionar archivo");
@@ -977,10 +979,19 @@ public class PolizaHomeController implements Initializable, Controller {
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
-                Caratula nueva = new Caratula(new File(archivoField.getText()), poliza);
-                nueva.setIdpoliza(poliza.getIdpoliza());
-                nueva.setPoliza(poliza);
-                return nueva;
+                if (archivoField.getText().equalsIgnoreCase(caratula.archivoProperty().get())) {
+                    return caratula;
+                } else {
+                    try {
+                        Caratula nueva = new Caratula(new File(archivoField.getText()), poliza);
+                        nueva.setIdpoliza(poliza.getIdpoliza());
+                        nueva.setPoliza(poliza);
+                        return nueva;
+                    } catch (IOException ex) {
+                        logger.error(Logging.Exception_MESSAGE, ex);
+                        Utilities.makeAlert(Alert.AlertType.ERROR, "Error al leer el archivo", "").showAndWait();
+                    }
+                }
             }
             return null;
         });
@@ -1070,32 +1081,36 @@ public class PolizaHomeController implements Initializable, Controller {
             Path temp = Files.createTempFile(doc.getNombre(), doc.getExtension());
             Files.write(temp, doc.getArchivo());
             if (!Desktop.isDesktopSupported()) {
-                Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, "Desktop not supported");
+                Utilities.makeAlert(Alert.AlertType.ERROR, "Desktop no soportado", "").showAndWait();
             }
             if (temp.toFile().exists()) {
                 try {
                     Desktop.getDesktop().open(temp.toFile());
                 } catch (IOException ex) {
-                    Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-                    Utilities.makeAlert(ex, "Error al ver documento").showAndWait();
+                    logger.error(Logging.Exception_MESSAGE, ex);
+                    Utilities.makeAlert(Alert.AlertType.ERROR, "Error al abrir el archivo", "").showAndWait();
                 }
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-            Utilities.makeAlert(ex, "Error al ver documento").showAndWait();
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al abrir el archivo", "").showAndWait();
         }
     }
 
     private void guardarDocumentoRecibo(File file, Recibo recibo) {
-        DocumentoRecibo documentoRecibo = new DocumentoRecibo(file, recibo);
         try {
+            DocumentoRecibo documentoRecibo = new DocumentoRecibo(file, recibo);
             MainApp.getInstance().getBaseDeDatos().create(documentoRecibo);
             recibo.setDocumentoRecibo(documentoRecibo);
             recibosTableView.getItems().clear();
             recibosTableView.setItems(FXCollections.observableArrayList(poliza.getReciboList()));
-        } catch (Exception e) {
-            Utilities.makeAlert(e, "error al agregar documento recibo").showAndWait();
+        } catch (IOException e) {
+            logger.error(Logging.Exception_MESSAGE, e);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al leer el archivo", "").showAndWait();
+        } catch (Exception ex) {
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al guardar el arhivo", "").showAndWait();
         }
     }
 
@@ -1116,16 +1131,20 @@ public class PolizaHomeController implements Initializable, Controller {
     }
 
     private void createCaratula(File file) {
-        Caratula caratula = new Caratula(file, poliza);
-        caratula.setPoliza(poliza);
-        caratula.setIdpoliza(poliza.getIdpoliza());
         try {
+            Caratula caratula = new Caratula(file, poliza);
+            caratula.setPoliza(poliza);
+            caratula.setIdpoliza(poliza.getIdpoliza());
             MainApp.getInstance().getBaseDeDatos().create(caratula);
             poliza.setCaratula(caratula);
             caratulaTableView.getItems().add(caratula);
 //            agregarCaratulaButton.setDisable(true);
-        } catch (Exception e) {
-            Utilities.makeAlert(e, "error al agregar caratula").showAndWait();
+        } catch (IOException e) {
+            logger.error(Logging.Exception_MESSAGE, e);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al leer el archivo", "").showAndWait();
+        } catch (Exception ex) {
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al guardar la caratula", "").showAndWait();
         }
     }
 
@@ -1144,7 +1163,8 @@ public class PolizaHomeController implements Initializable, Controller {
                 controller.setData(this.poliza);
                 MainApp.getInstance().changeSceneContent(this, location, parent, loader);
             } catch (IOException ex) {
-                Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(Logging.Exception_MESSAGE, ex);
+                Utilities.makeAlert(Alert.AlertType.ERROR, Logging.CAMBIAR_VENTANA_MESSAGE, "").showAndWait();
             }
         }
 
@@ -1251,7 +1271,8 @@ public class PolizaHomeController implements Initializable, Controller {
                 cambiarTitular(present);
             });
         } catch (IOException ex) {
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, "Error al abrir la ventana", "").showAndWait();
         }
     }
 
@@ -1262,8 +1283,8 @@ public class PolizaHomeController implements Initializable, Controller {
                 poliza.setTitular(nuevo);
                 MainApp.getInstance().getBaseDeDatos().cambiarTitular(poliza);
             } catch (Exception ex) {
-                Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
-                Utilities.makeAlert(ex, "Error al cambiar de titular");
+                logger.error(Logging.Exception_MESSAGE, ex);
+                Utilities.makeAlert(Alert.AlertType.ERROR, "Error al cambiar al titular", "").showAndWait();
                 poliza.setTitular(oldTitular);
             }
             llenarDatosPoliza();
@@ -1283,8 +1304,8 @@ public class PolizaHomeController implements Initializable, Controller {
                     poliza.setPlan(p.getValue());
                     MainApp.getInstance().getBaseDeDatos().edit(poliza);
                 } catch (Exception ex) {
-                    Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
-                    Utilities.makeAlert(ex, "Error al editar datos del plan").showAndWait();
+                    logger.error(Logging.Exception_MESSAGE, ex);
+                    Utilities.makeAlert(Alert.AlertType.ERROR, "Error editar la poliza", "").showAndWait();
                     poliza.setProducto(oldProducto);
                     poliza.setPlan(oldPlan);
                 }
@@ -1330,7 +1351,8 @@ public class PolizaHomeController implements Initializable, Controller {
         try {
             MainApp.getInstance().goBack();
         } catch (IOException ex) {
-            Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, Logging.CAMBIAR_VENTANA_MESSAGE, "").showAndWait();
         }
     }
 
@@ -1339,7 +1361,8 @@ public class PolizaHomeController implements Initializable, Controller {
         try {
             MainApp.getInstance().goHome();
         } catch (IOException ex) {
-            Logger.getLogger(PolizaHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, Logging.CAMBIAR_VENTANA_MESSAGE, "").showAndWait();
         }
     }
 

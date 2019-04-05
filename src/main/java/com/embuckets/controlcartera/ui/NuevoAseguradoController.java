@@ -13,25 +13,19 @@ import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.Email;
 import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.Telefono;
-import com.embuckets.controlcartera.entidades.TipoDocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
-import com.embuckets.controlcartera.ui.observable.ObservableEmail;
-import com.embuckets.controlcartera.ui.observable.ObservableTelefono;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
@@ -63,6 +57,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * FXML Controller class
@@ -70,6 +66,8 @@ import javafx.util.Callback;
  * @author emilio
  */
 public class NuevoAseguradoController implements Initializable {
+
+    private static final Logger logger = LogManager.getLogger(NuevoAseguradoController.class);
 
     private String location = "fxml/NuevoAsegurado.fxml";
     //Informacion Personal
@@ -215,41 +213,22 @@ public class NuevoAseguradoController implements Initializable {
 
     private void fillEstadosComboBox() {
 
-        //pedir los estados a la base de datos
-//        String[] estados = {"Aguascalientes", " Baja California", " Baja California Sur",
-//            " Campeche", " Chiapas", " Chihuahua", " Ciudad de México",
-//            " Coahuila", " Colima", " Durango", " Estado de México", " Guanajuato",
-//            " Guerrero", " Hidalgo", " Jalisco", " Michoacán", " Morelos",
-//            " Nayarit", " Nuevo León", " Oaxaca", " Puebla", " Querétaro",
-//            " Quintana Roo", " San Luis Potosí", " Sinaloa", " Sonora",
-//            " Tabasco", " Tamaulipas", " Tlaxcala", " Veracruz", " Yucatán", " Zacatecas"};
-//        ObservableList<String> estadosList = FXCollections.observableArrayList(estados);
         estadoComboBox.setItems(FXCollections.observableArrayList(getAllEstados()));
-//        estadoComboBox.getItems().addAll(estadosList);
-        estadoComboBox.getSelectionModel().select(6);
+//        estadoComboBox.getSelectionModel().select(6);
     }
 
     private List<String> getAllEstados() {
         List<Estado> estados = MainApp.getInstance().getBaseDeDatos().getAll(Estado.class);
-//        List<String> estadosString = new ArrayList<>();
         return estados.stream().map(e -> e.getEstado()).collect(Collectors.toList());
     }
 
     private void fillDelegacionComboBox() {
-        //pedir los estados a la base de datos
-//        String[] estados = {"Álvaro Obregón", " Azcapotzalco", " Benito Juárez",
-//            " Coyoacán", " Cuajimalpa de Morelos", " Cuauhtémoc", "Gustavo A. Madero",
-//            " Iztacalco", " Iztapalapa", " La Magdalena Contreras", "Miguel Hidalgo", " Milpa Alta",
-//            " Tláhuac", " Tlalpan", " Venustiano Carranza", " Xochimilco"};
-//        ObservableList<String> estadosList = FXCollections.observableArrayList(estados);
         delegacionComboBox.setItems(FXCollections.observableArrayList(getAllDelegaciones()));
-//        delegacionComboBox.getItems().addAll(estadosList);
-        delegacionComboBox.getSelectionModel().select(0);
+//        delegacionComboBox.getSelectionModel().select(0);
     }
 
     private List<String> getAllDelegaciones() {
         List<Delegacion> estados = MainApp.getInstance().getBaseDeDatos().getAll(Delegacion.class);
-//        List<String> estadosString = new ArrayList<>();
         return estados.stream().map(e -> e.getDelegacion()).collect(Collectors.toList());
     }
 
@@ -402,18 +381,13 @@ public class NuevoAseguradoController implements Initializable {
         }
     }
 
-    public void homePage(ActionEvent event) throws IOException {
-        MainApp.getInstance().goHome();
-//        
-//        try {
-//            Parent parent = FXMLLoader.load(getClass().getResource("Home.fxml"));
-//            Scene newScene = new Scene(parent);
-//            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-//            stage.setScene(newScene);
-//
-//        } catch (IOException ex) {
-//            Logger.getLogger(NuevoAseguradoController.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+    public void homePage(ActionEvent event) {
+        try {
+            MainApp.getInstance().goHome();
+        } catch (IOException ex) {
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Utilities.makeAlert(Alert.AlertType.ERROR, Logging.CAMBIAR_VENTANA_MESSAGE, "").showAndWait();
+        }
     }
 
     public void guardar(ActionEvent event) throws IOException {
@@ -445,8 +419,12 @@ public class NuevoAseguradoController implements Initializable {
                 domicilio.setInterior(interiorTextField.getText());
                 domicilio.setCodigopostal(codigoPostaTextField.getText());
                 domicilio.setColonia(coloniaTextField.getText());
-                domicilio.setDelegacion(new Delegacion(delegacionComboBox.getValue().toString()));
-                domicilio.setEstado(new Estado(estadoComboBox.getValue().toString()));
+                if (delegacionComboBox.getValue() != null) {
+                    domicilio.setDelegacion(new Delegacion(delegacionComboBox.getValue().toString()));
+                }
+                if (estadoComboBox.getValue() != null) {
+                    domicilio.setEstado(new Estado(estadoComboBox.getValue().toString()));
+                }
                 asegurado.setIddomicilio(domicilio);
             }
 
@@ -459,26 +437,30 @@ public class NuevoAseguradoController implements Initializable {
                 asegurado.agregarDocumento(doc);
                 doc.setAsegurado(asegurado);
             }
-
-            try {
-                //guardar asegurado
-                MainApp.getInstance().getBaseDeDatos().create(asegurado);
-            } catch (Exception ex) {
-                Logger.getLogger(NuevoAseguradoController.class.getName()).log(Level.SEVERE, null, ex);
-                Alert alertDialog = Utilities.makeAlert(ex, "Error al guardar asegurado");
-                alertDialog.showAndWait();
+            List<Asegurado> existentes = MainApp.getInstance().getBaseDeDatos().buscarAseguradosPorNombre(asegurado.getNombre(), asegurado.getApellidoPaterno(), asegurado.getApellidoMaterno());
+            if (existentes.isEmpty()) {
+                try {
+                    MainApp.getInstance().getBaseDeDatos().create(asegurado);
+                    FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AseguradoHome.fxml"), null, new JavaFXBuilderFactory());
+                    Parent parent = loader.load();
+                    AseguradoHomeController controller = loader.<AseguradoHomeController>getController();
+                    controller.setAsegurado(asegurado);
+                    MainApp.getInstance().changeSceneContent(this, location, parent, loader);
+                } catch (Exception ex) {
+                    Alert alertDialog = Utilities.makeAlert(ex, "Error al guardar asegurado");
+                    alertDialog.showAndWait();
+                    return;
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Error");
+                alert.setHeaderText("No se puede guardar al asegurado");
+                alert.setContentText("El asegurado " + asegurado.getNombreCompleto() + " ya existe");
+                alert.showAndWait();
                 return;
-            }
-//            persistAsegurado(asegurado);
-            //ir a Asegurado Home
-            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AseguradoHome.fxml"), null, new JavaFXBuilderFactory());
-            Parent parent = loader.load();
-            AseguradoHomeController controller = loader.<AseguradoHomeController>getController();
-            controller.setAsegurado(asegurado);
-//            controller.setAseguradoId(id);
-//        loader.setController(controller);
-            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
-        } else {
+            }//end if asegurado ya existe
+        }//end if validarForm
+        else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error al guardar asegurado");

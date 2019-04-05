@@ -18,6 +18,7 @@ import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -235,42 +236,6 @@ public class NotificacionReciboJpaController implements Serializable, JpaControl
         }
     }
 
-    public List<NotificacionRecibo> getNotificacionesProximas() {
-        EntityManager em = null;
-        try {
-            em = BaseDeDatos.getInstance().getEntityManager();
-//            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (MONTH(n.recibo.cubredesde) = :today OR MONTH(n.recibo.cubredesde) = :next) AND YEAR(n.recibo.cubredesde) = :year");
-            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubredesde BETWEEN :today AND :nextMonth");
-            query.setParameter("today", LocalDate.now());
-            query.setParameter("nextMonth", LocalDate.now().plusMonths(1));
-//            query.setParameter("year", LocalDate.now().getYear());
-            return query.getResultList();
-        } catch (Exception ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw ex;
-        }
-    }
-
-    public List<NotificacionRecibo> getNotificacionesPendientes() {
-        EntityManager em = null;
-        try {
-            em = BaseDeDatos.getInstance().getEntityManager();
-            //TODO: ESTA MAL
-            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE n.recibo.cubredesde BETWEEN :today AND :nextMonth AND n.estadonotificacion.estadonotificacion = :pendiente");
-            query.setParameter("today", LocalDate.now());
-            query.setParameter("nextMonth", LocalDate.now().plusMonths(1));
-            query.setParameter("pendiente", Globals.NOTIFICACION_ESTADO_PENDIENTE);
-//            query.setParameter("year", LocalDate.now().getYear());
-            return query.getResultList();
-        } catch (Exception ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw ex;
-        }
-    }
 
     public List<NotificacionRecibo> getNotificacionesPendientesEntre(LocalDate start, LocalDate end) {
         EntityManager em = null;
@@ -285,8 +250,9 @@ public class NotificacionReciboJpaController implements Serializable, JpaControl
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw ex;
+            logger.error(Logging.Exception_MESSAGE);
         }
+        return new ArrayList<>();
     }
 
     public List<NotificacionRecibo> getNotificacionesEntre(LocalDate start, LocalDate end) {
@@ -301,25 +267,9 @@ public class NotificacionReciboJpaController implements Serializable, JpaControl
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw ex;
+            logger.error(Logging.Exception_MESSAGE);
         }
-    }
-
-    public List<NotificacionRecibo> getNotificacionesPendientesDentroDePrimeros(int dias) {
-        EntityManager em = null;
-        try {
-            em = BaseDeDatos.getInstance().getEntityManager();
-            //TODO: ESTA MAL
-            Query query = em.createQuery("SELECT n FROM NotificacionRecibo n WHERE (FUNCTION('timeDiff',SQL_TSI_DAY,n.recibo.cubredesde, CURRENT_TIMESTAMP) > 0 AND FUNCTION('timeDiff',SQL_TSI_DAY,n.recibo.cubredesde, CURRENT_TIMESTAMP) <= :dias) AND n.recibo.cobranza.cobranza = :pendiente");
-            query.setParameter("dias", dias);
-            query.setParameter("pendiente", Globals.NOTIFICACION_ESTADO_PENDIENTE);
-            return query.getResultList();
-        } catch (Exception ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw ex;
-        }
+        return new ArrayList<>();
     }
 
     @Override

@@ -8,20 +8,19 @@ package com.embuckets.controlcartera.ui;
 import com.embuckets.controlcartera.entidades.Agente;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Aseguradora;
-import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Utilities;
 import com.embuckets.controlcartera.excel.ExcelImporter;
-import com.embuckets.controlcartera.ui.observable.ObservableCliente;
+import com.embuckets.controlcartera.mail.MailService;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import com.embuckets.controlcartera.ui.observable.ObservableRenovacion;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -32,9 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -44,6 +41,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -62,6 +61,8 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * FXML Controller class
@@ -69,6 +70,8 @@ import javafx.stage.FileChooser;
  * @author emilio
  */
 public class HomeController implements Initializable, Controller {
+
+    private static final Logger logger = LogManager.getLogger(HomeController.class);
 
     private String location = "/fxml/Home.fxml";
     @FXML
@@ -174,7 +177,8 @@ public class HomeController implements Initializable, Controller {
                             controller.setAsegurado((Asegurado) obs);
                             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
                         } catch (IOException ex) {
-                            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.fatal("Error al cargar fxml", ex);
+                            showAlert(ex, "Error al cargar fxml");
                         }
                     } else if (obs instanceof Poliza) {
                         try {
@@ -184,7 +188,8 @@ public class HomeController implements Initializable, Controller {
                             controller.setPoliza((Poliza) obs);
                             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
                         } catch (IOException ex) {
-                            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.fatal("Error al cargar fxml", ex);
+                            showAlert(ex, "Error al cargar fxml");
                         }
                     }
                 }
@@ -299,9 +304,18 @@ public class HomeController implements Initializable, Controller {
             Optional<Agente> agente = controller.getDialog().showAndWait();
             agente.ifPresent((present) -> {
                 present.guardar();
+                try {
+                    MailService.getInstance().refresh();
+                } catch (Exception ex) {
+                    Alert alert = new Alert(AlertType.INFORMATION);
+                    alert.setTitle("Información");
+                    alert.setHeaderText("Datos incompletos");
+                    alert.setContentText("Email o password guardados son inválidos. No podra enviar notificaciones por correo\n" + ex.getMessage());
+                    alert.showAndWait();
+                }
             });
         } catch (IOException ex) {
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            //TODO
         }
     }
 
@@ -343,7 +357,8 @@ public class HomeController implements Initializable, Controller {
                 Files.write(targetFile.toPath(), bytes);
                 Desktop.getDesktop().open(targetFile.getParentFile());
             } catch (IOException ex) {
-                Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.fatal("Error al exportar excel", ex);
+                showAlert(ex, "Error al exportar excel");
             }
 
         }
@@ -463,6 +478,10 @@ public class HomeController implements Initializable, Controller {
         aseguradoraCombo.setItems(FXCollections.observableArrayList(aseguradorasStrings));
 
         ramoCombo.setItems(FXCollections.observableArrayList(Globals.getAllRamos()));
+    }
+
+    private void showAlert(Exception ex, String header) {
+        Utilities.makeAlert(ex, header).showAndWait();
     }
 
 }

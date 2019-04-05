@@ -8,7 +8,7 @@ package com.embuckets.controlcartera.excel;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import java.io.File;
 import java.util.List;
-import java.util.logging.Level;
+
 import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;

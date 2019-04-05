@@ -6,11 +6,8 @@
 package com.embuckets.controlcartera.entidades.controladores;
 
 import com.embuckets.controlcartera.entidades.Beneficiario;
-import com.embuckets.controlcartera.entidades.Cliente;
-import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.Serializable;
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -21,7 +18,7 @@ import javax.persistence.Query;
 public class BeneficiarioJpaController implements Serializable, JpaController {
 
     @Override
-    public void create(Object object) throws EntityExistsException, Exception {
+    public void create(Object object) throws Exception {
         EntityManager em = null;
         Beneficiario beneficiario = (Beneficiario) object;
         try {
@@ -62,7 +59,7 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
     }
 
     @Override
-    public void remove(Object object) throws Exception{
+    public void remove(Object object) throws Exception {
         EntityManager em = null;
         Beneficiario beneficiario = (Beneficiario) object;
         boolean isSubTransaction = false;
@@ -74,10 +71,20 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
             if (!isSubTransaction) {
                 em.getTransaction().begin();
             }
+//            String queryString = "DELETE FROM APP.Beneficiario WHERE idcliente = " + beneficiario.getCliente().getIdcliente() + " AND idpoliza = " + beneficiario.getPolizaVida().getIdpoliza();
+//            Query query = em.createNativeQuery(queryString);
+
             Query query = em.createNativeQuery("DELETE FROM APP.Beneficiario WHERE idcliente = :idcliente AND idpoliza = :idpoliza");
             query.setParameter("idcliente", beneficiario.getCliente().getIdcliente());
             query.setParameter("idpoliza", beneficiario.getPolizaVida().getIdpoliza());
+
+            beneficiario.getPolizaVida().getClienteList().remove(beneficiario.getCliente());
+//            beneficiario.setPolizaVida(null);
+
             query.executeUpdate();
+
+            em.merge(beneficiario.getPolizaVida());
+
             if (!isSubTransaction) {
                 em.getTransaction().commit();
             }

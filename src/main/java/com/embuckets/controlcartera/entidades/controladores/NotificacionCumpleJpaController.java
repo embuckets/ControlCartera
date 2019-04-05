@@ -18,6 +18,7 @@ import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.exceptions.PreexistingEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
@@ -30,12 +31,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author emilio
  */
 public class NotificacionCumpleJpaController implements Serializable, JpaController {
+
+    private static final Logger logger = LogManager.getLogger(NotificacionCumpleJpaController.class);
 
     public NotificacionCumpleJpaController(EntityManagerFactory emf) {
         this.emf = emf;
@@ -266,19 +271,13 @@ public class NotificacionCumpleJpaController implements Serializable, JpaControl
             };
             return result.stream().filter(predicate).collect(Collectors.toList());
 
-//            //BEFORE
-//            String queryString = "SELECT n FROM NotificacionCumple n WHERE ((MONTH(n.cliente.nacimiento) >= month(:start) and day(n.cliente.nacimiento) >= day(:start)) AND (month(n.cliente.nacimiento) <= month(:end) and day(n.cliente.nacimiento) <= day(:end))) AND n.estadonotificacion.estadonotificacion = :pendiente";
-//            queryString = queryString.replace(":start", "'" + start.toString() + "'");
-//            queryString = queryString.replace(":end", "'" + end.toString() + "'");
-//            Query query = em.createQuery(queryString);
-//            query.setParameter("pendiente", Globals.NOTIFICACION_ESTADO_PENDIENTE);
-//            return query.getResultList();
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw ex;
+            logger.error(Logging.Exception_MESSAGE, ex);
         }
+        return new ArrayList<>();
     }
 
     public List<NotificacionCumple> getNotificacionesEntre(LocalDate start, LocalDate end) {
@@ -299,60 +298,19 @@ public class NotificacionCumpleJpaController implements Serializable, JpaControl
             }
             Predicate<NotificacionCumple> predicate = (n) -> {
                 int dayOfYear = n.getCliente().getNacimiento().getDayOfYear();
-//                if (n.getCliente().getNacimiento().isLeapYear() && dayOfYear > 28) {
-//                    if (!end.isLeapYear() && end.getDayOfYear() > 28){
-//                        dayOfYear -= 1;
-//                    }
-//                }
                 return dayOfYear >= start.getDayOfYear() && dayOfYear <= end.getDayOfYear();
-//                return n.getCliente().getNacimiento().getDayOfYear() >= start.getDayOfYear() && n.getCliente().getNacimiento().getDayOfYear() <= end.getDayOfYear();
             };
             return result.stream().filter(predicate).collect(Collectors.toList());
-            
-//            String queryString = "SELECT n FROM NotificacionCumple n WHERE (MONTH(n.cliente.nacimiento) >= month(:start) and day(n.cliente.nacimiento) >= day(:start)) OR (month(n.cliente.nacimiento) <= month(:end) and day(n.cliente.nacimiento) <= day(:end))";
-//            queryString = queryString.replace(":start", "'" + start.toString() + "'");
-//            queryString = queryString.replace(":end", "'" + end.toString() + "'");
-//            Query query = em.createQuery(queryString);
-//            return query.getResultList();
+
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw ex;
+            logger.error(Logging.Exception_MESSAGE, ex);
         }
+        return new ArrayList<>();
     }
 
-    public List<NotificacionCumple> getNotificacionesPendientesDeHace(int dias) {
-        EntityManager em = null;
-        try {
-            em = BaseDeDatos.getInstance().getEntityManager();
-            boolean nextMonth = false;
-            StringBuilder queryString = new StringBuilder("SELECT n FROM NotificacionCumple n WHERE (MONTH(n.cliente.nacimiento) = :thisMonth");
-            if (LocalDate.now().minusDays(dias).getMonthValue() != LocalDate.now().getMonthValue()) {
-                queryString.append(" OR MONTH(n.cliente.nacimiento) = :nextMonth) AND n.estadonotificacion.estadonotificacion = :pendiente");
-                nextMonth = true;
-            } else {
-                queryString.append(") AND n.estadonotificacion.estadonotificacion = :pendiente");
-            }
-            Query query = em.createQuery(queryString.toString());
-            query.setParameter("thisMonth", LocalDate.now().getMonthValue());
-            if (nextMonth) {
-                query.setParameter("nextMonth", LocalDate.now().minusDays(1).getMonthValue());
-            }
-            query.setParameter("pendiente", Globals.NOTIFICACION_ESTADO_PENDIENTE);
-            List<NotificacionCumple> cumples = query.getResultList();
-            Predicate<NotificacionCumple> predicate = (t) -> {
-                Period period = t.getCliente().getNacimiento().until(LocalDate.now());
-                return (period.getDays() > 0 && period.getDays() <= dias);
-            };
-            return cumples.stream().filter(predicate).collect(Collectors.toList());
-        } catch (Exception ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw ex;
-        }
-    }
 
     /**
      * regresa todas las notificaciones de mes actual y siguiente

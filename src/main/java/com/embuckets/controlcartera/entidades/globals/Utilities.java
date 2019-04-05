@@ -19,8 +19,52 @@ public class Utilities {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(header);
-        alert.setContentText(ex.getCause().getLocalizedMessage());
+        alert.setContentText(ex.getLocalizedMessage());
         return alert;
+    }
+
+    public static Alert makeAlert(Alert.AlertType alertType, String title, String header, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        return alert;
+    }
+
+    public static Alert makeAlert(Alert.AlertType alertType, String header, String message) {
+        Alert alert = new Alert(alertType);
+        String title = getTitle(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        return alert;
+    }
+
+    public static Alert makeAlert(Alert.AlertType alertType, String header, Exception ex) {
+        Alert alert = new Alert(alertType);
+        String title = getTitle(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(ex.getLocalizedMessage());
+        return alert;
+    }
+
+    private static String getTitle(Alert.AlertType alertType) {
+        switch (alertType) {
+            case CONFIRMATION:
+                return "Confirmación";
+            case ERROR:
+                return "Error";
+            case INFORMATION:
+                return "Información";
+            case NONE:
+                return "";
+            case WARNING:
+                return "Advertencia";
+            default:
+                return "";
+        }
+
     }
 
     public static <T> T initializeAndUnproxy(T entity) {

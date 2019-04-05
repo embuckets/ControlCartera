@@ -16,31 +16,25 @@ import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.Telefono;
-import com.embuckets.controlcartera.entidades.TelefonoPK;
+import com.embuckets.controlcartera.entidades.TipoDocumentoAsegurado;
 import com.embuckets.controlcartera.entidades.TipoEmail;
 import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
 import com.embuckets.controlcartera.entidades.globals.Globals;
-import com.sun.org.apache.bcel.internal.generic.D2F;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.function.UnaryOperator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
@@ -49,12 +43,10 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -84,7 +76,6 @@ import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
-import org.hibernate.Hibernate;
 
 /**
  * FXML Controller class
@@ -247,8 +238,12 @@ public class AseguradoHomeController implements Initializable, Controller {
             interiorTextField.setText(asegurado.getIddomicilio().getInterior());
             codigoPostaTextField.setText(asegurado.getIddomicilio().getCodigopostal());
             coloniaTextField.setText(asegurado.getIddomicilio().getColonia());
-            delegacionTextField.setText(asegurado.getIddomicilio().getDelegacion().getDelegacion());
-            estadoTextField.setText(asegurado.getIddomicilio().getEstado().getEstado());
+            if (asegurado.getIddomicilio().getDelegacion() != null) {
+                delegacionTextField.setText(asegurado.getIddomicilio().getDelegacion().getDelegacion());
+            }
+            if (asegurado.getIddomicilio().getEstado() != null) {
+                estadoTextField.setText(asegurado.getIddomicilio().getEstado().getEstado());
+            }
             domicilioButton.setText("Editar");
             domicilioButton.setOnAction((event) -> {
                 editarDomicilio(event);
@@ -280,25 +275,14 @@ public class AseguradoHomeController implements Initializable, Controller {
                 final ContextMenu rowMenu = new ContextMenu();
                 MenuItem removeItem = new MenuItem("Borrar");
                 removeItem.setOnAction((ActionEvent event) -> {
-                    try {
-                        borrarTelefono(row.getItem());
-                    } catch (Exception e) {
-                        showAlert(e, "Error al borrar email");
-                    }
+                    borrarTelefono(row.getItem());
 //TODO: borrar telefono de la base de datos
                 });
                 MenuItem editItem = new MenuItem("Editar");
                 editItem.setOnAction((ActionEvent event) -> {
                     Optional<Telefono> result = createEditTelefonoDialog(row.getItem()).showAndWait();
                     result.ifPresent(nuevo -> {
-                        try {
-                            editarTelefono(row.getItem(), nuevo);
-                        } catch (Exception e) {
-                            showAlert(e, "Error al editar telefono");
-                        }
-                        telefonoTableView.getItems().clear();
-                        telefonoTableView.setItems(FXCollections.observableArrayList(asegurado.getTelefonoList()));
-                        //TODO: update telefono en la base
+                        editarTelefono(row.getItem(), nuevo);
                     });
                 });
                 rowMenu.getItems().addAll(editItem, removeItem);
@@ -335,7 +319,7 @@ public class AseguradoHomeController implements Initializable, Controller {
         return cantidadFilter;
     }
 
-    private void editarTelefono(Telefono viejo, Telefono nuevo) throws Exception {
+    private void editarTelefono(Telefono viejo, Telefono nuevo) {
         Map<String, Pair<Object, Object>> changes = new HashMap<>();
         changes.put("telefono", new Pair<>(viejo.getTelefonoPK().getTelefono(), nuevo.getTelefonoPK().getTelefono()));
         changes.put("tipo", new Pair<>(viejo.getTipotelefono().getTipotelefono(), nuevo.getTipotelefono().getTipotelefono()));
@@ -346,26 +330,23 @@ public class AseguradoHomeController implements Initializable, Controller {
                 MainApp.getInstance().getBaseDeDatos().remove(viejo);
                 MainApp.getInstance().getBaseDeDatos().create(nuevo);
                 asegurado.agregarTelefono(nuevo);
-//                viejo.setEmailPK(new EmailPK(asegurado.getIdcliente(), nuevo.getEmailPK().getEmail()));
-//                viejo.setTipoemail(new TipoEmail(nuevo.getTipoemail().getTipoemail()));
-//                Email unproxy = Utilities.initializeAndUnproxy(viejo);
-//                MainApp.getInstance().getBaseDeDatos().edit(unproxy);
             } catch (Exception e) {
-//                viejo.setTelefonoPK(new TelefonoPK(asegurado.getIdcliente(), (String) changes.get("telefono").getKey()));
-//                viejo.setTipoemail(new TipoEmail((String) changes.get("tipo").getKey()));
-                throw e;
+                showAlert(e, "Error al editar telefono");
             }
+            telefonoTableView.getItems().clear();
+            telefonoTableView.setItems(FXCollections.observableArrayList(asegurado.getTelefonoList()));
         }
     }
 
-    private void borrarTelefono(Telefono telefono) throws Exception {
+    private void borrarTelefono(Telefono telefono) {
         try {
             Telefono unproxy = Utilities.initializeAndUnproxy(telefono);
             MainApp.getInstance().getBaseDeDatos().remove(unproxy);
             asegurado.getTelefonoList().remove(telefono);
             telefonoTableView.getItems().remove(telefono);
         } catch (Exception e) {
-            throw e;
+            showAlert(e, "Error al borrar telefono");
+
         }
     }
 
@@ -441,27 +422,14 @@ public class AseguradoHomeController implements Initializable, Controller {
             final ContextMenu rowMenu = new ContextMenu();
             MenuItem removeItem = new MenuItem("Borrar");
             removeItem.setOnAction((ActionEvent event) -> {
-                try {
-                    borrarEmail(row.getItem());
-                } catch (Exception e) {
-                    showAlert(e, "Error al borrar email");
-                }
-                //TODO: borrar email de la base de datos
+                borrarEmail(row.getItem());
             });
             MenuItem editItem = new MenuItem("Editar");
             editItem.setOnAction((ActionEvent event) -> {
                 Optional<Email> result = createEditEmailDialog(row.getItem()).showAndWait();
                 result.ifPresent(email -> {
-                    try {
-                        editarEmail(row.getItem(), email);
-                    } catch (Exception ex) {
-                        showAlert(ex, "Error al editar email");
-                    }
-                    emailTableView.getItems().clear();
-                    emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
+                    editarEmail(row.getItem(), email);
                 });
-                //crear display window para editar telefono y guardar cambios
-                //TODO: borrar telefono de la base de datos
             });
             MenuItem notificarItem = new MenuItem("Cambiar Notificacion");
             notificarItem.setOnAction((ActionEvent event) -> {
@@ -472,7 +440,7 @@ public class AseguradoHomeController implements Initializable, Controller {
                     MainApp.getInstance().getBaseDeDatos().edit(email);
                 } catch (Exception ex) {
                     email.setNotificar(oldValue);
-                    Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+                    showAlert(ex, "Error al modificar el email");
                 }
                 emailTableView.getItems().clear();
                 emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
@@ -488,25 +456,18 @@ public class AseguradoHomeController implements Initializable, Controller {
         });
     }
 
-    private void actualizarEmail(Email email) throws Exception {
-        try {
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    private void borrarEmail(Email email) throws Exception {
+    private void borrarEmail(Email email) {
         try {
             Email unproxy = Utilities.initializeAndUnproxy(email);
             MainApp.getInstance().getBaseDeDatos().remove(unproxy);
             asegurado.getEmailList().remove(email);
             emailTableView.getItems().remove(email);
         } catch (Exception e) {
-            throw e;
+            showAlert(e, "Error al borrar email");
         }
     }
 
-    private void editarEmail(Email viejo, Email nuevo) throws Exception {
+    private void editarEmail(Email viejo, Email nuevo) {
         Map<String, Pair<Object, Object>> changes = new HashMap<>();
         changes.put("email", new Pair<>(viejo.getEmailPK().getEmail(), nuevo.getEmailPK().getEmail()));
         changes.put("tipo", new Pair<>(viejo.getTipoemail().getTipoemail(), nuevo.getTipoemail().getTipoemail()));
@@ -516,15 +477,11 @@ public class AseguradoHomeController implements Initializable, Controller {
                 MainApp.getInstance().getBaseDeDatos().remove(viejo);
                 MainApp.getInstance().getBaseDeDatos().create(nuevo);
                 asegurado.agregarEmail(nuevo);
-//                viejo.setEmailPK(new EmailPK(asegurado.getIdcliente(), nuevo.getEmailPK().getEmail()));
-//                viejo.setTipoemail(new TipoEmail(nuevo.getTipoemail().getTipoemail()));
-//                Email unproxy = Utilities.initializeAndUnproxy(viejo);
-//                MainApp.getInstance().getBaseDeDatos().edit(unproxy);
             } catch (Exception e) {
-//                viejo.setEmailPK(new EmailPK(asegurado.getIdcliente(), (String) changes.get("email").getKey()));
-//                viejo.setTipoemail(new TipoEmail((String) changes.get("tipo").getKey()));
-                throw e;
+                showAlert(e, "Error al editar email");
             }
+            emailTableView.getItems().clear();
+            emailTableView.setItems(FXCollections.observableArrayList(asegurado.getEmailList()));
         }
     }
 
@@ -591,22 +548,12 @@ public class AseguradoHomeController implements Initializable, Controller {
             editarItem.setOnAction((event) -> {
                 Optional<DocumentoAsegurado> documentoEditado = createDialogEditarDocumento(row.getItem()).showAndWait();
                 documentoEditado.ifPresent((present) -> {
-                    try {
-                        editarDocumento(row.getItem(), present);
-                    } catch (Exception e) {
-                        Utilities.makeAlert(e, "Error al editar documento").showAndWait();
-                    }
-                    documentoTableView.getItems().clear();
-                    documentoTableView.setItems(FXCollections.observableArrayList(asegurado.getDocumentoAseguradoList()));
+                    editarDocumento(row.getItem(), present);
                 });
             });
             MenuItem eliminarItem = new MenuItem("Eliminar");
             eliminarItem.setOnAction((event) -> {
-                try {
-                    borrarDocumento(row.getItem());
-                } catch (Exception e) {
-                    Utilities.makeAlert(e, "Error al borrar documento").showAndWait();
-                }
+                borrarDocumento(row.getItem());
             });
             menu.getItems().addAll(verItem, editarItem, eliminarItem);
             row.contextMenuProperty().bind(
@@ -620,24 +567,26 @@ public class AseguradoHomeController implements Initializable, Controller {
         fillTipoDocumentoComboBox();
     }
 
-    private void editarDocumento(DocumentoAsegurado viejo, DocumentoAsegurado nuevo) throws Exception {
+    private void editarDocumento(DocumentoAsegurado viejo, DocumentoAsegurado nuevo) {
         try {
             MainApp.getInstance().getBaseDeDatos().remove(viejo);
             MainApp.getInstance().getBaseDeDatos().create(nuevo);
             asegurado.getDocumentoAseguradoList().remove(viejo);
             asegurado.getDocumentoAseguradoList().add(nuevo);
         } catch (Exception e) {
-            throw e;
+            showAlert(e, "Error al editar documento");
         }
+        documentoTableView.getItems().clear();
+        documentoTableView.setItems(FXCollections.observableArrayList(asegurado.getDocumentoAseguradoList()));
     }
 
-    private void borrarDocumento(DocumentoAsegurado doc) throws Exception {
+    private void borrarDocumento(DocumentoAsegurado doc) {
         try {
             MainApp.getInstance().getBaseDeDatos().remove(doc);
             asegurado.getDocumentoAseguradoList().remove(doc);
             documentoTableView.getItems().remove(doc);
         } catch (Exception e) {
-            throw e;
+            showAlert(e, "Error al borrar el documento");
         }
     }
 
@@ -646,20 +595,30 @@ public class AseguradoHomeController implements Initializable, Controller {
             Path temp = Files.createTempFile(doc.getNombreArchivo(), doc.getExtension());
             Files.write(temp, doc.getArchivo());
             if (!Desktop.isDesktopSupported()) {
-                Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, "Desktop not supported");
+                logger.error(Logging.Exception_MESSAGE, new Exception("Desktop not Supported"));
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("No se puede abrir el archivo");
+                alert.setContentText("No hay soporte para el desktop");
+                alert.showAndWait();
             }
             if (temp.toFile().exists()) {
                 try {
                     Desktop.getDesktop().open(temp.toFile());
                 } catch (IOException ex) {
-                    Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-                    showAlert(ex, "Error al ver documento");
+                    logger.error(Logging.Exception_MESSAGE, ex);
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("No se puede abrir el archivo");
+                    alert.showAndWait();
                 }
             }
-
         } catch (IOException ex) {
-            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-            showAlert(ex, "Error al ver documento");
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("No se puede abrir el archivo");
+            alert.showAndWait();
         }
     }
 
@@ -702,9 +661,22 @@ public class AseguradoHomeController implements Initializable, Controller {
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == guardar) {
-                DocumentoAsegurado nuevo = new DocumentoAsegurado(new File(archivoField.getText()), tipoDocumentoBox.getValue());
-                nuevo.getDocumentoAseguradoPK().setIdcliente(doc.getDocumentoAseguradoPK().getIdcliente());
-                return nuevo;
+                if (archivoField.getText().equalsIgnoreCase(doc.archivoProperty().get())) {
+                    doc.setTipoDocumentoAsegurado(new TipoDocumentoAsegurado(tipoDocumentoBox.getValue()));
+                    return doc;
+                } else {
+                    try {
+                        DocumentoAsegurado nuevo = new DocumentoAsegurado(new File(archivoField.getText()), tipoDocumentoBox.getValue());
+                        nuevo.setAsegurado(asegurado);
+                        return nuevo;
+                    } catch (IOException ex) {
+                        logger.error(Logging.Exception_MESSAGE, ex);
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error al leer el archivo");
+                        alert.showAndWait();
+                    }
+                }
             }
             return null;
         });
@@ -797,7 +769,11 @@ public class AseguradoHomeController implements Initializable, Controller {
         try {
             MainApp.getInstance().goHome();
         } catch (IOException ex) {
-            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error al abrir la ventana");
+            alert.showAndWait();
         }
     }
 
@@ -927,11 +903,17 @@ public class AseguradoHomeController implements Initializable, Controller {
             MainApp.getInstance().getBaseDeDatos().remove(asegurado);
             MainApp.getInstance().goHome();
         } catch (IOException ex) {
-            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-            Utilities.makeAlert(ex, "Error al eliminar asegurado");
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error al cambiar de ventana");
+            alert.showAndWait();
         } catch (Exception ex) {
-            Logger.getLogger(AseguradoHomeController.class.getName()).log(Level.SEVERE, null, ex);
-            Utilities.makeAlert(ex, "Error al eliminar asegurado");
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error al eliminar al asegurado");
+            alert.showAndWait();
         }
     }
 
@@ -943,7 +925,11 @@ public class AseguradoHomeController implements Initializable, Controller {
             controller.setPoliza((Poliza) poliza);
             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
         } catch (IOException ex) {
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(Logging.Exception_MESSAGE, ex);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(Logging.CAMBIAR_VENTANA_MESSAGE);
+            alert.showAndWait();
         }
     }
 
@@ -979,7 +965,12 @@ public class AseguradoHomeController implements Initializable, Controller {
                     Asegurado unproxy = Utilities.initializeAndUnproxy(asegurado);
                     MainApp.getInstance().getBaseDeDatos().edit(unproxy);
                 } catch (Exception e) {
-                    showAlert(e, "Error al editar asegurado");
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error al editar asegurado");
+                    alert.setHeaderText("Los nuevos datos son inválidos");
+                    alert.setContentText("Asegurado " + edited.getNombreCompleto() + " ya existe");
+                    alert.showAndWait();
+//                    showAlert(e, "Error al editar asegurado");
                     asegurado.setTipopersona(new TipoPersona((String) changes.get("tipopersona").getKey()));
                     asegurado.getCliente().setNombre((String) changes.get("nombre").getKey());
                     asegurado.getCliente().setApellidopaterno((String) changes.get("paterno").getKey());
@@ -1050,6 +1041,7 @@ public class AseguradoHomeController implements Initializable, Controller {
 
         });
         HBox radioHbox = new HBox();
+        radioHbox.setSpacing(10);
         radioHbox.getChildren().addAll(personaFisicaRadioButton, personaMoralRadioButton);
         TextField rfcField = new TextField(asegurado.getRfc());
 
@@ -1084,7 +1076,8 @@ public class AseguradoHomeController implements Initializable, Controller {
     }
 
     private void editarDomicilio(ActionEvent event) {
-        Domicilio actual = asegurado.getIddomicilio();
+        Domicilio proxy = asegurado.getIddomicilio();
+        Domicilio actual = Utilities.initializeAndUnproxy(proxy);
         Optional<Domicilio> editedDomicilio = createEditDomicilioDialog(asegurado.getIddomicilio()).showAndWait();
         //TODO: update domicilio
         if (editedDomicilio.isPresent()) {
@@ -1096,8 +1089,8 @@ public class AseguradoHomeController implements Initializable, Controller {
             changes.put("interior", new Pair<>(actual.getInterior(), edited.getInterior()));
             changes.put("codigo", new Pair<>(actual.getCodigopostal(), edited.getCodigopostal()));
             changes.put("colonia", new Pair<>(actual.getColonia(), edited.getColonia()));
-            changes.put("delegacion", new Pair<>(actual.getDelegacion().getDelegacion(), edited.getDelegacion().getDelegacion()));
-            changes.put("estado", new Pair<>(actual.getEstado().getEstado(), edited.getEstado().getEstado()));
+            changes.put("delegacion", new Pair<>(actual.getDelegacion(), edited.getDelegacion()));
+            changes.put("estado", new Pair<>(actual.getEstado(), edited.getEstado()));
             if (valuesChanged(changes)) {
                 try {
                     actual.setCalle(edited.getCalle());
@@ -1105,8 +1098,12 @@ public class AseguradoHomeController implements Initializable, Controller {
                     actual.setInterior(edited.getInterior());
                     actual.setCodigopostal(edited.getCodigopostal());
                     actual.setColonia(edited.getColonia());
-                    actual.setDelegacion(new Delegacion(edited.getDelegacion().getDelegacion()));
-                    actual.setEstado(new Estado(edited.getEstado().getEstado()));
+                    if (edited.getDelegacion() != null) {
+                        actual.setDelegacion(new Delegacion(edited.getDelegacion().getDelegacion()));
+                    }
+                    if (edited.getEstado() != null) {
+                        actual.setEstado(new Estado(edited.getEstado().getEstado()));
+                    }
 //                    Domicilio unproxy = Utilities.initializeAndUnproxy(actual);
                     MainApp.getInstance().getBaseDeDatos().edit(actual);
                 } catch (Exception e) {
@@ -1142,7 +1139,7 @@ public class AseguradoHomeController implements Initializable, Controller {
     private boolean valuesChanged(Map<String, Pair<Object, Object>> changes) {
         for (Pair pair : changes.values()) {
             Object notNull = pair.getKey() == null ? "" : pair.getKey();
-            if (!notNull.equals(pair.getValue())) {
+            if (!notNull.equals(pair.getValue() == null ? "" : pair.getValue())) {
                 return true;
             }
         }
@@ -1150,16 +1147,6 @@ public class AseguradoHomeController implements Initializable, Controller {
     }
 
     private Dialog<Domicilio> createEditDomicilioDialog(Domicilio domicilio) {
-//        if (domicilio == null) {
-//            domicilio = new Domicilio();
-//            domicilio.setCalle("");
-//            domicilio.setExterior("");
-//            domicilio.setInterior("");
-//            domicilio.setCodigopostal("");
-//            domicilio.setColonia("");
-//            domicilio.setDelegacion(new Delegacion());
-//            domicilio.setEstado(new Estado());
-//        }
         Dialog<Domicilio> dialog = new Dialog<>();
         dialog.setTitle("Editar domicilio");
         //set the button types
@@ -1178,19 +1165,22 @@ public class AseguradoHomeController implements Initializable, Controller {
 
         List<Delegacion> delegaciones = MainApp.getInstance().getBaseDeDatos().getAll(Delegacion.class);
         ObservableList<String> obsDelegaciones = FXCollections.observableArrayList(delegaciones.stream().map(d -> d.getDelegacion()).collect(Collectors.toList()));
-        ComboBox delegacionBox = new ComboBox(obsDelegaciones);
-        delegacionBox.getSelectionModel().select(obsDelegaciones.indexOf(domicilio.getDelegacion().getDelegacion()));
+        ComboBox<String> delegacionBox = new ComboBox(obsDelegaciones);
+        delegacionBox.setPromptText("Delegación");
+        if (domicilio.getDelegacion() != null) {
+            delegacionBox.getSelectionModel().select(obsDelegaciones.indexOf(domicilio.getDelegacion().getDelegacion()));
+        }
 //        if (delegacionBox.getSelectionModel().getSelectedItem() == null) {
 //            delegacionBox.getSelectionModel().select(0);
 //        }
 
         List<Estado> estados = MainApp.getInstance().getBaseDeDatos().getAll(Estado.class);
         ObservableList<String> obsEstados = FXCollections.observableArrayList(estados.stream().map(e -> e.getEstado()).collect(Collectors.toList()));
-        ComboBox estadosBox = new ComboBox(obsEstados);
-        estadosBox.getSelectionModel().select(obsEstados.indexOf(domicilio.getEstado().getEstado()));
-//        if (estadosBox.getSelectionModel().getSelectedItem() == null) {
-//            estadosBox.getSelectionModel().select(0);
-//        }
+        ComboBox<String> estadosBox = new ComboBox(obsEstados);
+        estadosBox.setPromptText("Estado");
+        if (domicilio.getEstado() != null) {
+            estadosBox.getSelectionModel().select(obsEstados.indexOf(domicilio.getEstado().getEstado()));
+        }
         grid.add(new Label("Calle"), 0, 0);
         grid.add(calleField, 1, 0);
         grid.add(new Label("No. Exterior"), 0, 1);
@@ -1223,8 +1213,12 @@ public class AseguradoHomeController implements Initializable, Controller {
                 nuevo.setInterior(interiorField.getText());
                 nuevo.setCodigopostal(codigoPostalField.getText());
                 nuevo.setColonia(coloniaField.getText());
-                nuevo.setDelegacion(new Delegacion(delegacionBox.getValue().toString()));
-                nuevo.setEstado(new Estado(estadosBox.getValue().toString()));
+                if (delegacionBox.getValue() != null) {
+                    nuevo.setDelegacion(new Delegacion(delegacionBox.getValue()));
+                }
+                if (estadosBox.getValue() != null) {
+                    nuevo.setEstado(new Estado(estadosBox.getValue()));
+                }
                 return nuevo;
             }
             return null;
@@ -1355,7 +1349,8 @@ public class AseguradoHomeController implements Initializable, Controller {
             controller.setContratante(this.asegurado);
             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
         } catch (IOException ex) {
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.fatal("No se puede cargan la ventan", ex);
+            showAlert(ex, "Error al cargar la ventan");
         }
     }
 

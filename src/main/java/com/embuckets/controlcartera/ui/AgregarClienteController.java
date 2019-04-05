@@ -83,8 +83,10 @@ public class AgregarClienteController implements Initializable {
         clienteTableView.setRowFactory((TableView<Cliente> param) -> {
             final TableRow<Cliente> row = new TableRow<>();
             row.setOnMouseClicked((event) -> {
-                cliente = row.getItem();
-                clienteSelectedField.setText(cliente.nombreProperty().get());
+                if (row.getItem() != null) {
+                    cliente = row.getItem();
+                    clienteSelectedField.setText(cliente.nombreProperty().get());
+                }
             });
             return row;
         });
@@ -115,7 +117,12 @@ public class AgregarClienteController implements Initializable {
     private void crearCliente(ActionEvent event) {
         Optional<Cliente> optional = createAgregarClienteDialog().showAndWait();
         optional.ifPresent(present -> {
-            this.cliente = present;
+            List<Cliente> existentes = MainApp.getInstance().getBaseDeDatos().buscarClientesPor(present.getNombre(), present.getApellidopaterno(), present.getApellidomaterno());
+            if (!existentes.isEmpty()) {
+                this.cliente = existentes.get(0);
+            } else {
+                this.cliente = present;
+            }
             clienteSelectedField.setText(cliente.nombreProperty().get());
         });
     }

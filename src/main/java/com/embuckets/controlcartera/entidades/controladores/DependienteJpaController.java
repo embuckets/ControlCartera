@@ -5,7 +5,6 @@
  */
 package com.embuckets.controlcartera.entidades.controladores;
 
-import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.Serializable;

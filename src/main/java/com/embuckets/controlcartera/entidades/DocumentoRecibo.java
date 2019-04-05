@@ -5,13 +5,12 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,9 +22,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -41,6 +40,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "DocumentoRecibo.findByExtension", query = "SELECT d FROM DocumentoRecibo d WHERE d.extension = :extension"),
     @NamedQuery(name = "DocumentoRecibo.findByActualizado", query = "SELECT d FROM DocumentoRecibo d WHERE d.actualizado = :actualizado")})
 public class DocumentoRecibo implements Serializable {
+
+    private static final Logger logger = LogManager.getLogger(DocumentoRecibo.class);
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -67,17 +68,7 @@ public class DocumentoRecibo implements Serializable {
     public DocumentoRecibo() {
     }
 
-//    public DocumentoRecibo(Integer idrecibo) {
-//        this.idrecibo = idrecibo;
-//    }
-//
-//    public DocumentoRecibo(Integer idrecibo, String nombre, String extension, Serializable archivo) {
-//        this.idrecibo = idrecibo;
-//        this.nombre = nombre;
-//        this.extension = extension;
-//        this.archivo = archivo;
-//    }
-    public DocumentoRecibo(File file, Recibo recibo) {
+    public DocumentoRecibo(File file, Recibo recibo) throws IOException {
         this.recibo = recibo;
         this.idrecibo = recibo.getIdrecibo();
         String[] tokens = file.getName().split("\\.");
@@ -86,8 +77,9 @@ public class DocumentoRecibo implements Serializable {
         this.actualizado = LocalDateTime.now();
         try {
             this.archivo = Files.readAllBytes(file.toPath());
-        } catch (Exception e) {
-            Logger.getLogger(DocumentoRecibo.class.getName()).log(Level.SEVERE, null, e);
+        } catch (IOException e) {
+            logger.error(Logging.Exception_MESSAGE, e);
+            throw e;
         }
     }
 
