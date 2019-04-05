@@ -5,9 +5,6 @@
  */
 package com.embuckets.controlcartera.hibernate;
 
-import java.sql.Types;
-import javax.persistence.metamodel.Type;
-import org.hibernate.dialect.DerbyTenFiveDialect;
 import org.hibernate.dialect.DerbyTenSevenDialect;
 import org.hibernate.dialect.function.StandardJDBCEscapeFunction;
 import org.hibernate.type.StandardBasicTypes;

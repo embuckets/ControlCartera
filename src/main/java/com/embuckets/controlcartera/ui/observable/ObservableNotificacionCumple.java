@@ -5,11 +5,6 @@
  */
 package com.embuckets.controlcartera.ui.observable;
 
-import com.embuckets.controlcartera.entidades.Cliente;
-import com.embuckets.controlcartera.entidades.NotificacionCumple;
-import javafx.beans.property.IntegerPropertyBase;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**

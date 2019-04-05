@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
-import java.util.logging.Level;
 
 import java.util.stream.Collectors;
 import javafx.application.Platform;

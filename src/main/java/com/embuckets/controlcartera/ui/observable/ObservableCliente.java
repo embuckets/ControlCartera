@@ -5,12 +5,6 @@
  */
 package com.embuckets.controlcartera.ui.observable;
 
-import com.embuckets.controlcartera.entidades.Cliente;
-import java.time.ZoneId;
-import java.util.Date;
-import javafx.beans.property.IntegerPropertyBase;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 
 /**

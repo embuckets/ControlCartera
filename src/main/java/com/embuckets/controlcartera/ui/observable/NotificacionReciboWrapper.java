@@ -6,12 +6,8 @@
 package com.embuckets.controlcartera.ui.observable;
 
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
-import com.embuckets.controlcartera.entidades.globals.Globals;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**

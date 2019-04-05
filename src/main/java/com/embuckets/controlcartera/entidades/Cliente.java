@@ -8,8 +8,6 @@ package com.embuckets.controlcartera.entidades;
 import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.sql.Date;
 //import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -31,8 +29,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 

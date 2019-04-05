@@ -40,11 +40,6 @@
                   <MenuItem mnemonicParsing="false" onAction="#exportarPlantilla" text="Exportar plantilla" />
                       </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Help">
-                      <items>
-                          <MenuItem mnemonicParsing="false" text="About" />
-                      </items>
-                  </Menu>
               </menus>
           </MenuBar>
       <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">

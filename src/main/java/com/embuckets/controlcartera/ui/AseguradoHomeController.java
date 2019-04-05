@@ -1246,12 +1246,14 @@ public class AseguradoHomeController implements Initializable, Controller {
 
         List<Delegacion> delegaciones = MainApp.getInstance().getBaseDeDatos().getAll(Delegacion.class);
         ObservableList<String> obsDelegaciones = FXCollections.observableArrayList(delegaciones.stream().map(d -> d.getDelegacion()).collect(Collectors.toList()));
-        ComboBox delegacionBox = new ComboBox(obsDelegaciones);
-        delegacionBox.getSelectionModel().selectFirst();
+        ComboBox<String> delegacionBox = new ComboBox(obsDelegaciones);
+        delegacionBox.setPromptText("Delegación");
+//        delegacionBox.getSelectionModel().selectFirst();
         List<Estado> estados = MainApp.getInstance().getBaseDeDatos().getAll(Estado.class);
         ObservableList<String> obsEstados = FXCollections.observableArrayList(estados.stream().map(e -> e.getEstado()).collect(Collectors.toList()));
-        ComboBox estadosBox = new ComboBox(obsEstados);
-        estadosBox.getSelectionModel().selectFirst();
+        ComboBox<String> estadosBox = new ComboBox(obsEstados);
+        estadosBox.setPromptText("Estado");
+//        estadosBox.getSelectionModel().selectFirst();
         grid.add(new Label("Calle"), 0, 0);
         grid.add(calleField, 1, 0);
         grid.add(new Label("No. Exterior"), 0, 1);
@@ -1283,8 +1285,12 @@ public class AseguradoHomeController implements Initializable, Controller {
                 nuevo.setInterior(interiorField.getText());
                 nuevo.setCodigopostal(codigoPostalField.getText());
                 nuevo.setColonia(coloniaField.getText());
-                nuevo.setDelegacion(new Delegacion(delegacionBox.getValue().toString()));
-                nuevo.setEstado(new Estado(estadosBox.getValue().toString()));
+                if (delegacionBox.getValue() != null) {
+                    nuevo.setDelegacion(new Delegacion(delegacionBox.getValue()));
+                }
+                if (estadosBox.getValue() != null) {
+                    nuevo.setEstado(new Estado(estadosBox.getValue()));
+                }
                 return nuevo;
             }
             return null;

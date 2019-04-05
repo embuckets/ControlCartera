@@ -206,10 +206,15 @@ public class AseguradoJpaController implements Serializable, JpaController {
 
             List<String> illegalOrphanMessages = null;
             List<Email> emailListOrphanCheck = asegurado.getEmailList();
+//            for (Email emailListOrphanCheckEmail : emailListOrphanCheck) {
+//                emailListOrphanCheckEmail.setAsegurado(null);
+//                emailListOrphanCheckEmail = em.merge(emailListOrphanCheckEmail);
+//            }
             for (Email emailListOrphanCheckEmail : emailListOrphanCheck) {
                 emailListOrphanCheckEmail.setAsegurado(null);
-                emailListOrphanCheckEmail = em.merge(emailListOrphanCheckEmail);
+                em.remove(emailListOrphanCheckEmail);
             }
+            emailListOrphanCheck.clear();
 
             Poliza[] polizaListOrphanCheck = new Poliza[asegurado.getPolizaList().size()];
             for (int i = 0; i < asegurado.getPolizaList().size(); i++) {
@@ -221,15 +226,29 @@ public class AseguradoJpaController implements Serializable, JpaController {
             }
 
             List<DocumentoAsegurado> documentoAseguradoListOrphanCheck = asegurado.getDocumentoAseguradoList();
+//            for (DocumentoAsegurado documentoAseguradoListOrphanCheckDocumentoAsegurado : documentoAseguradoListOrphanCheck) {
+//                documentoAseguradoListOrphanCheckDocumentoAsegurado.setAsegurado(null);
+//                documentoAseguradoListOrphanCheckDocumentoAsegurado = em.merge(documentoAseguradoListOrphanCheckDocumentoAsegurado);
+//            }
             for (DocumentoAsegurado documentoAseguradoListOrphanCheckDocumentoAsegurado : documentoAseguradoListOrphanCheck) {
                 documentoAseguradoListOrphanCheckDocumentoAsegurado.setAsegurado(null);
-                documentoAseguradoListOrphanCheckDocumentoAsegurado = em.merge(documentoAseguradoListOrphanCheckDocumentoAsegurado);
+                em.remove(documentoAseguradoListOrphanCheckDocumentoAsegurado);
+//                documentoAseguradoListOrphanCheckDocumentoAsegurado = em.merge(documentoAseguradoListOrphanCheckDocumentoAsegurado);
             }
+            documentoAseguradoListOrphanCheck.clear();
+
             List<Telefono> telefonoListOrphanCheck = asegurado.getTelefonoList();
+//            for (Telefono telefonoListOrphanCheckTelefono : telefonoListOrphanCheck) {
+//                telefonoListOrphanCheckTelefono.setAsegurado(null);
+//                telefonoListOrphanCheckTelefono = em.merge(telefonoListOrphanCheckTelefono);
+//            }
             for (Telefono telefonoListOrphanCheckTelefono : telefonoListOrphanCheck) {
                 telefonoListOrphanCheckTelefono.setAsegurado(null);
-                telefonoListOrphanCheckTelefono = em.merge(telefonoListOrphanCheckTelefono);
+                em.remove(telefonoListOrphanCheckTelefono);
+//                telefonoListOrphanCheckTelefono = em.merge(telefonoListOrphanCheckTelefono);
             }
+            telefonoListOrphanCheck.clear();
+
             Cliente cliente = asegurado.getCliente();
             if (cliente != null) {
                 cliente.setAsegurado(null);

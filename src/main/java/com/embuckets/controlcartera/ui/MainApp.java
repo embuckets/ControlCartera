@@ -44,6 +44,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -87,6 +88,7 @@ public final class MainApp extends Application {
     public void start(Stage primaryStage) {
         try {
             mainStage = primaryStage;
+            mainStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/icons/cartera.png")));
             Parent page = FXMLLoader.load(getClass().getResource("/fxml/Home.fxml"));
             Scene scene = new Scene(page);
             primaryStage.setScene(scene);
