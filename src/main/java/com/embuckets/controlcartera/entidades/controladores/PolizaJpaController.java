@@ -75,6 +75,12 @@ public class PolizaJpaController implements Serializable, JpaController {
             }
             PolizaAuto polizaAutoOrphanCheck = poliza.getPolizaAuto();
             if (polizaAutoOrphanCheck != null) {
+                for (Auto auto : polizaAutoOrphanCheck.getAutoList()) {
+//                    polizaAutoOrphanCheck.getAutoList().remove(auto);
+//                    polizaAutoOrphanCheck = em.merge(polizaAutoOrphanCheck);
+                    em.remove(auto);
+                }
+                polizaAutoOrphanCheck.getAutoList().clear();
                 polizaAutoOrphanCheck.setPoliza(null);
                 polizaAutoOrphanCheck = em.merge(polizaAutoOrphanCheck);
             }

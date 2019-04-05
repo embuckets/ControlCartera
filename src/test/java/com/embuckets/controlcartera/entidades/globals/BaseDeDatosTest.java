@@ -11,6 +11,7 @@ import com.embuckets.controlcartera.entidades.Auto;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.ConductoCobro;
 import com.embuckets.controlcartera.entidades.Delegacion;
+import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.Domicilio;
 import com.embuckets.controlcartera.entidades.Estado;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
@@ -20,6 +21,7 @@ import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
+import com.embuckets.controlcartera.entidades.PolizaGmm;
 import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
@@ -32,6 +34,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -166,6 +169,33 @@ public class BaseDeDatosTest {
         List<Asegurado> asegurados = bd.getAll(Asegurado.class);
         assertNotNull(asegurados);
         // TODO review the generated test code and remove the default call to fail.
+    }
+    
+    /**
+     * Test of getById method, of class BaseDeDatos.
+     */
+    @Test
+    public void testBeneficiarioEquals() {
+        System.out.println("testgetAll");
+        Asegurado daniel = bd.buscarAseguradosPorNombre("daniel", "hernandez", "segovia").get(0);
+        PolizaGmm polizaGmm = daniel.getPolizaList().stream().filter(p -> p.getRamo().getRamo().equals(Globals.POLIZA_RAMO_GM)).findFirst().get().getPolizaGmm();
+        PolizaVida polizaVida = daniel.getPolizaList().stream().filter(p -> p.getRamo().getRamo().equals(Globals.POLIZA_RAMO_VIDA)).findFirst().get().getPolizaVida();
+        
+        
+        List<Dependiente> dependientes = new ArrayList<>();
+        polizaGmm.getClienteList().forEach(c -> dependientes.add(new Dependiente(c, polizaGmm)));
+        dependientes.stream().forEach(d -> {
+            System.out.println("Contains: " + d.getCliente()+ " - " + polizaGmm.getClienteList().contains(d.getCliente()));
+            System.out.println("Hash: " + d.hashCode());
+            System.out.println("Remove: " + polizaGmm.getClienteList().remove(d.getCliente()));
+        });
+        
+        
+        
+        
+        
+        
+        
     }
 
     /**

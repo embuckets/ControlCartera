@@ -6,8 +6,11 @@
 package com.embuckets.controlcartera.entidades.controladores;
 
 import com.embuckets.controlcartera.entidades.Beneficiario;
+import com.embuckets.controlcartera.entidades.Cliente;
+import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -71,20 +74,40 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
             if (!isSubTransaction) {
                 em.getTransaction().begin();
             }
-//            String queryString = "DELETE FROM APP.Beneficiario WHERE idcliente = " + beneficiario.getCliente().getIdcliente() + " AND idpoliza = " + beneficiario.getPolizaVida().getIdpoliza();
-//            Query query = em.createNativeQuery(queryString);
-
             Query query = em.createNativeQuery("DELETE FROM APP.Beneficiario WHERE idcliente = :idcliente AND idpoliza = :idpoliza");
             query.setParameter("idcliente", beneficiario.getCliente().getIdcliente());
             query.setParameter("idpoliza", beneficiario.getPolizaVida().getIdpoliza());
-
-            beneficiario.getPolizaVida().getClienteList().remove(beneficiario.getCliente());
-//            beneficiario.setPolizaVida(null);
-
             query.executeUpdate();
 
-            em.merge(beneficiario.getPolizaVida());
+            if (!isSubTransaction) {
+                PolizaVida pVida = beneficiario.getPolizaVida();
+                List<Cliente> pVidaClientes = beneficiario.getPolizaVida().getClienteList();
+                Cliente cliente = beneficiario.getCliente();
+                boolean removed = pVidaClientes.remove(cliente);
+                logger.info("Remove [" + beneficiario.getCliente() + "] = " + removed);
+                em.merge(pVida);
 
+            }
+
+//            logger.info("Finding beneficiario [" + cliente.getIdcliente() + "] en polizaVida [" + pVida.getIdpoliza() + "]");
+//            logger.info("Contains [" + pVidaClientes.contains(cliente) + "]");
+//            for (Cliente b : pVidaClientes) {
+////                logger.info("equals [" + b.getIdcliente() + "] = [" + b.equals(cliente) + "]");
+//                logger.info("intValue [" + b.getIdcliente().intValue() + "] = [" + (b.getIdcliente().intValue() == cliente.getIdcliente().intValue()) + "]");
+////                logger.info("compare [" + b.getIdcliente() + "] = [" + (b.getIdcliente().compareTo(cliente.getIdcliente())) + "]");
+//                if (b.getIdcliente().intValue() == cliente.getIdcliente().intValue()) {
+//                    int index = pVidaClientes.indexOf(b);
+//                    logger.info("index [" + index + "]");
+//                    boolean removed = pVidaClientes.remove(b);
+//                    logger.info("remove object [" + b.getIdcliente() + "] = [" + removed + "]");
+//                    if (!removed) {
+//                        if (index >= 0) {
+//                            logger.info("remove index [" + b.getIdcliente() + "] = [" + pVidaClientes.remove(index) + "]");
+//                        }
+//                    }
+//                    break;
+//                }
+//            }
             if (!isSubTransaction) {
                 em.getTransaction().commit();
             }

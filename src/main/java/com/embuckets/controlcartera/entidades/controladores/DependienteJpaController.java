@@ -5,18 +5,24 @@
  */
 package com.embuckets.controlcartera.entidades.controladores;
 
+import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author emilio
  */
 public class DependienteJpaController implements Serializable, JpaController {
+
+    private static final Logger logger = LogManager.getLogger(DependienteJpaController.class);
 
     @Override
     public void create(Object object) throws EntityExistsException, Exception {
@@ -76,6 +82,13 @@ public class DependienteJpaController implements Serializable, JpaController {
             query.setParameter("idcliente", beneficiario.getCliente().getIdcliente());
             query.setParameter("idpoliza", beneficiario.getPolizaGmm().getIdpoliza());
             query.executeUpdate();
+
+            if (!isSubTransaction) {
+                List<Cliente> clientes = beneficiario.getPolizaGmm().getClienteList();
+                logger.info("Remove [" + beneficiario.getCliente() + "] = " + clientes.remove(beneficiario.getCliente()));
+                em.merge(beneficiario.getPolizaGmm());
+            }
+
             if (!isSubTransaction) {
                 em.getTransaction().commit();
             }

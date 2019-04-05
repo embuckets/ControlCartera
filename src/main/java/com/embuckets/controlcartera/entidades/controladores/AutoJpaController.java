@@ -21,15 +21,25 @@ public class AutoJpaController implements Serializable, JpaController {
 
     @Override
     public void remove(Object object) throws Exception {
-        EntityManager em = null;
         Auto auto = (Auto) object;
+        boolean isSubTransaction = false;
+        EntityManager em = null;
         try {
             em = BaseDeDatos.getInstance().getEntityManager();
-            em.getTransaction().begin();
+            if (em.getTransaction().isActive()) {
+                isSubTransaction = true;
+            }
+            if (!isSubTransaction) {
+                em.getTransaction().begin();
+            }
+            
             auto.getIdpoliza().getAutoList().remove(auto);
             em.merge(auto.getIdpoliza());
             em.remove(auto);
-            em.getTransaction().commit();
+            
+            if (!isSubTransaction) {
+                em.getTransaction().commit();
+            }
         } catch (Exception ex) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

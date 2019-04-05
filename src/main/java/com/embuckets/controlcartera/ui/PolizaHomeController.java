@@ -597,7 +597,7 @@ public class PolizaHomeController implements Initializable, Controller {
                 Cliente cliente = row.getItem();
                 try {
                     MainApp.getInstance().getBaseDeDatos().remove(new Dependiente(cliente, polizaGmm));
-                    polizaGmm.getClienteList().remove(row.getItem());
+//                    polizaGmm.getClienteList().remove(row.getItem());
                     clientesTableView.getItems().remove(row.getItem());
                 } catch (Exception e) {
                     Utilities.makeAlert(e, "Error al borrar dependiente").showAndWait();
@@ -772,15 +772,8 @@ public class PolizaHomeController implements Initializable, Controller {
                 Cliente cliente = row.getItem();
                 try {
                     MainApp.getInstance().getBaseDeDatos().remove(new Beneficiario(cliente, polizaVida));
-//                    polizaVida.getClienteList().remove(row.getItem());
-//                    clientesTableView.getItems().remove(row.getItem());
-                    Cliente unproxy = Utilities.initializeAndUnproxy(row.getItem());
-                    List<Cliente> unproxyList = Utilities.initializeAndUnproxy(polizaVida.getClienteList());
-                    unproxyList.remove(cliente);
-//                    unproxyList.remove(unproxy);
-//                    polizaVida.getClienteList().remove(unproxy);
                     clientesTableView.getItems().clear();
-                    clientesTableView.setItems(FXCollections.observableArrayList(unproxyList));
+                    clientesTableView.setItems(FXCollections.observableArrayList(polizaVida.getClienteList()));
 //                    clientesTableView.setItems(FXCollections.observableArrayList(polizaVida.getClienteList()));
                 } catch (Exception e) {
                     Utilities.makeAlert(e, "Error al borrar beneficiario").showAndWait();

@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.sql.Date;
 //import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -138,18 +139,8 @@ public class Cliente implements Serializable, ObservableCliente {
         return nacimiento;
     }
 
-//    public String getNacimientoString() {
-//        return getNacimientoLocalDate().toString();
-//    }
-//    public LocalDate getNacimientoLocalDate() {
-//        return nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//    }
-//    public void setNacimiento(Date nacimiento) {
-//        this.nacimiento = nacimiento;
-//    }
     public void setNacimiento(LocalDate nacimiento) {
         this.nacimiento = nacimiento;
-//        this.nacimiento = Date.from(nacimiento.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     @XmlTransient
@@ -202,18 +193,38 @@ public class Cliente implements Serializable, ObservableCliente {
         return hash;
     }
 
+//    @Override
+//    public boolean equals(Object object) {
+//        // TODO: Warning - this method won't work in the case the id fields are not set
+//        if (!(object instanceof Cliente)) {
+//            return false;
+//        }
+//        Cliente other = (Cliente) object;
+//        other.getIdcliente();
+//        if ((this.idcliente == null && other.idcliente != null) || (this.idcliente != null && !this.idcliente.equals(other.idcliente))) {
+//            return false;
+//        }
+//        return true;
+//    }
+
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Cliente)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        Cliente other = (Cliente) object;
-        if ((this.idcliente == null && other.idcliente != null) || (this.idcliente != null && !this.idcliente.equals(other.idcliente))) {
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Cliente other = (Cliente) obj;
+        if (!Objects.equals(this.idcliente, other.idcliente)) {
             return false;
         }
         return true;
     }
+    
 
     @Override
     public String toString() {
