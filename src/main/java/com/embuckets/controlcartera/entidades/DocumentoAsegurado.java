@@ -5,10 +5,8 @@
  */
 package com.embuckets.controlcartera.entidades;
 
-import com.embuckets.controlcartera.ui.observable.ObservableArchivo;
-import com.embuckets.controlcartera.ui.observable.ObservableDocumentoAsegurado;
+import com.embuckets.controlcartera.entidades.globals.Logging;
 import java.io.Serializable;
-import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -22,9 +20,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -40,8 +44,10 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "DocumentoAsegurado.findByExtension", query = "SELECT d FROM DocumentoAsegurado d WHERE d.extension = :extension"),
     @NamedQuery(name = "DocumentoAsegurado.findByTipodocumento", query = "SELECT d FROM DocumentoAsegurado d WHERE d.documentoAseguradoPK.tipodocumento = :tipodocumento"),
     @NamedQuery(name = "DocumentoAsegurado.findByActualizado", query = "SELECT d FROM DocumentoAsegurado d WHERE d.actualizado = :actualizado")})
-public class DocumentoAsegurado implements Serializable, ObservableDocumentoAsegurado {
+public class DocumentoAsegurado implements Serializable, ObservableDocumento {
 
+    private static final Logger logger = LogManager.getLogger(DocumentoAsegurado.class);
+    
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected DocumentoAseguradoPK documentoAseguradoPK;
@@ -51,33 +57,36 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumentoAseg
     @Basic(optional = false)
     @Lob
     @Column(name = "ARCHIVO")
-    private Serializable archivo;
+    private byte[] archivo;
     @Column(name = "ACTUALIZADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualizado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime actualizado;
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado asegurado;
     @JoinColumn(name = "TIPODOCUMENTO", referencedColumnName = "TIPODOCUMENTO", insertable = false, updatable = false)
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private TipoDocumentoAsegurado tipoDocumentoAsegurado;
-    private String path;
 
     public DocumentoAsegurado() {
+        this.documentoAseguradoPK = new DocumentoAseguradoPK();
+        this.tipoDocumentoAsegurado = new TipoDocumentoAsegurado();
     }
 
-    public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK) {
-        this.documentoAseguradoPK = documentoAseguradoPK;
-    }
-
-    public DocumentoAsegurado(DocumentoAseguradoPK documentoAseguradoPK, String extension, Serializable archivo) {
-        this.documentoAseguradoPK = documentoAseguradoPK;
-        this.extension = extension;
-        this.archivo = archivo;
-    }
-
-    public DocumentoAsegurado(int idcliente, String nombre, String tipodocumento) {
-        this.documentoAseguradoPK = new DocumentoAseguradoPK(idcliente, nombre, tipodocumento);
+    public DocumentoAsegurado(File file, String tipoDocumentoAsegurado) throws IOException {
+        this.documentoAseguradoPK = new DocumentoAseguradoPK();
+        String[] tokens = file.getName().split("\\.");
+        this.documentoAseguradoPK.setNombre(tokens[0]);
+        this.documentoAseguradoPK.setTipodocumento(tipoDocumentoAsegurado);
+        this.extension = "." + tokens[1];
+        this.actualizado = LocalDateTime.now();
+        this.tipoDocumentoAsegurado = new TipoDocumentoAsegurado(tipoDocumentoAsegurado);
+        try {
+            this.archivo = Files.readAllBytes(file.toPath());
+        } catch (IOException ex) {
+            logger.error(Logging.Exception_MESSAGE, ex);
+            throw ex;
+        }
     }
 
     public DocumentoAseguradoPK getDocumentoAseguradoPK() {
@@ -96,19 +105,19 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumentoAseg
         this.extension = extension;
     }
 
-    public Serializable getArchivo() {
+    public byte[] getArchivo() {
         return archivo;
     }
 
-    public void setArchivo(Serializable archivo) {
+    public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 
-    public Date getActualizado() {
+    public LocalDateTime getActualizado() {
         return actualizado;
     }
 
-    public void setActualizado(Date actualizado) {
+    public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 
@@ -146,6 +155,10 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumentoAseg
             return false;
         }
         return true;
+    }
+
+    public String getNombreArchivo() {
+        return documentoAseguradoPK.getNombre();
     }
 
     @Override

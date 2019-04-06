@@ -5,15 +5,6 @@
  */
 package com.embuckets.controlcartera.ui.observable;
 
-import com.embuckets.controlcartera.entidades.Asegurado;
-import com.embuckets.controlcartera.entidades.Cliente;
-import com.embuckets.controlcartera.entidades.NotificacionRecibo;
-import com.embuckets.controlcartera.entidades.Poliza;
-import java.time.ZoneId;
-import java.util.Date;
-import javafx.beans.property.IntegerPropertyBase;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
@@ -21,8 +12,6 @@ import javafx.beans.property.StringProperty;
  * @author emilio
  */
 public interface ObservableNotificacionRecibo {
-
-    int getId();
 
     StringProperty polizaProperty();
 
@@ -37,5 +26,7 @@ public interface ObservableNotificacionRecibo {
     StringProperty cobranzaProperty();
 
     StringProperty enviadoProperty();
-
+    
+    StringProperty documentoProperty();
+    
 }

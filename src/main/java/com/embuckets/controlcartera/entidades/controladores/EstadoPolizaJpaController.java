@@ -12,9 +12,9 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import com.embuckets.controlcartera.entidades.Poliza;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.exceptions.IllegalOrphanException;
+import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.exceptions.PreexistingEntityException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -24,12 +24,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class EstadoPolizaJpaController implements Serializable {
+public class EstadoPolizaJpaController implements Serializable, JpaController {
 
     public EstadoPolizaJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public EstadoPolizaJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -205,5 +208,36 @@ public class EstadoPolizaJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public void create(Object object) throws PreexistingEntityException, Exception {
+        //DO NOTHING
+    }
+
+    @Override
+    public <T> T edit(Object object) throws Exception {
+        //DO NOTHING
+        return null;
+    }
+
+    @Override
+    public void remove(Object object) {
+        //DO NOTHING
+    }
+
+    @Override
+    public String getControlledClassName() {
+        return EstadoPoliza.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByEstado";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "estado";
+    }
+
 }

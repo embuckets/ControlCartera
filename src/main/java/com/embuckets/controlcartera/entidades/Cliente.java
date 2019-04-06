@@ -8,9 +8,9 @@ package com.embuckets.controlcartera.entidades;
 import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
+//import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -29,8 +29,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -64,8 +62,8 @@ public class Cliente implements Serializable, ObservableCliente {
     @Column(name = "APELLIDOMATERNO")
     private String apellidomaterno;
     @Column(name = "NACIMIENTO")
-    @Temporal(TemporalType.DATE)
-    private Date nacimiento;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate nacimiento;
     @JoinTable(name = "DEPENDIENTE", joinColumns = {
         @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE")}, inverseJoinColumns = {
         @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA")})
@@ -133,20 +131,12 @@ public class Cliente implements Serializable, ObservableCliente {
         this.apellidomaterno = apellidomaterno;
     }
 
-    public Date getNacimiento() {
+    public LocalDate getNacimiento() {
         return nacimiento;
     }
 
-    public LocalDate getNacimientoLocalDate() {
-        return nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    }
-
-    public void setNacimiento(Date nacimiento) {
-        this.nacimiento = nacimiento;
-    }
-
     public void setNacimiento(LocalDate nacimiento) {
-        this.nacimiento = Date.from(nacimiento.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.nacimiento = nacimiento;
     }
 
     @XmlTransient
@@ -199,18 +189,38 @@ public class Cliente implements Serializable, ObservableCliente {
         return hash;
     }
 
+//    @Override
+//    public boolean equals(Object object) {
+//        // TODO: Warning - this method won't work in the case the id fields are not set
+//        if (!(object instanceof Cliente)) {
+//            return false;
+//        }
+//        Cliente other = (Cliente) object;
+//        other.getIdcliente();
+//        if ((this.idcliente == null && other.idcliente != null) || (this.idcliente != null && !this.idcliente.equals(other.idcliente))) {
+//            return false;
+//        }
+//        return true;
+//    }
+
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Cliente)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        Cliente other = (Cliente) object;
-        if ((this.idcliente == null && other.idcliente != null) || (this.idcliente != null && !this.idcliente.equals(other.idcliente))) {
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Cliente other = (Cliente) obj;
+        if (!Objects.equals(this.idcliente, other.idcliente)) {
             return false;
         }
         return true;
     }
+    
 
     @Override
     public String toString() {
@@ -223,8 +233,23 @@ public class Cliente implements Serializable, ObservableCliente {
     }
 
     @Override
+    public StringProperty primerNombreProperty() {
+        return new SimpleStringProperty(nombre);
+    }
+
+    @Override
+    public StringProperty paternoProperty() {
+        return new SimpleStringProperty(apellidopaterno);
+    }
+
+    @Override
+    public StringProperty maternoProperty() {
+        return new SimpleStringProperty(apellidomaterno);
+    }
+
+    @Override
     public StringProperty nacimientoProperty() {
-        return new SimpleStringProperty(nacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(nacimiento == null ? "" : nacimiento.toString());
     }
 
 }

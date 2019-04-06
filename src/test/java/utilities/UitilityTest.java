@@ -5,14 +5,16 @@
  */
 package utilities;
 
+import com.embuckets.controlcartera.entidades.globals.Globals;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.regex.Pattern;
+import java.time.LocalDate;
+import java.time.Month;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -50,9 +52,30 @@ public class UitilityTest {
         System.out.println(phone);
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
+    @Test
+    public void testDateUntil() {
+        LocalDate today = LocalDate.now();
+        LocalDate firstJan = LocalDate.of(2019, Month.JANUARY, 1);
+        LocalDate thirtyOneDic = LocalDate.of(2018, Month.DECEMBER, 31);
+        LocalDate firstDic = LocalDate.of(2018, Month.DECEMBER, 1);
+        System.out.println("today until firstJan = " + today.until(firstJan).toString());
+        System.out.println("firstJan until thirtyOneDic = " + firstJan.until(thirtyOneDic).toString());
+        System.out.println("thirtyOneDic until firstJan = " + thirtyOneDic.until(firstJan).toString());
+        System.out.println("firstDic until thirtyOneDic = " + firstDic.until(thirtyOneDic).toString());
+    }
+
+    @Test
+    public void testNumberFormatter() {
+        DecimalFormat formatter = new DecimalFormat("$###,###,###.###");
+//        System.out.println(formatter.format(Float.valueOf("1000000")));
+//        System.out.println(formatter.format(456789));
+//        System.out.println(formatter.format("SIN LIMITE"));
+
+        System.out.println(Globals.formatCantidad(Float.valueOf("1000000")));
+        System.out.println(Globals.formatCantidad(456789));
+        System.out.println(Globals.formatCantidad(new BigDecimal(123456.45646)));
+        System.out.println(Globals.formatCantidad("SIN LIMITE"));
+
+    }
+
 }

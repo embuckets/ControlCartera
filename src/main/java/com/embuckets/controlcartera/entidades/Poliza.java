@@ -12,9 +12,7 @@ import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -33,8 +31,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -72,27 +68,27 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     private String plan;
     @Basic(optional = false)
     @Column(name = "INICIOVIGENCIA")
-    @Temporal(TemporalType.DATE)
-    private Date iniciovigencia;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate iniciovigencia;
     @Basic(optional = false)
     @Column(name = "FINVIGENCIA")
-    @Temporal(TemporalType.DATE)
-    private Date finvigencia;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate finvigencia;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @Column(name = "PRIMA")
     private BigDecimal prima;
     @Column(name = "NOTA")
     private String nota;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private Caratula caratula;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaAuto polizaAuto;
     @JoinColumn(name = "CONTRATANTE", referencedColumnName = "IDCLIENTE")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado contratante;
     @JoinColumn(name = "ASEGURADORA", referencedColumnName = "ASEGURADORA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Aseguradora aseguradora;
     @JoinColumn(name = "TITULAR", referencedColumnName = "IDCLIENTE")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -107,16 +103,17 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private FormaPago formapago;
     @JoinColumn(name = "PRIMAMONEDA", referencedColumnName = "MONEDA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Moneda primamoneda;
     @JoinColumn(name = "RAMO", referencedColumnName = "RAMO")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Ramo ramo;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaVida polizaVida;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "poliza", fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "poliza", fetch = FetchType.LAZY)
     private PolizaGmm polizaGmm;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idpoliza", fetch = FetchType.LAZY)
+//    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "idpoliza", fetch = FetchType.LAZY)
     private List<Recibo> reciboList;
 
     public Poliza() {
@@ -128,7 +125,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         this.reciboList = new ArrayList<>();
     }
 
-    public Poliza(Integer idpoliza, String numero, Date iniciovigencia, Date finvigencia, BigDecimal prima) {
+    public Poliza(Integer idpoliza, String numero, LocalDate iniciovigencia, LocalDate finvigencia, BigDecimal prima) {
         this.idpoliza = idpoliza;
         this.numero = numero;
         this.iniciovigencia = iniciovigencia;
@@ -169,22 +166,30 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         this.plan = plan;
     }
 
-    public Date getIniciovigencia() {
+    public LocalDate getIniciovigencia() {
         return iniciovigencia;
     }
 
-    public void setIniciovigencia(Date iniciovigencia) {
+    public void setIniciovigencia(LocalDate iniciovigencia) {
         this.iniciovigencia = iniciovigencia;
+        this.finvigencia = iniciovigencia.plusMonths(12);
     }
 
-    public Date getFinvigencia() {
+//    public void setIniciovigencia(LocalDate iniciovigencia) {
+//        this.iniciovigencia = iniciovigencia;
+//    }
+    public LocalDate getFinvigencia() {
         return finvigencia;
     }
 
-    public void setFinvigencia(Date finvigencia) {
+    public void setFinvigencia(LocalDate finvigencia) {
         this.finvigencia = finvigencia;
+        this.iniciovigencia = finvigencia.minusMonths(12);
     }
 
+//    public void setFinvigencia(LocalDate finvigencia) {
+//        this.finvigencia = Date.from(finvigencia.atStartOfDay(ZoneId.systemDefault()).toInstant());
+//    }
     public BigDecimal getPrima() {
         return prima;
     }
@@ -279,6 +284,31 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 
     public void setRamo(Ramo ramo) {
         this.ramo = ramo;
+        crearSubPoliza();
+    }
+
+    private void crearSubPoliza() {
+        if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_AUTOS) || this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_FLOTILLA)) {
+            this.polizaAuto = new PolizaAuto(idpoliza);
+            polizaAuto.setIdpoliza(this.idpoliza);
+            polizaAuto.setPoliza(this);
+            polizaVida = null;
+            polizaGmm = null;
+        }
+        if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_VIDA)) {
+            this.polizaVida = new PolizaVida(idpoliza);
+            polizaVida.setIdpoliza(this.idpoliza);
+            polizaVida.setPoliza(this);
+            polizaAuto = null;
+            polizaGmm = null;
+        }
+        if (this.ramo.getRamo().equalsIgnoreCase(Globals.POLIZA_RAMO_GM)) {
+            this.polizaGmm = new PolizaGmm(idpoliza);
+            polizaGmm.setIdpoliza(this.idpoliza);
+            polizaGmm.setPoliza(this);
+            polizaVida = null;
+            polizaAuto = null;
+        }
     }
 
     public PolizaVida getPolizaVida() {
@@ -368,7 +398,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 
     @Override
     public StringProperty primaProperty() {
-        return new SimpleStringProperty("$" + prima);
+        return new SimpleStringProperty(Globals.formatCantidad(prima) + " " + primamoneda.getMoneda());
     }
 
     @Override
@@ -388,17 +418,16 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 
     @Override
     public StringProperty finVigenciaProperty() {
-        return new SimpleStringProperty(this.finvigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(this.finvigencia.toString());
     }
 
     public StringProperty inicioVigenciaProperty() {
-        return new SimpleStringProperty(this.iniciovigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(this.iniciovigencia.toString());
     }
 
     @Override
     public StringProperty faltanProperty() {
-        LocalDate fin = finvigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return new SimpleStringProperty("" + (fin.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
+        return new SimpleStringProperty("" + (finvigencia.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
     }
 
     @Override
@@ -409,7 +438,7 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
     public void generarRecibos(int recibosPagados, BigDecimal importeConDerechoDePoliza, BigDecimal importeSubsecuente) {
         int recibos = cuantosRecibos();
         int siguienteMes = siguienteMes();
-        LocalDate inicioVigenciaAnterior = this.iniciovigencia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate inicioVigenciaAnterior = this.iniciovigencia;
         LocalDate finVigenciaAnterior = inicioVigenciaAnterior.plusMonths(siguienteMes);
         Recibo recibo = new Recibo();
         recibo.setIdpoliza(this);
@@ -420,7 +449,10 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         if (recibosPagados > 0) {
             recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PAGADO));
             recibosPagados--;
+        } else {
+            recibo.setCobranza(new Cobranza(Globals.RECIBO_COBRANZA_PENDIENTE));
         }
+
         this.reciboList.add(recibo);
         for (int i = 1; i < recibos; i++) {
             inicioVigenciaAnterior = finVigenciaAnterior;

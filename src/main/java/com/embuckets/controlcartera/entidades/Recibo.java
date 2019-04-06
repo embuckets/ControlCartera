@@ -9,10 +9,7 @@ import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -29,8 +26,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -56,12 +51,12 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     private Integer idrecibo;
     @Basic(optional = false)
     @Column(name = "CUBREDESDE")
-    @Temporal(TemporalType.DATE)
-    private Date cubredesde;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate cubredesde;
     @Basic(optional = false)
     @Column(name = "CUBREHASTA")
-    @Temporal(TemporalType.DATE)
-    private Date cubrehasta;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate cubrehasta;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @Column(name = "IMPORTE")
@@ -71,7 +66,7 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "recibo", fetch = FetchType.LAZY)
     private NotificacionRecibo notificacionRecibo;
     @JoinColumn(name = "COBRANZA", referencedColumnName = "COBRANZA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Cobranza cobranza;
     @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -84,7 +79,7 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
         this.idrecibo = idrecibo;
     }
 
-    public Recibo(Integer idrecibo, Date cubredesde, Date cubrehasta, BigDecimal importe) {
+    public Recibo(Integer idrecibo, LocalDate cubredesde, LocalDate cubrehasta, BigDecimal importe) {
         this.idrecibo = idrecibo;
         this.cubredesde = cubredesde;
         this.cubrehasta = cubrehasta;
@@ -99,30 +94,28 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
         this.idrecibo = idrecibo;
     }
 
-    public Date getCubredesde() {
+    public LocalDate getCubredesde() {
         return cubredesde;
     }
 
-    public void setCubredesde(Date cubredesde) {
+    public void setCubredesde(LocalDate cubredesde) {
         this.cubredesde = cubredesde;
     }
 
-    public void setCubredesde(LocalDate cubredesde) {
-        this.cubredesde = Date.from(cubredesde.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-    }
-
-    public Date getCubrehasta() {
+//    public void setCubredesde(LocalDate cubredesde) {
+//        this.cubredesde = Date.from(cubredesde.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+//    }
+    public LocalDate getCubrehasta() {
         return cubrehasta;
     }
 
-    public void setCubrehasta(Date cubrehasta) {
+    public void setCubrehasta(LocalDate cubrehasta) {
         this.cubrehasta = cubrehasta;
     }
 
-    public void setCubrehasta(LocalDate cubrehasta) {
-        this.cubrehasta = Date.from(cubrehasta.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-    }
-
+//    public void setCubrehasta(LocalDate cubrehasta) {
+//        this.cubrehasta = Date.from(cubrehasta.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+//    }
     public BigDecimal getImporte() {
         return importe;
     }
@@ -189,11 +182,6 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     }
 
     @Override
-    public int getId() {
-        return idrecibo;
-    }
-
-    @Override
     public StringProperty polizaProperty() {
         return getIdpoliza().numeroProperty();
     }
@@ -205,23 +193,23 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
 
     @Override
     public StringProperty cubreDesdeProperty() {
-        return new SimpleStringProperty(cubredesde.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(cubredesde.toString());
     }
 
     @Override
     public StringProperty cubreHastaProperty() {
-        return new SimpleStringProperty(cubrehasta.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return new SimpleStringProperty(cubrehasta.toString());
     }
 
     @Override
     public StringProperty importeProperty() {
-        return new SimpleStringProperty("$" + importe);
+        return new SimpleStringProperty(Globals.formatCantidad(importe));
     }
 
     @Override
     public StringProperty enviadoProperty() {
         //puede ser null
-        if (notificacionRecibo != null) {
+        if (notificacionRecibo != null && notificacionRecibo.getEnviado() != null) {
             return notificacionRecibo.enviadoProperty();
         } else {
             return new SimpleStringProperty(Globals.NOTIFICACION_ESTADO_PENDIENTE);
@@ -231,6 +219,11 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     @Override
     public StringProperty cobranzaProperty() {
         return new SimpleStringProperty(cobranza.getCobranza());
+    }
+
+    @Override
+    public StringProperty documentoProperty() {
+        return documentoRecibo == null ? new SimpleStringProperty("NO") : new SimpleStringProperty("SI");
     }
 
 }

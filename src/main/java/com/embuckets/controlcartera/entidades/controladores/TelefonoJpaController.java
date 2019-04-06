@@ -14,8 +14,10 @@ import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Telefono;
 import com.embuckets.controlcartera.entidades.TelefonoPK;
 import com.embuckets.controlcartera.entidades.TipoTelefono;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.exceptions.PreexistingEntityException;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
+import com.embuckets.controlcartera.entidades.globals.Utilities;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -24,12 +26,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class TelefonoJpaController implements Serializable {
+public class TelefonoJpaController implements Serializable, JpaController {
 
     public TelefonoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public TelefonoJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -205,5 +210,43 @@ public class TelefonoJpaController implements Serializable {
             em.close();
         }
     }
+
+    @Override
+    public void remove(Object object) {
+        EntityManager em = null;
+        Telefono telefono = (Telefono) object;
+        try {
+            em = BaseDeDatos.getInstance().getEntityManager();
+            em.getTransaction().begin();
+            List<Telefono> asegUnproxy = Utilities.initializeAndUnproxy(telefono.getAsegurado().getTelefonoList());
+            asegUnproxy.remove(telefono);
+//            email.getAsegurado().getEmailList().remove(email);
+            em.merge(telefono.getAsegurado());
+            em.remove(telefono);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        }
+    }
     
+    
+
+    @Override
+    public String getControlledClassName() {
+        return Telefono.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdcliente";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idcliente";
+    }
+
 }

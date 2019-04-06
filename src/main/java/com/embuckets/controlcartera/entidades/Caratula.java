@@ -5,8 +5,13 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Logging;
+import com.embuckets.controlcartera.ui.observable.ObservableDocumento;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
@@ -20,9 +25,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -37,7 +42,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Caratula.findByNombre", query = "SELECT c FROM Caratula c WHERE c.nombre = :nombre"),
     @NamedQuery(name = "Caratula.findByExtension", query = "SELECT c FROM Caratula c WHERE c.extension = :extension"),
     @NamedQuery(name = "Caratula.findByActualizado", query = "SELECT c FROM Caratula c WHERE c.actualizado = :actualizado")})
-public class Caratula implements Serializable {
+public class Caratula implements Serializable, ObservableDocumento {
+
+    private static final Logger logger = LogManager.getLogger(Caratula.class);
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,10 +60,10 @@ public class Caratula implements Serializable {
     @Basic(optional = false)
     @Lob
     @Column(name = "ARCHIVO")
-    private Serializable archivo;
+    private byte[] archivo;
     @Column(name = "ACTUALIZADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualizado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime actualizado;
     @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA", insertable = false, updatable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Poliza poliza;
@@ -64,15 +71,19 @@ public class Caratula implements Serializable {
     public Caratula() {
     }
 
-    public Caratula(Integer idpoliza) {
-        this.idpoliza = idpoliza;
-    }
-
-    public Caratula(Integer idpoliza, String nombre, String extension, Serializable archivo) {
-        this.idpoliza = idpoliza;
-        this.nombre = nombre;
-        this.extension = extension;
-        this.archivo = archivo;
+    public Caratula(File file, Poliza poliza) throws IOException {
+        this.poliza = poliza;
+        this.idpoliza = poliza.getIdpoliza();
+        String[] tokens = file.getName().split("\\.");
+        this.nombre = tokens[0];
+        this.extension = "." + tokens[1];
+        this.actualizado = LocalDateTime.now();
+        try {
+            this.archivo = Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            logger.error(Logging.Exception_MESSAGE, e);
+            throw e;
+        }
     }
 
     public Integer getIdpoliza() {
@@ -99,19 +110,19 @@ public class Caratula implements Serializable {
         this.extension = extension;
     }
 
-    public Serializable getArchivo() {
+    public byte[] getArchivo() {
         return archivo;
     }
 
-    public void setArchivo(Serializable archivo) {
+    public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 
-    public Date getActualizado() {
+    public LocalDateTime getActualizado() {
         return actualizado;
     }
 
-    public void setActualizado(Date actualizado) {
+    public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 
@@ -148,8 +159,14 @@ public class Caratula implements Serializable {
         return "com.embuckets.controlcartera.entidades.Caratula[ idpoliza=" + idpoliza + " ]";
     }
 
-    public StringProperty nombreProperty() {
+    @Override
+    public StringProperty archivoProperty() {
         return new SimpleStringProperty(nombre + extension);
+    }
+
+    @Override
+    public StringProperty tipoProperty() {
+        return new SimpleStringProperty("");
     }
 
 }

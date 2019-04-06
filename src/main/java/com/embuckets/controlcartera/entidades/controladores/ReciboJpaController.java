@@ -15,8 +15,8 @@ import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Cobranza;
 import com.embuckets.controlcartera.entidades.Poliza;
 import com.embuckets.controlcartera.entidades.Recibo;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.IllegalOrphanException;
-import com.embuckets.controlcartera.entidades.controladores.exceptions.NonexistentEntityException;
+import com.embuckets.controlcartera.exceptions.IllegalOrphanException;
+import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -26,12 +26,15 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author emilio
  */
-public class ReciboJpaController implements Serializable {
+public class ReciboJpaController implements Serializable, JpaController {
 
     public ReciboJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
+
+    public ReciboJpaController() {
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -289,5 +292,20 @@ public class ReciboJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    @Override
+    public String getControlledClassName() {
+        return Recibo.class.getSimpleName();
+    }
+
+    @Override
+    public String getFindByIdNamedQuery() {
+        return "findByIdrecibo";
+    }
+
+    @Override
+    public String getFindByIdParameter() {
+        return "idrecibo";
+    }
+
 }

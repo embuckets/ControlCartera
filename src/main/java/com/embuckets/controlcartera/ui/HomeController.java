@@ -5,44 +5,34 @@
  */
 package com.embuckets.controlcartera.ui;
 
+import com.embuckets.controlcartera.entidades.Agente;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Aseguradora;
-import com.embuckets.controlcartera.entidades.Auto;
-import com.embuckets.controlcartera.entidades.Cliente;
-import com.embuckets.controlcartera.entidades.ConductoCobro;
-import com.embuckets.controlcartera.entidades.EstadoPoliza;
-import com.embuckets.controlcartera.entidades.FormaPago;
-import com.embuckets.controlcartera.entidades.Moneda;
+import com.embuckets.controlcartera.entidades.NotificacionCumple;
 import com.embuckets.controlcartera.entidades.NotificacionRecibo;
 import com.embuckets.controlcartera.entidades.Poliza;
-import com.embuckets.controlcartera.entidades.PolizaAuto;
-import com.embuckets.controlcartera.entidades.PolizaGmm;
-import com.embuckets.controlcartera.entidades.PolizaVida;
-import com.embuckets.controlcartera.entidades.Ramo;
-import com.embuckets.controlcartera.entidades.Recibo;
-import com.embuckets.controlcartera.entidades.SumaAseguradaAuto;
-import com.embuckets.controlcartera.entidades.TipoPersona;
 import com.embuckets.controlcartera.entidades.globals.Globals;
-import com.embuckets.controlcartera.ui.observable.ObservableAsegurado;
-import com.embuckets.controlcartera.ui.observable.ObservableCliente;
+import com.embuckets.controlcartera.entidades.globals.Utilities;
+import com.embuckets.controlcartera.excel.ExcelImporter;
+import com.embuckets.controlcartera.mail.MailService;
 import com.embuckets.controlcartera.ui.observable.ObservableNotificacionRecibo;
-import com.embuckets.controlcartera.ui.observable.ObservablePoliza;
 import com.embuckets.controlcartera.ui.observable.ObservableRenovacion;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.Date;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -51,9 +41,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
@@ -61,6 +59,10 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * FXML Controller class
@@ -69,8 +71,9 @@ import javafx.scene.input.KeyCode;
  */
 public class HomeController implements Initializable, Controller {
 
+    private static final Logger logger = LogManager.getLogger(HomeController.class);
+
     private String location = "/fxml/Home.fxml";
-    //TreeTableView 
     @FXML
     private TreeTableView<ObservableTreeItem> treeAsegurados;
     @FXML
@@ -118,15 +121,33 @@ public class HomeController implements Initializable, Controller {
 
     //TableView Cumple
     @FXML
-    private TableView<ObservableCliente> tableViewCumple;
+    private TableView<NotificacionCumple> tableViewCumple;
     @FXML
     private TableColumn cumpleNombreTableColumn;
     @FXML
     private TableColumn cumpleNacimientoTableColumn;
+    @FXML
+    private TableColumn cumpleFaltanTableColumn;
+    @FXML
+    private TableColumn cumpleEstadoTableColumn;
 
     //Botones
     @FXML
-    private Button buttonNuevo;
+    private Button nuevoAseguradoButton;
+    @FXML
+    private Button nuevaPolizaButton;
+    @FXML
+    private TextField nombreField;
+    @FXML
+    private TextField paternoField;
+    @FXML
+    private TextField maternoField;
+    @FXML
+    private TextField numeroPolizaField;
+    @FXML
+    private ComboBox<String> aseguradoraCombo;
+    @FXML
+    private ComboBox<String> ramoCombo;
 
     /**
      * Initializes the controller class.
@@ -137,18 +158,11 @@ public class HomeController implements Initializable, Controller {
         fillTablaRecibos();
         fillTablaCumple();
         fillTablaAsegurados();
+        llenarComboFiltros();
     }
 
     private void fillTablaAsegurados() {
         treeAsegurados.setRoot(createTree());
-        //agregar listeners
-//        treeAsegurados.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//            //Agregar listener para doble click que lleve a la pagina del asegurado o poliza
-//            System.out.println("oldValue: " + oldValue);//item previamente seleccionado
-//            System.out.println("newValue: " + newValue);//item actualmente seleccionado ObservableAsegurado | ObservablePoliza
-//            System.out.println("observable: " + observable);//item actualmente seleccionado ObservableAsegurado | ObservablePoliza
-//            System.out.println();
-//        });
 
         treeAsegurados.setRowFactory(table -> {
             TreeTableRow<ObservableTreeItem> row = new TreeTableRow<>();
@@ -161,12 +175,10 @@ public class HomeController implements Initializable, Controller {
                             Parent parent = loader.load();
                             AseguradoHomeController controller = loader.<AseguradoHomeController>getController();
                             controller.setAsegurado((Asegurado) obs);
-//            controller.setAseguradoId(id);
-//        loader.setController(controller);
                             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
-//mandar el id y que el controlador de AsegurdoHome lo tome de la base
                         } catch (IOException ex) {
-                            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.fatal("Error al cargar fxml", ex);
+                            showAlert(ex, "Error al cargar fxml");
                         }
                     } else if (obs instanceof Poliza) {
                         try {
@@ -174,12 +186,10 @@ public class HomeController implements Initializable, Controller {
                             Parent parent = loader.load();
                             PolizaHomeController controller = loader.<PolizaHomeController>getController();
                             controller.setPoliza((Poliza) obs);
-//            controller.setAseguradoId(id);
-//        loader.setController(controller);
                             MainApp.getInstance().changeSceneContent(this, location, parent, loader);
-//mandar el id y que el controlador de AsegurdoHome lo tome de la base
                         } catch (IOException ex) {
-                            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.fatal("Error al cargar fxml", ex);
+                            showAlert(ex, "Error al cargar fxml");
                         }
                     }
                 }
@@ -194,7 +204,6 @@ public class HomeController implements Initializable, Controller {
             return row;
         });
 
-//        treeAsegurados.getSelectionModel().selectedItemProperty().addListener();
     }
 
     private TreeItem createTree() {
@@ -223,18 +232,6 @@ public class HomeController implements Initializable, Controller {
 
     }
 
-//    private List<ObservableTreeItem> createObservableAsegurados(List<Asegurado> list) {
-//        List<ObservableAsegurado> obsList = new ArrayList<>();
-//        for (Asegurado ase : list) {
-//            ObservableAsegurado obsAsegurdo = new ObservableAsegurado(ase);
-//            for (Poliza pol : ase.getPolizaList()) {
-//                ObservablePoliza obsPoliza = new ObservablePoliza(pol);
-//                obsAsegurdo.addObservablePoliza(obsPoliza);
-//            }
-//            obsList.add(obsAsegurdo);
-//        }
-//        return obsList;
-//    }
     /**
      * lee todos los asegurados de la base
      *
@@ -242,219 +239,52 @@ public class HomeController implements Initializable, Controller {
      */
     private List<? extends ObservableTreeItem> getAsegurados() {
         //TODO: pedir al sistema ControlCartera todos los asegurados
-        return createAseguradosFalsos();
+        return MainApp.getInstance().getBaseDeDatos().getAll(Asegurado.class);
     }
 
-    private List<Asegurado> createAseguradosFalsos() {
-        Asegurado asegurado1 = new Asegurado("emilio", "hernandez", "segovia");
-        asegurado1.setIdcliente(1);
-        asegurado1.getCliente().setIdcliente(1);
-        asegurado1.getCliente().setNacimiento(Date.from(Instant.parse("1993-05-22T00:00:01.00Z")));
-        asegurado1.setTipopersona(new TipoPersona("Fisica"));
-        Asegurado asegurado2 = new Asegurado("daniel", "hernandez", "segovia");
-        asegurado2.getCliente().setNacimiento(Date.from(Instant.parse("1994-09-23T00:00:01.00Z")));
-        asegurado2.setIdcliente(2);
-        asegurado2.getCliente().setIdcliente(2);
-        asegurado2.setTipopersona(new TipoPersona("Fisica"));
-
-        Poliza poliza1 = new Poliza();
-        poliza1.setIdpoliza(1);
-        poliza1.setNumero("numeor1");
-        poliza1.setAseguradora(new Aseguradora("GNP"));
-        poliza1.setRamo(new Ramo("vida"));
-        poliza1.setProducto("producto");
-        poliza1.setPlan("plan");
-        poliza1.setPrima(new BigDecimal(21456));
-        poliza1.setPrimamoneda(new Moneda("pesos"));
-        poliza1.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(15))));
-        poliza1.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-        poliza1.setEstado(new EstadoPoliza("Vigente"));
-        poliza1.setConductocobro(new ConductoCobro("agente"));
-        poliza1.setFormapago(new FormaPago("mensual"));
-        Cliente benef = new Cliente("beneficiario1", "hijo", "hijo");
-        benef.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
-        poliza1.setPolizaVida(new PolizaVida(1));
-        poliza1.getPolizaVida().setSumaasegurada(BigDecimal.valueOf(50000));
-        poliza1.getPolizaVida().setSumaaseguradamoneda(new Moneda("Dolares"));
-        poliza1.getPolizaVida().getClienteList().add(benef);
-        poliza1.generarRecibos(3, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        Poliza poliza2 = new Poliza();
-        poliza2.setIdpoliza(2);
-        poliza2.setNumero("numeor2");
-        poliza2.setAseguradora(new Aseguradora("GNP"));
-        poliza2.setRamo(new Ramo("autos"));
-        poliza2.setProducto("producto");
-        poliza2.setPlan("plan");
-        poliza2.setPrima(new BigDecimal(54789));
-        poliza2.setPrimamoneda(new Moneda("pesos"));
-        poliza2.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(20))));
-        poliza2.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-        poliza2.setEstado(new EstadoPoliza("Cancelada"));
-        poliza2.setPolizaAuto(new PolizaAuto(2));
-        poliza2.getPolizaAuto().setSumaaseguradaauto(new SumaAseguradaAuto("Factura"));
-        poliza2.getPolizaAuto().getAutoList().add(new Auto(2, "STD 4PT RL", "VW", "Jetta", Year.of(2016)));
-        poliza2.setConductocobro(new ConductoCobro("agente"));
-        poliza2.setFormapago(new FormaPago("mensual"));
-        poliza2.generarRecibos(4, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        poliza1.setContratante(asegurado1);
-        poliza1.setTitular(asegurado1.getCliente());
-        poliza2.setContratante(asegurado1);
-        poliza2.setTitular(asegurado1.getCliente());
-        asegurado1.getPolizaList().add(poliza1);
-        asegurado1.getPolizaList().add(poliza2);
-
-        Poliza poliza3 = new Poliza();
-        poliza3.setIdpoliza(3);
-        poliza3.setNumero("numeor3");
-        poliza3.setAseguradora(new Aseguradora("PLAN SEGURO"));
-        poliza3.setRamo(new Ramo("gastos medicos"));
-        poliza3.setProducto("producto");
-        poliza3.setPlan("plan");
-        poliza3.setPrima(new BigDecimal(12456));
-        poliza3.setPrimamoneda(new Moneda("PESOS"));
-        poliza3.setIniciovigencia(java.util.Date.from(Instant.now().minus(Duration.ofDays(5))));
-        poliza3.setFinvigencia(java.util.Date.from(Instant.now().plus(Duration.ofDays(365))));
-        poliza3.setEstado(new EstadoPoliza("No vigente"));
-        poliza3.setConductocobro(new ConductoCobro("agente"));
-        poliza3.setFormapago(new FormaPago(Globals.FORMA_PAGO_TRIMESTRAL));
-        poliza3.setPolizaGmm(new PolizaGmm(3, BigDecimal.valueOf(789654.12), "100,000,000", (short) 10));
-        poliza3.getPolizaGmm().setDeduciblemoneda(new Moneda("PESOS"));
-        poliza3.getPolizaGmm().setSumaaseguradamondeda(new Moneda("PESOS"));
-        Cliente depend = new Cliente("beneficiario1", "hijo", "hijo");
-        depend.setNacimiento(LocalDate.of(2016, Month.JANUARY, 9));
-        poliza3.getPolizaGmm().getClienteList().add(depend);
-        poliza3.generarRecibos(2, new BigDecimal(10123.12), new BigDecimal(9123.12));
-
-        poliza3.setContratante(asegurado2);
-        poliza3.setTitular(asegurado2.getCliente());
-        asegurado2.getPolizaList().add(poliza3);
-
-        List<Asegurado> list = new ArrayList<>();
-        list.add(asegurado1);
-        list.add(asegurado2);
-        return list;
+    private ObservableList<NotificacionCumple> getCumplesProximos() {
+        return FXCollections.observableArrayList(getNotificacionesCumple());
     }
 
-    private ObservableList<ObservableCliente> createCumple() {
-        return FXCollections.observableArrayList(getClientes());
-//        return createObservableClientes(getClientes());
-    }
-
-//    private ObservableList<ObservableCliente> createObservableClientes(List<Cliente> clientes) {
-//        List<ObservableCliente> observableClientes = new ArrayList<>();
-//        clientes.stream().map((cliente) -> new ObservableCliente(cliente)).forEachOrdered((obvs) -> {
-//            observableClientes.add(obvs);
-//        });
-//        return FXCollections.observableArrayList(observableClientes);
-//    }
-    private List<? extends Cliente> getClientes() {
-        //TODO: pedir clientes que cumplan
-        return createClientesFalsos();
-    }
-
-    private List<Cliente> createClientesFalsos() {
-        List<Asegurado> asegurados = createAseguradosFalsos();
-        List<Cliente> clientes = new ArrayList<>();
-        asegurados.forEach((asegurado) -> {
-            clientes.add(asegurado.getCliente());
-        });
-        return clientes;
+    private List<NotificacionCumple> getNotificacionesCumple() {
+        return MainApp.getInstance().getBaseDeDatos().getCumplesEntre(Globals.CUMPLES_ENTRE_START_DEFAULT, Globals.CUMPLES_ENTRE_END_DEFAULT);
     }
 
     private void fillTablaRenovaciones() {
-        tableViewRenovaciones.setItems(createRenovaciones());
+        tableViewRenovaciones.setItems(getRenovacionesProximas());
 
         renovacionesAseguradoTableColumn.setCellValueFactory(new PropertyValueFactory("asegurado"));
         renovacionesPolizaTableColumn.setCellValueFactory(new PropertyValueFactory("numero"));
         renovacionesFinVigenciaTableColumn.setCellValueFactory(new PropertyValueFactory("finVigencia"));
         renovacionesFaltanTableColumn.setCellValueFactory(new PropertyValueFactory("faltan"));
-
-//        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-//        cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory<>("nacimiento"));
-//        colNotificar.setCellValueFactory(new Callback<CellDataFeatures<ObservableAsegurado, CheckBox>, ObservableValue<CheckBox>>() {
-//            //This callback tell the cell how to bind the data model 'Registered' property to
-//            //the cell, itself.
-//            @Override
-//            public ObservableValue<CheckBox> call(CellDataFeatures<ObservableAsegurado, CheckBox> param) {
-//                ObservableAsegurado asegurado = param.getValue();
-//                CheckBox checkbox = new CheckBox();
-//                checkbox.selectedProperty().setValue(asegurado.isNotificado());
-//                checkbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-//                    @Override
-//                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-//                        asegurado.setNotificado(newValue);
-////                        System.out.println(asegurado.nombreProperty + ", " + asegurado.notificarProperty);
-//                    }
-//                });
-//
-//                checkbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-//                    @Override
-//                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-//                        asegurado.setNotificado(checkNotificarCumple.isSelected());
-////                        checkbox.setSelected(asegurado.notificarProperty.getValue());
-//                    }
-//                });
-//
-//                return new SimpleObjectProperty<CheckBox>(checkbox);
-////                return param.getValue().notificarProperty();
-//            }
-//        });
-//        colNotificar.setCellFactory(CheckBoxTableCell.forTableColumn(colNotificar));
     }
 
-//    @FXML
-//    void notificarTodosCumple(ActionEvent event) {
-//        CheckBox checkBox = (CheckBox) event.getSource();
-//        ObservableList<ObservableAsegurado> asegurados = tableViewCumple.getItems();
-//        for (ObservableAsegurado asegurado : asegurados) {
-//            asegurado.setNotificado(checkBox.isSelected());
-//            colNotificar.getCellData(asegurado).setSelected(checkBox.isSelected());
-////            System.out.println(asegurado.nombreProperty + ", " + asegurado.notificarProperty);
-//
-//        }
-//
-//        tableViewCumple.setItems(asegurados);
-//
-//    }
+    @FXML
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevoAsegurado.fxml");
-//        try {
-//            Parent parent = FXMLLoader.load(getClass().getResource("NuevoAsegurado.fxml"));
-//            
-////            VBox page = (VBox) FXMLLoader.load(getClass().getResource("NuevoAsegurado.fxml"));
-//            Scene newScene = new Scene(parent);
-//            
-//            Stage mainWindow = (Stage) ((Node)event.getSource()).getScene().getWindow();
-//            mainWindow.getScene().getRoot().setEffect(new GaussianBlur());
-//            
-//            Stage popUpStage = new Stage(StageStyle.DECORATED);
-//            popUpStage.initOwner(mainWindow);
-//            popUpStage.initModality(Modality.APPLICATION_MODAL);
-//            popUpStage.setScene(newScene);
-////            popUpStage.setMaximized(true);
-//            popUpStage.show();
-//            
-////            mainWindow.setScene(newScene);
-////            mainWindow.setMaximized(true);
-////            mainWindow.show();
-//            
-//        } catch (IOException ex) {
-//            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        
+    }
+
+    @FXML
+    public void abrirSceneNuevaPoliza(ActionEvent event) throws IOException {
+        MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevaPoliza.fxml");
+    }
+
+    @FXML
+    public void goToNotificaciones(ActionEvent event) throws IOException {
+        MainApp.getInstance().changeSceneContent(this, location, "/fxml/NotificacionHome.fxml");
     }
 
     private void fillTablaCumple() {
-        tableViewCumple.setItems(createCumple());
+        tableViewCumple.setItems(getCumplesProximos());
 
-        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory("nombre"));
+        cumpleNombreTableColumn.setCellValueFactory(new PropertyValueFactory("nombreCompleto"));
         cumpleNacimientoTableColumn.setCellValueFactory(new PropertyValueFactory("nacimiento"));
+        cumpleFaltanTableColumn.setCellValueFactory(new PropertyValueFactory("faltan"));
+        cumpleEstadoTableColumn.setCellValueFactory(new PropertyValueFactory("estado"));
     }
 
     private void fillTablaRecibos() {
-        tableViewRecibos.setItems(createRecibos());
+        tableViewRecibos.setItems(getRecibosProximos());
 
         recibosAseguradoTableColumn.setCellValueFactory(new PropertyValueFactory("asegurado"));
         recibosPolizaTableColumn.setCellValueFactory(new PropertyValueFactory("poliza"));
@@ -465,72 +295,89 @@ public class HomeController implements Initializable, Controller {
 
     }
 
-    private ObservableList<ObservableRenovacion> createRenovaciones() {
-        return FXCollections.observableArrayList(getRenovaciones());
-//        return createObservableRenovacionesList();
-    }
-
-//    private ObservableList<ObservablePoliza> createObservableRenovacionesList(List<Poliza> renovaciones) {
-//        List<ObservablePoliza> result = new ArrayList<>();
-//        for (Poliza poliza : renovaciones) {
-//            ObservablePoliza observablePoliza = new ObservablePoliza(poliza);
-//            result.add(observablePoliza);
-//        }
-//        return FXCollections.observableArrayList(result);
-//    }
-    private List<? extends ObservableRenovacion> getRenovaciones() {
-        //TODO: get renovaciones de la base de datos
-        return createRenovacionesFalsas();
-    }
-
-    private List<Poliza> createRenovacionesFalsas() {
-        List<Poliza> result = new ArrayList<>();
-        List<Asegurado> asegurados = (List<Asegurado>) getAsegurados();
-        for (Asegurado asegurado : asegurados) {
-            List<Poliza> polizas = asegurado.getPolizaList();
-            polizas.stream().forEach((p) -> result.add(p));
+    @FXML
+    public void editarAgente(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/Agente.fxml"), null, new JavaFXBuilderFactory());
+            Parent parent = loader.load();
+            AgenteController controller = loader.getController();
+            Optional<Agente> agente = controller.getDialog().showAndWait();
+            agente.ifPresent((present) -> {
+                present.guardar();
+                try {
+                    MailService.getInstance().refresh();
+                } catch (Exception ex) {
+                    Alert alert = new Alert(AlertType.INFORMATION);
+                    alert.setTitle("Información");
+                    alert.setHeaderText("Datos incompletos");
+                    alert.setContentText("Email o password guardados son inválidos. No podra enviar notificaciones por correo\n" + ex.getMessage());
+                    alert.showAndWait();
+                }
+            });
+        } catch (IOException ex) {
+            //TODO
         }
-        return result;
     }
 
-    private ObservableList<ObservableNotificacionRecibo> createRecibos() {
+    @FXML
+    public void importarCartera(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Elige un Documento");
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XLSX", "*.xlsx"));
+        File file = chooser.showOpenDialog(MainApp.getInstance().getStage());
+        if (file != null) {
+            try {
+                List<Asegurado> asegurados = new ExcelImporter().importar(file);
+                MainApp.getInstance().getBaseDeDatos().importarAsegurados(asegurados);
+                fillTablaAsegurados();
+            } catch (Exception e) {
+                TextArea textArea = new TextArea(e.getMessage());
+                textArea.setEditable(false);
+                Dialog dialog = new Dialog();
+                dialog.setTitle("Error al importar");
+                DialogPane pane = new DialogPane();
+                pane.setContent(textArea);
+                dialog.setDialogPane(pane);
+                dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+                dialog.showAndWait();
+            }
+        }
+    }
+
+    @FXML
+    public void exportarPlantilla(ActionEvent event) {
+        final DirectoryChooser chooser = new DirectoryChooser();
+        final File directory = chooser.showDialog(MainApp.getInstance().getStage());
+        if (directory != null) {
+            try (InputStream in = new FileInputStream(Globals.TEMPLATE_EXCEL)) {
+                File targetFile = new File(directory.getAbsolutePath() + "/plantilla-cartera.xlsx");
+                File plantilla = new File(Globals.TEMPLATE_EXCEL);
+                byte[] bytes = Files.readAllBytes(plantilla.toPath());
+                Files.write(targetFile.toPath(), bytes);
+                Desktop.getDesktop().open(targetFile.getParentFile());
+            } catch (IOException ex) {
+                logger.fatal("Error al exportar excel", ex);
+                showAlert(ex, "Error al exportar excel");
+            }
+
+        }
+    }
+
+    private ObservableList<ObservableRenovacion> getRenovacionesProximas() {
+        return FXCollections.observableArrayList(getRenovaciones());
+    }
+
+    private List<? extends ObservableRenovacion> getRenovaciones() {
+        return MainApp.getInstance().getBaseDeDatos().getRenovacionesEntre(Globals.RENOVACION_ENTRE_START_DEFAULT, Globals.RENOVACION_ENTRE_END_DEFAULT);
+    }
+
+    private ObservableList<ObservableNotificacionRecibo> getRecibosProximos() {
         return FXCollections.observableArrayList(getNotificacionesRecibos());
     }
 
-    private List<? extends NotificacionRecibo> getNotificacionesRecibos() {
-        //TODO: getNotifacaciones de la base de dato
-        return createNotificacionesRecibosFalsos();
-    }
-
-//    private ObservableList<ObservableNotificacionRecibo> createObservableNotificacionesRecibo(List<NotificacionRecibo> notificacionesRecibos) {
-//        List<ObservableNotificacionRecibo> result = new ArrayList<>();
-//        notificacionesRecibos.stream().map((notificacionRecibo) -> new ObservableNotificacionRecibo(notificacionRecibo)).forEachOrdered((obv) -> {
-//            result.add(obv);
-//        });
-//        return FXCollections.observableArrayList(result);
-//    }
-    private List<NotificacionRecibo> createNotificacionesRecibosFalsos() {
-        NotificacionRecibo notificacion1 = new NotificacionRecibo();
-        notificacion1.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(2))));
-        notificacion1.setIdrecibo(1);
-        notificacion1.setRecibo(new Recibo(1, Date.from(Instant.parse("2018-12-01T00:00:01.00Z")), Date.from(Instant.parse("2018-12-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
-        notificacion1.getRecibo().setIdpoliza(new Poliza());
-        notificacion1.getRecibo().getIdpoliza().setNumero("numero1");
-        notificacion1.getRecibo().getIdpoliza().setContratante(new Asegurado("Emilio", "Hernandez", "Segovia"));
-
-        NotificacionRecibo notificacion2 = new NotificacionRecibo();
-        notificacion2.setEnviado(Date.from(Instant.now().minus(Duration.ofHours(26))));
-        notificacion2.setIdrecibo(2);
-        notificacion2.setRecibo(new Recibo(2, Date.from(Instant.parse("2019-01-01T00:00:01.00Z")), Date.from(Instant.parse("2019-01-31T00:00:01.00Z")), BigDecimal.valueOf(12548.45)));
-        notificacion2.getRecibo().setIdpoliza(new Poliza());
-        notificacion2.getRecibo().getIdpoliza().setNumero("numero1");
-        notificacion2.getRecibo().getIdpoliza().setContratante(new Asegurado("Daniel", "Hernandez", "Segovia"));
-
-        List<NotificacionRecibo> result = new ArrayList<>();
-        result.add(notificacion1);
-        result.add(notificacion2);
-        return result;
-
+    private List<NotificacionRecibo> getNotificacionesRecibos() {
+        return MainApp.getInstance().getBaseDeDatos().getRecibosEntre(Globals.RECIBO_CUBRE_DESDE_INICIO_DEFAULT, Globals.RECIBO_CUBRE_DESDE_FIN_DEFAULT);
     }
 
     @Override
@@ -541,6 +388,100 @@ public class HomeController implements Initializable, Controller {
     @Override
     public Object getData() {
         return null;
+    }
+
+    @FXML
+    private void filtrarAsegurados(ActionEvent event) {
+        //
+        List<ObservableTreeItem> observableAsegurados = (List<ObservableTreeItem>) filtrarAseguradorsAsItems(nombreField.getText(), paternoField.getText(), maternoField.getText());
+        //make root item
+        TreeItem root = new TreeItem(new Asegurado("Control Cartera", "", ""));
+        root.setExpanded(true);
+
+        //agrega los asegurados a root
+        observableAsegurados.stream().forEach((asegurado) -> {
+            TreeItem aseguradoItem = new TreeItem(asegurado);
+            root.getChildren().add(aseguradoItem);
+            asegurado.getPolizaListProperty().stream().forEach((poliza) -> {
+                aseguradoItem.getChildren().add(new TreeItem(poliza));
+            });
+        });
+//        treeAsegurados.getRoot().getChildren().clear();
+        treeAsegurados.setRoot(root);
+    }
+
+    private List<? extends ObservableTreeItem> filtrarAseguradorsAsItems(String nombre, String paterno, String materno) {
+        return MainApp.getInstance().getBaseDeDatos().buscarAseguradosPorNombre(nombre, paterno, materno);
+    }
+
+    @FXML
+    private void quitarFiltros(ActionEvent event) {
+        //
+        List<ObservableTreeItem> observableAsegurados = (List<ObservableTreeItem>) getAsegurados();
+        //make root item
+        TreeItem root = new TreeItem(new Asegurado("Control Cartera", "", ""));
+        root.setExpanded(true);
+
+        //agrega los asegurados a root
+        observableAsegurados.stream().forEach((asegurado) -> {
+            TreeItem aseguradoItem = new TreeItem(asegurado);
+            root.getChildren().add(aseguradoItem);
+            asegurado.getPolizaListProperty().stream().forEach((poliza) -> {
+                aseguradoItem.getChildren().add(new TreeItem(poliza));
+            });
+        });
+//        treeAsegurados.getRoot().getChildren().clear();
+        treeAsegurados.setRoot(root);
+        nombreField.setText("");
+        paternoField.setText("");
+        maternoField.setText("");
+
+        numeroPolizaField.setText("");
+        aseguradoraCombo.getSelectionModel().clearSelection();
+        ramoCombo.getSelectionModel().clearSelection();
+    }
+
+    @FXML
+    private void filtrarPolizas(ActionEvent event) {
+        List<Poliza> polizas = MainApp.getInstance().getBaseDeDatos().buscarPolizasPor(numeroPolizaField.getText(), aseguradoraCombo.getValue(), ramoCombo.getValue());
+
+        Map<Asegurado, List<Poliza>> mapped = new HashMap<>();
+        polizas.forEach((poliza) -> {
+            if (mapped.containsKey(poliza.getContratante())) {
+                mapped.get(poliza.getContratante()).add(poliza);
+            } else {
+                mapped.put(poliza.getContratante(), new ArrayList<>());
+                mapped.get(poliza.getContratante()).add(poliza);
+            }
+        });
+        TreeItem root = new TreeItem(new Asegurado("Control Cartera", "", ""));
+        root.setExpanded(true);
+
+        //agrega los asegurados a root
+        mapped.keySet().stream().forEach((k) -> {
+            TreeItem aseguradoItem = new TreeItem(k);
+            root.getChildren().add(aseguradoItem);
+            mapped.get(k).forEach((poliza) -> {
+                aseguradoItem.getChildren().add(new TreeItem(poliza));
+            });
+        });
+        treeAsegurados.setRoot(root);
+    }
+
+    private List<? extends ObservableTreeItem> filterPolizas(String numeroPoliza, String aseguradora, String ramo) {
+        return MainApp.getInstance().getBaseDeDatos().buscarPolizasPor(numeroPoliza, aseguradora, ramo);
+    }
+
+    private void llenarComboFiltros() {
+        List<Aseguradora> aseguradoras = MainApp.getInstance().getBaseDeDatos().getAll(Aseguradora.class);
+        List<String> aseguradorasStrings = aseguradoras.stream().map(a -> a.getAseguradora()).collect(Collectors.toList());
+        aseguradoraCombo.setItems(FXCollections.observableArrayList(aseguradorasStrings));
+
+        ramoCombo.setItems(FXCollections.observableArrayList(Globals.getAllRamos()));
+    }
+
+    private void showAlert(Exception ex, String header) {
+        Utilities.makeAlert(ex, header).showAndWait();
     }
 
 }

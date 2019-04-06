@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.embuckets.controlcartera.ui.NuevaPolizaController">
+   <children>
+      <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="20.0">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <children>
+                  <HBox VBox.vgrow="NEVER">
+                     <children>
+                        <Label text="Nueva Poliza" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <GridPane hgap="10.0" vgap="5.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="200.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" />
+                          </columnConstraints>
+                          <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Titular" GridPane.rowIndex="2" />
+                              <TextField fx:id="contratanteField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="Contratante" GridPane.rowIndex="1" />
+                              <Button mnemonicParsing="false" onAction="#buscarContratante" text="Buscar" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Button mnemonicParsing="false" onAction="#buscarTitular" text="Buscar" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <CheckBox fx:id="esContratanteCheckBox" mnemonicParsing="false" onAction="#esContratante" text="Es el contratante" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                              <TextField fx:id="titularField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="Contratante" GridPane.columnSpan="2147483647" />
+                           </children>
+                        </GridPane>
+                     </children>
+                  </HBox>
+                  <HBox spacing="20.0">
+                     <children>
+                        <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <GridPane vgap="5.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="Numero de Poliza" GridPane.rowIndex="1" />
+                                    <TextField fx:id="numeroField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label text="Aseguradora" GridPane.rowIndex="2" />
+                                    <ComboBox fx:id="aseguradoraCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Label text="Ramo" GridPane.rowIndex="3" />
+                                    <ComboBox fx:id="ramoCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Label text="Producto" GridPane.rowIndex="4" />
+                                    <TextField fx:id="productoField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <TextField fx:id="planField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                    <Label text="Plan" GridPane.rowIndex="5" />
+                                    <Label text="Datos de la Poliza" GridPane.columnSpan="2147483647" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </VBox>
+                        <VBox layoutX="739.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <GridPane vgap="5.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label text="Inicio de vigencia" GridPane.rowIndex="1" />
+                                    <Label text="Fin de vigencia" GridPane.rowIndex="2" />
+                                    <Label text="Conducto de cobro" GridPane.rowIndex="3" />
+                                    <ComboBox fx:id="conductoCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Label text="Forma de pago" GridPane.rowIndex="4" />
+                                    <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                       <children>
+                                          <TextField fx:id="primaField" />
+                                          <ComboBox fx:id="primaMonedaCombo" />
+                                       </children>
+                                    </HBox>
+                                    <Label text="Prima" GridPane.rowIndex="5" />
+                                    <DatePicker fx:id="inicioVigenciaPicker" onAction="#setFinVigenciaOnDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <DatePicker fx:id="finVigenciaPicker" disable="true" editable="false" layoutX="319.0" layoutY="12.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <ComboBox fx:id="formaPagoCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Recibos" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="10.0">
+                     <children>
+                        <Label text="Importe primer recibo" />
+                        <TextField fx:id="importePrimerReciboField" />
+                        <Label text="Importe recibos subsecuentes">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="importeSubsecuentesField" />
+                        <Label text="Recibos pagados">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Spinner fx:id="recibosPagadosSpinner" />
+                     </children>
+                  </HBox>
+                  <VBox fx:id="camposExtraVBox" spacing="15.0" />
+                  <VBox spacing="10.0">
+                     <children>
+                        <GridPane>
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Carátula" />
+                              <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                 <children>
+                                    <Button fx:id="agregarCaratulaButton" mnemonicParsing="false" onAction="#agregarCaratula" text="Agregar" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </GridPane>
+                        <VBox prefHeight="65.0" spacing="10.0">
+                           <children>
+                              <TableView fx:id="caratulaTableView">
+                                 <columns>
+                                    <TableColumn fx:id="archivoTableColumn" prefWidth="75.0" text="Archivo" />
+                                 </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                           </children>
+                        </VBox>
+                        <GridPane minHeight="-Infinity" minWidth="-Infinity">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Notas" GridPane.columnSpan="2147483647" />
+                           </children>
+                        </GridPane>
+                        <VBox maxHeight="150.0" minHeight="100.0">
+                           <children>
+                              <TextArea fx:id="notaTextArea" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+                  <HBox alignment="BOTTOM_RIGHT" spacing="10.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#cancelar" text="Cancelar" />
+                        <Button mnemonicParsing="false" onAction="#guardar" text="Guardar" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </children>
+</VBox>

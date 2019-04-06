@@ -32,29 +32,45 @@
 package com.embuckets.controlcartera.ui;
 
 //import dominio.ControlCartera;
+import com.embuckets.controlcartera.entidades.Agente;
+import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+//import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class MainApp extends Application {
+public final class MainApp extends Application {
+
+    private static final Logger logger = LogManager.getLogger(MainApp.class);
 
     private Stage mainStage;
     private static MainApp instance;
     private Deque<Pair<Object, String>> windowStack;
+    private BaseDeDatos bd;
+    private Agente agente;
 //    private ControlCartera controlCartera;
 
     public MainApp() {
         instance = this;
         windowStack = new ArrayDeque<>();
+        this.bd = BaseDeDatos.getInstance();
+        try {
+            this.agente = Agente.getInstance();
+        } catch (IOException ex) {
+            logger.fatal("Error al cargar al cliente", ex);
+            this.stop();
+        }
     }
 
     public static MainApp getInstance() {
@@ -71,24 +87,25 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-
-            //si existe base de datos ve a home.fxml
-            // si no existe base de datos mostrar dialogo para importar de excel
             mainStage = primaryStage;
+            mainStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/icons/cartera.png")));
             Parent page = FXMLLoader.load(getClass().getResource("/fxml/Home.fxml"));
             Scene scene = new Scene(page);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Control de Cartera");
             primaryStage.setMaximized(true);
             primaryStage.show();
+            logger.info("Application started");
         } catch (Exception ex) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Error al correr aplicacion: ", ex);
         }
     }
 
     public void changeSceneContent(Object previousController, String previousFxml, String nextFxml) throws IOException {
         Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(nextFxml), null, new JavaFXBuilderFactory());
-        windowStack.addLast(new Pair(previousController, previousFxml));
+        if (!(previousFxml.equals("/fxml/RenovarPoliza.fxml") && nextFxml.equals("/fxml/PolizaHome.fxml"))) {
+            windowStack.addLast(new Pair(previousController, previousFxml));
+        }
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -101,7 +118,10 @@ public class MainApp extends Application {
     }
 
     public void changeSceneContent(Object previousController, String previousFxml, Parent page, FXMLLoader loader) {
-        windowStack.addLast(new Pair<>(previousController, previousFxml));
+        if (!(previousFxml.equals("/fxml/RenovarPoliza.fxml") && loader.getLocation().getFile().endsWith("/fxml/PolizaHome.fxml"))) {
+            windowStack.addLast(new Pair(previousController, previousFxml));
+        }
+//        windowStack.addLast(new Pair<>(previousController, previousFxml));
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -114,22 +134,11 @@ public class MainApp extends Application {
     }
 
     public void goBack() throws IOException {
-//        FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/AseguradoHome.fxml"), null, new JavaFXBuilderFactory());
-//                            Parent parent = loader.load();
-//                            AseguradoHomeController controller = loader.<AseguradoHomeController>getController();
-//                            controller.setAsegurado((Asegurado) obs);
-////            controller.setAseguradoId(id);
-////        loader.setController(controller);
-//                            MainApp.getInstance().changeSceneContent(this, location, parent, loader);
-        
-        
-        Pair pair = windowStack.getLast();
+        Pair pair = windowStack.pollLast();
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource((String) pair.getValue()));
         Parent page = (Parent) loader.load();
         Controller controller = loader.<Controller>getController();
-        controller.setData(((Controller)pair.getKey()).getData());
-//        loader.setController(((Controller)pair.getKey()).getData());
-//        Parent page = (Parent) loader.load(MainApp.class.getResource((String)pair.getValue()), null, new JavaFXBuilderFactory());
+        controller.setData(((Controller) pair.getKey()).getData());
         Scene scene = mainStage.getScene();
         if (scene == null) {
             scene = new Scene(page);
@@ -154,14 +163,22 @@ public class MainApp extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
-        System.out.println("Closing control cartera");
-//        ControlCartera.getInstance().detenerBaseDeDatos();
-        super.stop(); //To change body of generated methods, choose Tools | Templates.
+    public void stop() {
+        logger.info("Stopping Control de Cartera");
+        bd.close();
+        LogManager.shutdown();
     }
 
     public Stage getStage() {
         return mainStage;
+    }
+
+    public BaseDeDatos getBaseDeDatos() {
+        return this.bd;
+    }
+
+    public Agente getAgente() {
+        return this.agente;
     }
 
 }

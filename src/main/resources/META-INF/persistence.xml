@@ -34,11 +34,14 @@
     <class>com.embuckets.controlcartera.entidades.Telefono</class>
     <class>com.embuckets.controlcartera.entidades.DocumentoRecibo</class>
     <properties>
+      <property name="hibernate.dialect" value="com.embuckets.controlcartera.hibernate.MyDerbyDialect"/>
       <property name="javax.persistence.jdbc.url" value="jdbc:derby:cartera"/>
       <property name="javax.persistence.jdbc.user" value="emilio"/>
       <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
       <property name="javax.persistence.jdbc.password" value="emilio"/>
       <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.format_sql" value="true"/>
+      <property name="hibernate.connection.autocommit" value="true"/>
       <property name="hibernate.default_schema" value="APP"/>
       <!--<property name="hibernate.default_schema">APP</property>-->
       <!--<property name="hibernate.current_session_context_class">thread</property>-->

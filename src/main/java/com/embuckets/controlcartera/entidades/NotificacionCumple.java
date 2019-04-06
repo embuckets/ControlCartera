@@ -5,8 +5,17 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableNotificacionCumple;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Year;
+import static java.time.temporal.ChronoUnit.DAYS;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,8 +27,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -32,8 +39,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "NotificacionCumple.findAll", query = "SELECT n FROM NotificacionCumple n"),
     @NamedQuery(name = "NotificacionCumple.findByIdcliente", query = "SELECT n FROM NotificacionCumple n WHERE n.idcliente = :idcliente"),
-    @NamedQuery(name = "NotificacionCumple.findByEnviado", query = "SELECT n FROM NotificacionCumple n WHERE n.enviado = :enviado")})
-public class NotificacionCumple implements Serializable {
+    @NamedQuery(name = "NotificacionCumple.findByEnviado", query = "SELECT n FROM NotificacionCumple n WHERE n.enviado = :enviado"),
+    @NamedQuery(name = "NotificacionCumple.findPendingWithin", query = "SELECT n FROM NotificacionCumple n WHERE n.estadonotificacion.estadonotificacion = :estado AND n.cliente.nacimiento BETWEEN :startDate AND :endDate"),
+    @NamedQuery(name = "NotificacionCumple.findWithin", query = "SELECT n FROM NotificacionCumple n WHERE n.cliente.nacimiento BETWEEN :startDate AND :endDate")})
+public class NotificacionCumple implements Serializable, ObservableNotificacionCumple, Notificacion {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -41,8 +50,8 @@ public class NotificacionCumple implements Serializable {
     @Column(name = "IDCLIENTE")
     private Integer idcliente;
     @Column(name = "ENVIADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date enviado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime enviado;
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = false, updatable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Cliente cliente;
@@ -52,9 +61,15 @@ public class NotificacionCumple implements Serializable {
 
     public NotificacionCumple() {
     }
+//
+//    public NotificacionCumple(Integer idcliente) {
+//        this.idcliente = idcliente;
+//    }
 
-    public NotificacionCumple(Integer idcliente) {
-        this.idcliente = idcliente;
+    public NotificacionCumple(Cliente cliente, String estadonotificacion) {
+        this.idcliente = cliente.getIdcliente();
+        this.cliente = cliente;
+        this.estadonotificacion = new EstadoNotificacion(estadonotificacion);
     }
 
     public Integer getIdcliente() {
@@ -65,11 +80,13 @@ public class NotificacionCumple implements Serializable {
         this.idcliente = idcliente;
     }
 
-    public Date getEnviado() {
+    @Override
+    public LocalDateTime getEnviado() {
         return enviado;
     }
 
-    public void setEnviado(Date enviado) {
+    @Override
+    public void setEnviado(LocalDateTime enviado) {
         this.enviado = enviado;
     }
 
@@ -81,12 +98,36 @@ public class NotificacionCumple implements Serializable {
         this.cliente = cliente;
     }
 
+    @Override
     public EstadoNotificacion getEstadonotificacion() {
         return estadonotificacion;
     }
 
+    @Override
     public void setEstadonotificacion(EstadoNotificacion estadonotificacion) {
         this.estadonotificacion = estadonotificacion;
+    }
+
+    public String getNombreAsegurado() {
+        return cliente.nombreProperty().get();
+    }
+
+    @Override
+    public boolean tieneEmail() {
+        return !cliente.getAsegurado().getEmailList().isEmpty();
+    }
+
+    @Override
+    public List<String> getEmailsDeNotificacion() {
+        List<Email> emails = cliente.getAsegurado().getEmailList();
+        List<String> emailsDeNotificacio = emails.stream().filter(e -> e.isNotificar()).map(e -> e.getEmailPK().getEmail()).collect(Collectors.toList());
+        if (!emailsDeNotificacio.isEmpty()) {
+            return emailsDeNotificacio;
+        } else {
+            ArrayList<String> first = new ArrayList<>();
+            first.add(emails.get(0).getEmailPK().getEmail());
+            return first;
+        }
     }
 
     @Override
@@ -113,5 +154,29 @@ public class NotificacionCumple implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.NotificacionCumple[ idcliente=" + idcliente + " ]";
     }
-    
+
+    @Override
+    public StringProperty nombreCompletoProperty() {
+        return cliente.nombreProperty();
+    }
+
+    @Override
+    public StringProperty nacimientoProperty() {
+        return cliente.nacimientoProperty();
+    }
+
+    @Override
+    public StringProperty faltanProperty() {
+        LocalDate nacimiento = this.cliente.getNacimiento().withYear(Year.now().getValue());
+        long dias = DAYS.between(LocalDate.now(), nacimiento);
+//        long dias = nacimiento.until(LocalDate.now(), ChronoUnit.DAYS);
+        String faltan = dias > 0 ? dias + " días" : "hace " + Math.abs(dias);
+        return new SimpleStringProperty(faltan);
+    }
+
+    @Override
+    public StringProperty estadoProperty() {
+        return new SimpleStringProperty(this.estadonotificacion.getEstadonotificacion());
+    }
+
 }

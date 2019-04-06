@@ -6,11 +6,9 @@
 package com.embuckets.controlcartera.ui.observable;
 
 import com.embuckets.controlcartera.entidades.Asegurado;
-import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

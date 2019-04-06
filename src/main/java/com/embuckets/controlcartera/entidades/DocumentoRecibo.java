@@ -5,8 +5,12 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.entidades.globals.Logging;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,9 +22,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -37,6 +41,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "DocumentoRecibo.findByActualizado", query = "SELECT d FROM DocumentoRecibo d WHERE d.actualizado = :actualizado")})
 public class DocumentoRecibo implements Serializable {
 
+    private static final Logger logger = LogManager.getLogger(DocumentoRecibo.class);
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -51,10 +57,10 @@ public class DocumentoRecibo implements Serializable {
     @Basic(optional = false)
     @Lob
     @Column(name = "ARCHIVO")
-    private Serializable archivo;
+    private byte[] archivo;
     @Column(name = "ACTUALIZADO")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualizado;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime actualizado;
     @JoinColumn(name = "IDRECIBO", referencedColumnName = "IDRECIBO", insertable = false, updatable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Recibo recibo;
@@ -62,15 +68,19 @@ public class DocumentoRecibo implements Serializable {
     public DocumentoRecibo() {
     }
 
-    public DocumentoRecibo(Integer idrecibo) {
-        this.idrecibo = idrecibo;
-    }
-
-    public DocumentoRecibo(Integer idrecibo, String nombre, String extension, Serializable archivo) {
-        this.idrecibo = idrecibo;
-        this.nombre = nombre;
-        this.extension = extension;
-        this.archivo = archivo;
+    public DocumentoRecibo(File file, Recibo recibo) throws IOException {
+        this.recibo = recibo;
+        this.idrecibo = recibo.getIdrecibo();
+        String[] tokens = file.getName().split("\\.");
+        this.nombre = tokens[0];
+        this.extension = "." + tokens[1];
+        this.actualizado = LocalDateTime.now();
+        try {
+            this.archivo = Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            logger.error(Logging.Exception_MESSAGE, e);
+            throw e;
+        }
     }
 
     public Integer getIdrecibo() {
@@ -97,19 +107,19 @@ public class DocumentoRecibo implements Serializable {
         this.extension = extension;
     }
 
-    public Serializable getArchivo() {
+    public byte[] getArchivo() {
         return archivo;
     }
 
-    public void setArchivo(Serializable archivo) {
+    public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 
-    public Date getActualizado() {
+    public LocalDateTime getActualizado() {
         return actualizado;
     }
 
-    public void setActualizado(Date actualizado) {
+    public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 
@@ -145,5 +155,5 @@ public class DocumentoRecibo implements Serializable {
     public String toString() {
         return "com.embuckets.controlcartera.entidades.DocumentoRecibo[ idrecibo=" + idrecibo + " ]";
     }
-    
+
 }

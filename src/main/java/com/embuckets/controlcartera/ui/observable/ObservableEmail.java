@@ -14,4 +14,5 @@ import javafx.beans.property.StringProperty;
 public interface ObservableEmail {
     StringProperty emailProperty();
     StringProperty tipoProperty();
+    StringProperty notificarProperty();
 }

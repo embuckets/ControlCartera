@@ -9,6 +9,7 @@ import com.embuckets.controlcartera.ui.observable.ObservableEmail;
 import java.io.Serializable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,8 +40,10 @@ public class Email implements Serializable, ObservableEmail {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Asegurado asegurado;
     @JoinColumn(name = "TIPOEMAIL", referencedColumnName = "TIPOEMAIL")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private TipoEmail tipoemail;
+    @Column(name = "NOTIFICAR")
+    private boolean notificar;
 
     public Email() {
     }
@@ -82,6 +85,14 @@ public class Email implements Serializable, ObservableEmail {
         this.tipoemail = tipoemail;
     }
 
+    public boolean isNotificar() {
+        return notificar;
+    }
+
+    public void setNotificar(boolean notificar) {
+        this.notificar = notificar;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -115,6 +126,11 @@ public class Email implements Serializable, ObservableEmail {
     @Override
     public StringProperty tipoProperty() {
         return new SimpleStringProperty(this.tipoemail.getTipoemail());
+    }
+
+    @Override
+    public StringProperty notificarProperty() {
+        return notificar ? new SimpleStringProperty("SI") : new SimpleStringProperty("NO");
     }
 
 }

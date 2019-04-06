@@ -156,6 +156,7 @@ CREATE TABLE EMAIL (
   idCliente INT NOT NULL,
   Email VARCHAR(45) NOT NULL,
   TipoEmail VARCHAR(8),
+  NOTIFICAR BOOLEAN DEFAULT FALSE NOT NULL,
   PRIMARY KEY (Email, idCliente),
   CONSTRAINT fk_email_asegurado
     FOREIGN KEY (idCliente)
@@ -555,7 +556,7 @@ CREATE TABLE  ESTADO_NOTIFICACION (
 -- -----------------------------------------------------
 CREATE TABLE  NOTIFICACION_CUMPLE (
   idCliente INT NOT NULL,
-  Enviado TIMESTAMP WITH DEFAULT CURRENT_TIMESTAMP,
+  Enviado TIMESTAMP,--  WITH DEFAULT CURRENT_TIMESTAMP
   EstadoNotificacion VARCHAR(9) NOT NULL,
   PRIMARY KEY (idCliente),
   CONSTRAINT fk_notifCumple_estadoNotif
@@ -572,7 +573,7 @@ CREATE TABLE  NOTIFICACION_CUMPLE (
 -- -----------------------------------------------------
 CREATE TABLE  NOTIFICACION_RECIBO (
   idRecibo INT NOT NULL,
-  Enviado TIMESTAMP WITH DEFAULT CURRENT_TIMESTAMP,
+  Enviado TIMESTAMP,--  WITH DEFAULT CURRENT_TIMESTAMP
   EstadoNotificacion VARCHAR(9) NOT NULL,
   PRIMARY KEY (idRecibo),
   CONSTRAINT fk_notifRecibo_estadoNotif
@@ -693,6 +694,7 @@ INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Assurant');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Atradius');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('AXA');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Berkley International');
+INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Best Doctors');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('BUPA');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Cardif');
 INSERT INTO ASEGURADORA (Aseguradora) VALUES ('Chubb');
@@ -785,7 +787,7 @@ INSERT INTO MONEDA (Moneda) VALUES ('UDIS');
 -- -----------------------------------------------------
 
 INSERT INTO ESTADO_POLIZA (Estado) VALUES ('Vigente');
-INSERT INTO ESTADO_POLIZA (Estado) VALUES ('No Vigente');
+INSERT INTO ESTADO_POLIZA (Estado) VALUES ('Renovada');
 INSERT INTO ESTADO_POLIZA (Estado) VALUES ('Cancelada');
 
 

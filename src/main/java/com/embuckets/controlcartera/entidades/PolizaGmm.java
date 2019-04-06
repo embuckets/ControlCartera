@@ -57,10 +57,10 @@ public class PolizaGmm implements Serializable {
     @ManyToMany(mappedBy = "polizaGmmList", fetch = FetchType.LAZY)
     private List<Cliente> clienteList;
     @JoinColumn(name = "SUMAASEGURADAMONDEDA", referencedColumnName = "MONEDA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Moneda sumaaseguradamondeda;
     @JoinColumn(name = "DEDUCIBLEMONEDA", referencedColumnName = "MONEDA")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Moneda deduciblemoneda;
     @JoinColumn(name = "IDPOLIZA", referencedColumnName = "IDPOLIZA", insertable = false, updatable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)

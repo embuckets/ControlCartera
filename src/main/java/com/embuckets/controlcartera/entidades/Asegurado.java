@@ -5,6 +5,7 @@
  */
 package com.embuckets.controlcartera.entidades;
 
+import com.embuckets.controlcartera.ui.observable.ObservableCliente;
 import com.embuckets.controlcartera.ui.observable.ObservableTreeItem;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,8 +20,12 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -33,13 +38,48 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "ASEGURADO")
+@NamedEntityGraphs({
+    @NamedEntityGraph(
+            name = "asegurado-graph-full-noDoc-noDom",
+            attributeNodes = {
+                @NamedAttributeNode("cliente"),
+                @NamedAttributeNode("tipopersona"),
+                @NamedAttributeNode("polizaList"),
+                @NamedAttributeNode(value = "telefonoList", subgraph = "telef-subgraph"),
+                @NamedAttributeNode(value = "emailList", subgraph = "email-subgraph"),},
+            subgraphs = {
+                @NamedSubgraph(
+                        name = "telef-subgraph",
+                        attributeNodes = {
+                            @NamedAttributeNode("tipotelefono")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "email-subgraph",
+                        attributeNodes = {
+                            @NamedAttributeNode("tipoemail")
+                        }
+                )
+            }
+    ),
+    @NamedEntityGraph(
+            name = "asegurado-graph-cliente",
+            attributeNodes = {
+                @NamedAttributeNode("cliente")
+            }
+    ),
+    @NamedEntityGraph(
+            name = "asegurado-IncludeAll",
+            includeAllAttributes = true)
+})
+
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Asegurado.findAll", query = "SELECT a FROM Asegurado a"),
     @NamedQuery(name = "Asegurado.findByIdcliente", query = "SELECT a FROM Asegurado a WHERE a.idcliente = :idcliente"),
     @NamedQuery(name = "Asegurado.findByRfc", query = "SELECT a FROM Asegurado a WHERE a.rfc = :rfc"),
     @NamedQuery(name = "Asegurado.findByNota", query = "SELECT a FROM Asegurado a WHERE a.nota = :nota")})
-public class Asegurado implements Serializable, ObservableTreeItem {
+public class Asegurado implements Serializable, ObservableTreeItem, ObservableCliente {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,7 +93,7 @@ public class Asegurado implements Serializable, ObservableTreeItem {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
     private List<Email> emailList;
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = true, updatable = true)
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.EAGER)
     private Cliente cliente;
     @JoinColumn(name = "IDDOMICILIO", referencedColumnName = "IDDOMICILIO")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -132,6 +172,22 @@ public class Asegurado implements Serializable, ObservableTreeItem {
 
     public Cliente getCliente() {
         return cliente;
+    }
+
+    public String getNombreCompleto() {
+        return cliente.nombreProperty().get();
+    }
+
+    public String getNombre() {
+        return cliente.getNombre();
+    }
+
+    public String getApellidoPaterno() {
+        return cliente.getApellidopaterno();
+    }
+
+    public String getApellidoMaterno() {
+        return cliente.getApellidomaterno();
     }
 
     public void setCliente(Cliente cliente) {
@@ -217,6 +273,10 @@ public class Asegurado implements Serializable, ObservableTreeItem {
         emailList.add(email);
     }
 
+    public void agregarDocumento(DocumentoAsegurado documentoAsegurado) {
+        documentoAseguradoList.add(documentoAsegurado);
+    }
+
     @Override
     public int getId() {
         return getIdcliente();
@@ -267,4 +327,23 @@ public class Asegurado implements Serializable, ObservableTreeItem {
         return new SimpleStringProperty("");
     }
 
+    @Override
+    public StringProperty primerNombreProperty() {
+        return new SimpleStringProperty(cliente.getNombre());
+    }
+
+    @Override
+    public StringProperty paternoProperty() {
+        return new SimpleStringProperty(cliente.getApellidopaterno());
+    }
+
+    @Override
+    public StringProperty maternoProperty() {
+        return new SimpleStringProperty(cliente.getApellidomaterno());
+    }
+
+    @Override
+    public StringProperty nacimientoProperty() {
+        return new SimpleStringProperty(cliente.getNacimiento() == null ? "" : cliente.getNacimiento().toString());
+    }
 }

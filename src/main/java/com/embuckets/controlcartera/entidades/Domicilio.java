@@ -59,17 +59,15 @@ public class Domicilio implements Serializable {
     @Column(name = "COLONIA")
     private String colonia;
     @JoinColumn(name = "DELEGACION", referencedColumnName = "DELEGACION")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Delegacion delegacion;
     @JoinColumn(name = "ESTADO", referencedColumnName = "ESTADO")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Estado estado;
     @OneToMany(mappedBy = "iddomicilio", fetch = FetchType.LAZY)
     private List<Asegurado> aseguradoList;
 
     public Domicilio() {
-        this.delegacion = new Delegacion();
-        this.estado = new Estado();
     }
 
     public Domicilio(Integer iddomicilio) {
