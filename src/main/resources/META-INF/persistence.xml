@@ -1,50 +1,78 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-  <persistence-unit name="cartera" transaction-type="RESOURCE_LOCAL">
-    <provider>org.hibernate.ejb.HibernatePersistence</provider>
-    <class>com.embuckets.controlcartera.entidades.TipoDocumentoAsegurado</class>
-    <class>com.embuckets.controlcartera.entidades.PolizaGmm</class>
-    <class>com.embuckets.controlcartera.entidades.Email</class>
-    <class>com.embuckets.controlcartera.entidades.PolizaVida</class>
-    <class>com.embuckets.controlcartera.entidades.Aseguradora</class>
-    <class>com.embuckets.controlcartera.entidades.Asegurado</class>
-    <class>com.embuckets.controlcartera.entidades.TipoEmail</class>
-    <class>com.embuckets.controlcartera.entidades.NotificacionRecibo</class>
-    <class>com.embuckets.controlcartera.entidades.FormaPago</class>
-    <class>com.embuckets.controlcartera.entidades.SumaAseguradaAuto</class>
-    <class>com.embuckets.controlcartera.entidades.Moneda</class>
-    <class>com.embuckets.controlcartera.entidades.PolizaAuto</class>
-    <class>com.embuckets.controlcartera.entidades.EstadoPoliza</class>
-    <class>com.embuckets.controlcartera.entidades.Ramo</class>
-    <class>com.embuckets.controlcartera.entidades.Cobranza</class>
-    <class>com.embuckets.controlcartera.entidades.EstadoNotificacion</class>
-    <class>com.embuckets.controlcartera.entidades.Poliza</class>
-    <class>com.embuckets.controlcartera.entidades.Caratula</class>
-    <class>com.embuckets.controlcartera.entidades.Domicilio</class>
-    <class>com.embuckets.controlcartera.entidades.Delegacion</class>
-    <class>com.embuckets.controlcartera.entidades.TipoPersona</class>
-    <class>com.embuckets.controlcartera.entidades.Recibo</class>
-    <class>com.embuckets.controlcartera.entidades.Auto</class>
-    <class>com.embuckets.controlcartera.entidades.TipoTelefono</class>
-    <class>com.embuckets.controlcartera.entidades.DocumentoAsegurado</class>
-    <class>com.embuckets.controlcartera.entidades.Estado</class>
-    <class>com.embuckets.controlcartera.entidades.NotificacionCumple</class>
-    <class>com.embuckets.controlcartera.entidades.ConductoCobro</class>
-    <class>com.embuckets.controlcartera.entidades.Cliente</class>
-    <class>com.embuckets.controlcartera.entidades.Telefono</class>
-    <class>com.embuckets.controlcartera.entidades.DocumentoRecibo</class>
-    <properties>
-      <property name="hibernate.dialect" value="com.embuckets.controlcartera.hibernate.MyDerbyDialect"/>
-      <property name="javax.persistence.jdbc.url" value="jdbc:derby:cartera"/>
-      <property name="javax.persistence.jdbc.user" value="emilio"/>
-      <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-      <property name="javax.persistence.jdbc.password" value="emilio"/>
-      <property name="hibernate.show_sql" value="true"/>
-      <property name="hibernate.format_sql" value="true"/>
-      <property name="hibernate.connection.autocommit" value="true"/>
-      <property name="hibernate.default_schema" value="APP"/>
-      <!--<property name="hibernate.default_schema">APP</property>-->
-      <!--<property name="hibernate.current_session_context_class">thread</property>-->
-    </properties>
-  </persistence-unit>
+    <persistence-unit name="cartera" transaction-type="RESOURCE_LOCAL">
+        <description>JPA Configuration</description>
+        <!--<provider>org.hibernate.ejb.HibernatePersistence</provider>-->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>com.embuckets.controlcartera.entidades.TipoDocumentoAsegurado</class>
+        <class>com.embuckets.controlcartera.entidades.PolizaGmm</class>
+        <class>com.embuckets.controlcartera.entidades.Email</class>
+        <class>com.embuckets.controlcartera.entidades.PolizaVida</class>
+        <class>com.embuckets.controlcartera.entidades.Aseguradora</class>
+        <class>com.embuckets.controlcartera.entidades.Asegurado</class>
+        <class>com.embuckets.controlcartera.entidades.TipoEmail</class>
+        <class>com.embuckets.controlcartera.entidades.NotificacionRecibo</class>
+        <class>com.embuckets.controlcartera.entidades.FormaPago</class>
+        <class>com.embuckets.controlcartera.entidades.SumaAseguradaAuto</class>
+        <class>com.embuckets.controlcartera.entidades.Moneda</class>
+        <class>com.embuckets.controlcartera.entidades.PolizaAuto</class>
+        <class>com.embuckets.controlcartera.entidades.EstadoPoliza</class>
+        <class>com.embuckets.controlcartera.entidades.Ramo</class>
+        <class>com.embuckets.controlcartera.entidades.Cobranza</class>
+        <class>com.embuckets.controlcartera.entidades.EstadoNotificacion</class>
+        <class>com.embuckets.controlcartera.entidades.Poliza</class>
+        <class>com.embuckets.controlcartera.entidades.Caratula</class>
+        <class>com.embuckets.controlcartera.entidades.Domicilio</class>
+        <class>com.embuckets.controlcartera.entidades.Delegacion</class>
+        <class>com.embuckets.controlcartera.entidades.TipoPersona</class>
+        <class>com.embuckets.controlcartera.entidades.Recibo</class>
+        <class>com.embuckets.controlcartera.entidades.Auto</class>
+        <class>com.embuckets.controlcartera.entidades.TipoTelefono</class>
+        <class>com.embuckets.controlcartera.entidades.DocumentoAsegurado</class>
+        <class>com.embuckets.controlcartera.entidades.Estado</class>
+        <class>com.embuckets.controlcartera.entidades.NotificacionCumple</class>
+        <class>com.embuckets.controlcartera.entidades.ConductoCobro</class>
+        <class>com.embuckets.controlcartera.entidades.Cliente</class>
+        <class>com.embuckets.controlcartera.entidades.Telefono</class>
+        <class>com.embuckets.controlcartera.entidades.DocumentoRecibo</class>
+        <properties>
+            <property name="hibernate.dialect" value="com.embuckets.controlcartera.hibernate.MyDerbyDialect"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby:cartera"/>
+            <!--<property name="javax.persistence.jdbc.url" value="jdbc:derby:classpath:cartera"/>-->
+            <property name="javax.persistence.jdbc.user" value="emilio"/>
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <property name="javax.persistence.jdbc.password" value="emilio"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.connection.autocommit" value="true"/>
+            <property name="hibernate.default_schema" value="APP"/>
+            <!--production connection poll-->
+            <property name="hibernate.connection.provider_class" value="org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider"/>
+            <property name="hibernate.c3p0.min_size" value="10"/>
+            <property name="hibernate.c3p0.max_size" value="20"/>
+            <property name="hibernate.c3p0.acquire_increment" value="1"/>
+            <property name="hibernate.c3p0.idle_test_period" value="3000"/>
+            <property name="hibernate.c3p0.max_statements" value="50"/>
+            <property name="hibernate.c3p0.timeout" value="1800"/>
+            <!--old schema-->
+<!--            <property name="hibernate.dialect" value="com.embuckets.controlcartera.hibernate.MyDerbyDialect"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby:cartera"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby:classpath:cartera"/>
+            <property name="javax.persistence.jdbc.user" value="emilio"/>
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <property name="javax.persistence.jdbc.password" value="emilio"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.connection.autocommit" value="true"/>
+            <property name="hibernate.default_schema" value="APP"/>
+            production connection poll
+            <property name="hibernate.connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property> 
+            <property name="hibernate.c3p0.min_size">10</property>
+            <property name="hibernate.c3p0.max_size">20</property>
+            <property name="hibernate.c3p0.acquire_increment">1</property>
+            <property name="hibernate.c3p0.idle_test_period">3000</property>
+            <property name="hibernate.c3p0.max_statements">50</property>
+            <property name="hibernate.c3p0.timeout">1800</property>-->
+        </properties>
+    </persistence-unit>
 </persistence>

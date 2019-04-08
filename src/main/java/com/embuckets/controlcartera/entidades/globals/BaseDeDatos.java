@@ -113,6 +113,9 @@ public class BaseDeDatos {
     }
 
     public EntityManager getEntityManager() {
+        if (em != null) {
+            em = emf.createEntityManager();
+        }
         return em;
     }
 
