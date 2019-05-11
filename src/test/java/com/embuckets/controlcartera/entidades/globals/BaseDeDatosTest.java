@@ -30,7 +30,7 @@ public class BaseDeDatosTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         bd = BaseDeDatos.getInstance();
     }
 

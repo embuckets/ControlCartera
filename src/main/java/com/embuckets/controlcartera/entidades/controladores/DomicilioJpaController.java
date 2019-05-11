@@ -14,19 +14,34 @@ import com.embuckets.controlcartera.entidades.Domicilio;
  */
 public class DomicilioJpaController implements Serializable, JpaController {
 
+    /**
+     *
+     */
     public DomicilioJpaController() {
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return Domicilio.class.getSimpleName();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "findByIddomicilio";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "iddomicilio";

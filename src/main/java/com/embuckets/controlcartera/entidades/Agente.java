@@ -18,7 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- *
+ * 
  * @author emilio
  */
 public class Agente {
@@ -52,58 +52,107 @@ public class Agente {
         }
     }
 
+    /**
+     * Regresa el Agente, cargado los datos a partir del archivo de configuracion del usuario
+     * @return La instancia statica
+     * @throws IOException
+     */
     public static Agente getInstance() throws IOException {
         if (agente == null) {
             agente = new Agente();
         }
         return agente;
     }
-
+    
+    /**
+     * 
+     * @return Nombre de pila del agente
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     * Establece el nombre de pila
+     * @param nombre 
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
         users.setProperty("nombre", nombre);
     }
 
+    /**
+     * 
+     * @return El apellido paterno
+     */
     public String getApellidoPaterno() {
         return apellidoPaterno;
     }
+    
+    /**
+     * Establece el apellido paterno
+     * @param apellidoPaterno 
+     */
 
     public void setApellidoPaterno(String apellidoPaterno) {
         this.apellidoPaterno = apellidoPaterno;
         users.put("paterno", apellidoPaterno);
     }
 
+    /**
+     * 
+     * @return El apellido materno
+     */
     public String getApellidoMaterno() {
         return apellidoMaterno;
     }
-
+    /**
+     * Establece el apellido materno
+     * @param apellidoMaterno 
+     */
     public void setApellidoMaterno(String apellidoMaterno) {
         this.apellidoMaterno = apellidoMaterno;
         users.put("materno", apellidoMaterno);
     }
 
+    /**
+     *
+     * @return el correo
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Establece el email
+     * @param email
+     */
     public void setEmail(String email) {
         this.email = email;
         users.put("email", email);
     }
 
+    /**
+     *
+     * @return La contraseña del email
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Establece la constraseña del email
+     * @param password
+     */
     public void setPassword(String password) {
         this.password = password;
         users.put("password", password);
     }
 
+    /**
+     *
+     * @return El nombre completo
+     */
     public String getNombreCompleto() {
         StringBuilder sb = new StringBuilder();
         sb.append(nombre);
@@ -114,6 +163,9 @@ public class Agente {
         return sb.toString();
     }
 
+    /**
+     * Guarda los valores actuales al archivo de configuracion del usuario
+     */
     public void guardar() {
         try (OutputStream output = new FileOutputStream("config/user.config")) {
             users.store(output, "Actualizado: " + LocalDateTime.now());

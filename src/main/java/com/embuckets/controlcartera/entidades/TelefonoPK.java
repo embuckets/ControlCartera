@@ -24,26 +24,50 @@ public class TelefonoPK implements Serializable {
     @Column(name = "TELEFONO")
     private String telefono;
 
+    /**
+     *
+     */
     public TelefonoPK() {
     }
 
+    /**
+     *
+     * @param idcliente
+     * @param telefono
+     */
     public TelefonoPK(int idcliente, String telefono) {
         this.idcliente = idcliente;
         this.telefono = telefono;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getIdcliente() {
         return idcliente;
     }
 
+    /**
+     *
+     * @param idcliente
+     */
     public void setIdcliente(int idcliente) {
         this.idcliente = idcliente;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTelefono() {
         return telefono;
     }
 
+    /**
+     *
+     * @param telefono
+     */
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }

@@ -27,35 +27,68 @@ public class DocumentoAseguradoPK implements Serializable {
     @Column(name = "TIPODOCUMENTO")
     private String tipodocumento;
 
+    /**
+     *
+     */
     public DocumentoAseguradoPK() {
     }
 
+    /**
+     *
+     * @param idcliente
+     * @param nombre
+     * @param tipodocumento
+     */
     public DocumentoAseguradoPK(int idcliente, String nombre, String tipodocumento) {
         this.idcliente = idcliente;
         this.nombre = nombre;
         this.tipodocumento = tipodocumento;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getIdcliente() {
         return idcliente;
     }
 
+    /**
+     *
+     * @param idcliente
+     */
     public void setIdcliente(int idcliente) {
         this.idcliente = idcliente;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     *
+     * @param nombre
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTipodocumento() {
         return tipodocumento;
     }
 
+    /**
+     *
+     * @param tipodocumento
+     */
     public void setTipodocumento(String tipodocumento) {
         this.tipodocumento = tipodocumento;
     }

@@ -62,6 +62,11 @@ public class MailService {
         sentMessages = Collections.synchronizedSet(new HashSet<>());
     }
 
+    /**
+     *
+     * @return
+     * @throws Exception
+     */
     public static MailService getInstance() throws Exception {
         if (mailService == null) {
             mailService = new MailService();
@@ -86,6 +91,10 @@ public class MailService {
         }
     }
 
+    /**
+     * actualiza los atributos a partir del archivo de configuracion
+     * @throws Exception
+     */
     public void refresh() throws Exception {
         loadProperties();
     }
@@ -100,6 +109,12 @@ public class MailService {
         }
     }
 
+    /**
+     * Crea el trasporte de correo ya conectado con el servidor de correos
+     * @return el transporte de correo
+     * @throws NoSuchProviderException - si no se encuentra el provedor de correo para el correo del asegurado
+     * @throws MessagingException - si falla la operacion
+     */
     public Transport connect() throws NoSuchProviderException, MessagingException {
         try {
             Session session = createSession();
@@ -116,6 +131,14 @@ public class MailService {
         }
     }
 
+    /**
+     * crea el mensaje de correo segun el tipo de notificacion.
+     * en caso de existir un archivo asociado con la notificacion lo adjunta al correo automaticamente
+     * @param notificacion de la cual llenar el correo
+     * @return correo html 
+     * @throws IOException - si falla la operacion
+     * @throws MessagingException - si falla la operacion
+     */
     public MimeMessage createMimeMessage(Notificacion notificacion) throws IOException, MessagingException {
         if (notificacion instanceof NotificacionCumple) {
             return createMimeMessage((NotificacionCumple) notificacion);
@@ -124,7 +147,7 @@ public class MailService {
         }
     }
 
-    public MimeMessage createMimeMessage(NotificacionRecibo notificacionRecibo) throws IOException, MessagingException {
+    private MimeMessage createMimeMessage(NotificacionRecibo notificacionRecibo) throws IOException, MessagingException {
         MimeMessage message = new MimeMessage(session);
 
         message.setFrom(new InternetAddress(from));
@@ -135,7 +158,7 @@ public class MailService {
         message.setSubject("Notificacion de Cobranza");
         message.setHeader("X-Mailer", "sendhtml");
         message.setSentDate(new Date());
-        String messageText = TemplateGenerator.getCobranzaMessage(notificacionRecibo);
+        String messageText = TemplateGenerator.crearMensajeHTMLDeNotificacionDeCobranza(notificacionRecibo);
         if (notificacionRecibo.tieneArchivo()) {
             //text bodyPart
             MimeBodyPart textBodyPart = new MimeBodyPart();
@@ -157,7 +180,7 @@ public class MailService {
         return message;
     }
 
-    public MimeMessage createMimeMessage(NotificacionCumple notificacionRecibo) throws AddressException, MessagingException, IOException {
+    private MimeMessage createMimeMessage(NotificacionCumple notificacionRecibo) throws AddressException, MessagingException, IOException {
         MimeMessage message = new MimeMessage(session);
 
         message.setFrom(new InternetAddress(from));
@@ -168,13 +191,18 @@ public class MailService {
         message.setSubject("Notificacion de Cumpleaños");
         message.setHeader("X-Mailer", "sendhtml");
         message.setSentDate(new Date());
-        String messageText = TemplateGenerator.getCumpleMessage(notificacionRecibo);
+        String messageText = TemplateGenerator.crearMensajeHTMLDeNotificacionDeCumple(notificacionRecibo);
         message.setDataHandler(new DataHandler(new ByteArrayDataSource(messageText, "text/html")));
 
         message.saveChanges();
         return message;
     }
 
+    /**
+     * crea un arreglo de a partir de la lista de direcciones especificados
+     * @param emails 
+     * @return arreglo de direcciones de internet
+     */
     public InternetAddress[] createAddressArray(List<String> emails) {
         InternetAddress[] result = new InternetAddress[emails.size()];
         for (int i = 0; i < result.length; i++) {
@@ -207,50 +235,98 @@ public class MailService {
         return session;
     }
 
+    /**
+     *
+     * @return
+     */
     public Session getSession() {
         return session;
     }
 
+    /**
+     *
+     * @param session
+     */
     public void setSession(Session session) {
         this.session = session;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getMailHost() {
         return mailHost;
     }
 
+    /**
+     *
+     * @param mailHost
+     */
     public void setMailHost(String mailHost) {
         this.mailHost = mailHost;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFrom() {
         return from;
     }
 
+    /**
+     *
+     * @param from
+     */
     public void setFrom(String from) {
         this.from = from;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     *
+     * @param password
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<Message, Notificacion> getScheduledNotificaciones() {
         return scheduledNotificaciones;
     }
 
+    /**
+     *
+     * @param scheduledNotificaciones
+     */
     public void setScheduledNotificaciones(Map<Message, Notificacion> scheduledNotificaciones) {
         this.scheduledNotificaciones = scheduledNotificaciones;
     }
 
+    /**
+     *
+     * @return
+     */
     public Set<Message> getSentMessages() {
         return sentMessages;
     }
 
+    /**
+     *
+     * @param sentMessages
+     */
     public void setSentMessages(Set<Message> sentMessages) {
         this.sentMessages = sentMessages;
     }

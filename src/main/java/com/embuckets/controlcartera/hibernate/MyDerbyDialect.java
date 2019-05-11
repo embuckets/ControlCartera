@@ -10,11 +10,14 @@ import org.hibernate.dialect.function.StandardJDBCEscapeFunction;
 import org.hibernate.type.StandardBasicTypes;
 
 /**
- *
+ * Extiende las funcionalidades del dialecto Derby
  * @author emilio
  */
 public class MyDerbyDialect extends DerbyTenSevenDialect {
 
+    /**
+     *
+     */
     public MyDerbyDialect() {
         super();
         registerFunction("timeDiff", new StandardJDBCEscapeFunction("TIMESTAMPDIFF", StandardBasicTypes.INTEGER));

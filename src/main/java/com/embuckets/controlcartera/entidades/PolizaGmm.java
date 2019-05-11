@@ -66,15 +66,29 @@ public class PolizaGmm implements Serializable {
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Poliza poliza;
 
+    /**
+     *
+     */
     public PolizaGmm() {
         this.clienteList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public PolizaGmm(Integer idpoliza) {
         this.idpoliza = idpoliza;
         this.clienteList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param idpoliza
+     * @param deducible
+     * @param sumaasegurada
+     * @param coaseguro
+     */
     public PolizaGmm(Integer idpoliza, BigDecimal deducible, String sumaasegurada, short coaseguro) {
         this.idpoliza = idpoliza;
         this.deducible = deducible;
@@ -83,67 +97,131 @@ public class PolizaGmm implements Serializable {
         this.clienteList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdpoliza() {
         return idpoliza;
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public void setIdpoliza(Integer idpoliza) {
         this.idpoliza = idpoliza;
     }
 
+    /**
+     *
+     * @return
+     */
     public BigDecimal getDeducible() {
         return deducible;
     }
 
+    /**
+     *
+     * @param deducible
+     */
     public void setDeducible(BigDecimal deducible) {
         this.deducible = deducible;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getSumaasegurada() {
         return sumaasegurada;
     }
 
+    /**
+     *
+     * @param sumaasegurada
+     */
     public void setSumaasegurada(String sumaasegurada) {
         this.sumaasegurada = sumaasegurada;
     }
 
+    /**
+     *
+     * @return
+     */
     public short getCoaseguro() {
         return coaseguro;
     }
 
+    /**
+     *
+     * @param coaseguro
+     */
     public void setCoaseguro(short coaseguro) {
         this.coaseguro = coaseguro;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Cliente> getClienteList() {
         return clienteList;
     }
 
+    /**
+     *
+     * @param clienteList
+     */
     public void setClienteList(List<Cliente> clienteList) {
         this.clienteList = clienteList;
     }
 
+    /**
+     *
+     * @return
+     */
     public Moneda getSumaaseguradamondeda() {
         return sumaaseguradamondeda;
     }
 
+    /**
+     *
+     * @param sumaaseguradamondeda
+     */
     public void setSumaaseguradamondeda(Moneda sumaaseguradamondeda) {
         this.sumaaseguradamondeda = sumaaseguradamondeda;
     }
 
+    /**
+     *
+     * @return
+     */
     public Moneda getDeduciblemoneda() {
         return deduciblemoneda;
     }
 
+    /**
+     *
+     * @param deduciblemoneda
+     */
     public void setDeduciblemoneda(Moneda deduciblemoneda) {
         this.deduciblemoneda = deduciblemoneda;
     }
 
+    /**
+     *
+     * @return
+     */
     public Poliza getPoliza() {
         return poliza;
     }
 
+    /**
+     *
+     * @param poliza
+     */
     public void setPoliza(Poliza poliza) {
         this.poliza = poliza;
     }

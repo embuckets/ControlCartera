@@ -13,14 +13,34 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableCliente {
 
+    /**
+     *
+     * @return
+     */
     StringProperty nombreProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty primerNombreProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty paternoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty maternoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty nacimientoProperty();
 
 }

@@ -17,23 +17,44 @@ public class Beneficiario {
     private Cliente cliente;
     private PolizaVida polizaVida;
 
+    /**
+     *
+     * @param cliente
+     * @param polizaVida
+     */
     public Beneficiario(Cliente cliente, PolizaVida polizaVida) {
         this.cliente = cliente;
         this.polizaVida = polizaVida;
     }
 
+    /**
+     *
+     * @return
+     */
     public Cliente getCliente() {
         return cliente;
     }
 
+    /**
+     *
+     * @param cliente
+     */
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
 
+    /**
+     *
+     * @return
+     */
     public PolizaVida getPolizaVida() {
         return polizaVida;
     }
 
+    /**
+     *
+     * @param polizaVida
+     */
     public void setPolizaVida(PolizaVida polizaVida) {
         this.polizaVida = polizaVida;
     }

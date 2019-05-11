@@ -240,7 +240,7 @@ CREATE TABLE POLIZA (
   FinVigencia DATE NOT NULL,
   ConductoCobro VARCHAR(6) NOT NULL,
   FormaPago VARCHAR(10) NOT NULL,
-  Prima DECIMAL(9,2) NOT NULL,
+  Prima DECIMAL(11,2) NOT NULL,
   PrimaMoneda VARCHAR(7) NOT NULL,
   Nota VARCHAR(100),
   Estado VARCHAR(10) NOT NULL,
@@ -271,57 +271,6 @@ CREATE TABLE POLIZA (
     REFERENCES ESTADO_POLIZA (Estado))
 ;
 
--- CREATE INDEX fk_poliza_conductoCobro_idx ON POLIZA (ConductoCobro ASC) ;
--- 
--- CREATE INDEX fk_poliza_formaPago_idx ON POLIZA (FormaPago ASC) ;
--- 
--- CREATE INDEX fk_poliza_ramo_idx ON POLIZA (Ramo ASC) ;
--- 
--- CREATE INDEX fk_poliza_aseguradora_idx ON POLIZA (Aseguradora ASC) ;
--- 
--- CREATE INDEX fk_polizaPrimaMoneda_moneda_idx ON POLIZA (PrimaMoneda ASC) ;
--- 
--- CREATE INDEX fk_poliza_contratante_idx ON POLIZA (Contratante ASC) ;
--- 
--- CREATE INDEX fk_poliza_titular_idx ON POLIZA (Titular ASC) ;
--- 
--- CREATE INDEX fk_poliza_estadoPoliza_idx ON POLIZA (Estado ASC) ;
-
-
--- -----------------------------------------------------
--- Table CONTRATANTE
--- -----------------------------------------------------
--- CREATE TABLE CONTRATANTE (
---   idCliente INT NOT NULL,
---   idPoliza INT NOT NULL,
---   PRIMARY KEY (idCliente, idPoliza),
---   CONSTRAINT fk_contratante_asegurado
---     FOREIGN KEY (idCliente)
---     REFERENCES ASEGURADO (idCliente),
---   CONSTRAINT fk_contratante_poliza
---     FOREIGN KEY (idPoliza)
---     REFERENCES POLIZA (idPoliza))
--- ;
-
--- CREATE INDEX fk_contratante_poliza_idx ON CONTRATANTE (idPoliza ASC) ;
-
-
--- -----------------------------------------------------
--- Table TITULAR
--- -----------------------------------------------------
--- CREATE TABLE TITULAR (
---   idCliente INT NOT NULL,
---   idPoliza INT NOT NULL,
---   PRIMARY KEY (idCliente, idPoliza),
---   CONSTRAINT fk_titular_asegurado
---     FOREIGN KEY (idCliente)
---     REFERENCES ASEGURADO (idCliente),
---   CONSTRAINT fk_titular_poliza
---     FOREIGN KEY (idPoliza)
---     REFERENCES POLIZA (idPoliza))
--- ;
-
--- CREATE INDEX fk_titular_poliza_idx ON TITULAR (idPoliza ASC) ;
 
 -- -----------------------------------------------------
 -- Table COBRANZA
@@ -340,7 +289,7 @@ CREATE TABLE RECIBO (
   idPoliza INT NOT NULL,
   cubreDesde DATE NOT NULL,
   cubreHasta DATE NOT NULL,
-  Importe DECIMAL(9,2) NOT NULL,
+  Importe DECIMAL(11,2) NOT NULL,
   Cobranza VARCHAR(9) NOT NULL,
   PRIMARY KEY (idRecibo),
   CONSTRAINT fk_recibo_cobranza
@@ -360,7 +309,7 @@ CREATE TABLE RECIBO (
 -- -----------------------------------------------------
 CREATE TABLE POLIZA_VIDA (
   idPoliza INT NOT NULL,
-  SumaAsegurada DECIMAL(9,2) NOT NULL,
+  SumaAsegurada DECIMAL(11,2) NOT NULL,
   SumaAseguradaMoneda VARCHAR(7) NOT NULL,
   PRIMARY KEY (idPoliza),
   CONSTRAINT fk_polizaVida_poliza
@@ -440,7 +389,7 @@ CREATE TABLE AUTO (
 -- -----------------------------------------------------
 CREATE TABLE POLIZA_GMM (
   idPoliza INT NOT NULL,
-  Deducible DECIMAL(9,2) NOT NULL,
+  Deducible DECIMAL(11,2) NOT NULL,
   DeducibleMoneda VARCHAR(7) NOT NULL,
   SumaAsegurada VARCHAR(14) NOT NULL,
   SumaAseguradaMondeda VARCHAR(7) NOT NULL,

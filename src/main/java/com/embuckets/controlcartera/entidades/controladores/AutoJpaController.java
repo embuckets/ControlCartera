@@ -16,9 +16,17 @@ import javax.persistence.EntityManager;
  */
 public class AutoJpaController implements Serializable, JpaController {
 
+    /**
+     *
+     */
     public AutoJpaController() {
     }
 
+    /**
+     *
+     * @param object
+     * @throws Exception
+     */
     @Override
     public void remove(Object object) throws Exception {
         Auto auto = (Auto) object;
@@ -48,16 +56,28 @@ public class AutoJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return Auto.class.getSimpleName();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "findByIdauto";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "idauto";

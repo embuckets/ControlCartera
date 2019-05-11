@@ -7,16 +7,13 @@ package com.embuckets.controlcartera.entidades.controladores;
 
 import java.io.Serializable;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import com.embuckets.controlcartera.entidades.Caratula;
 import com.embuckets.controlcartera.entidades.PolizaAuto;
 import com.embuckets.controlcartera.entidades.Asegurado;
 import com.embuckets.controlcartera.entidades.Aseguradora;
 import com.embuckets.controlcartera.entidades.Auto;
-import com.embuckets.controlcartera.entidades.Beneficiario;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.ConductoCobro;
-import com.embuckets.controlcartera.entidades.Dependiente;
 import com.embuckets.controlcartera.entidades.EstadoPoliza;
 import com.embuckets.controlcartera.entidades.FormaPago;
 import com.embuckets.controlcartera.entidades.Moneda;
@@ -26,7 +23,7 @@ import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.PolizaGmm;
 import com.embuckets.controlcartera.entidades.Recibo;
-import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
+
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.entidades.globals.Logging;
@@ -45,9 +42,17 @@ public class PolizaJpaController implements Serializable, JpaController {
 
     private static final Logger logger = LogManager.getLogger(PolizaJpaController.class);
 
+    /**
+     *
+     */
     public PolizaJpaController() {
     }
 
+    /**
+     *
+     * @param object
+     * @throws Exception
+     */
     @Override
     public void remove(Object object) throws Exception {
         EntityManager em = null;
@@ -61,18 +66,13 @@ public class PolizaJpaController implements Serializable, JpaController {
                 em.getTransaction().begin();
             }
             Poliza poliza = (Poliza) object;
-            int id = poliza.getIdpoliza();
-            try {
-                poliza = em.getReference(Poliza.class, poliza.getIdpoliza());
-                poliza.getIdpoliza();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The poliza with id " + id + " no longer exists.", enfe);
-            }
             Caratula caratulaOrphanCheck = poliza.getCaratula();
             if (caratulaOrphanCheck != null) {
                 caratulaOrphanCheck.setPoliza(null);
                 caratulaOrphanCheck = em.merge(caratulaOrphanCheck);
+//                em.remove(caratulaOrphanCheck);
             }
+
             PolizaAuto polizaAutoOrphanCheck = poliza.getPolizaAuto();
             if (polizaAutoOrphanCheck != null) {
                 for (Auto auto : polizaAutoOrphanCheck.getAutoList()) {
@@ -83,30 +83,44 @@ public class PolizaJpaController implements Serializable, JpaController {
                 polizaAutoOrphanCheck.getAutoList().clear();
                 polizaAutoOrphanCheck.setPoliza(null);
                 polizaAutoOrphanCheck = em.merge(polizaAutoOrphanCheck);
+//                em.remove(polizaAutoOrphanCheck);
             }
             PolizaVida polizaVidaOrphanCheck = poliza.getPolizaVida();
             if (polizaVidaOrphanCheck != null) {
-                BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
+//                BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
                 for (Cliente cliente : polizaVidaOrphanCheck.getClienteList()) {
-                    beneficiarioJpaController.remove(new Beneficiario(cliente, polizaVidaOrphanCheck));
+                    Query query = em.createNativeQuery("DELETE FROM APP.Beneficiario WHERE idcliente = :idcliente AND idpoliza = :idpoliza");
+                    query.setParameter("idcliente", cliente.getIdcliente());
+                    query.setParameter("idpoliza", poliza.getIdpoliza());
+                    query.executeUpdate();
+//                    beneficiarioJpaController.remove(new Beneficiario(cliente, polizaVidaOrphanCheck));
                 }
                 polizaVidaOrphanCheck.setPoliza(null);
+//                em.remove(polizaVidaOrphanCheck);
                 polizaVidaOrphanCheck = em.merge(polizaVidaOrphanCheck);
             }
             PolizaGmm polizaGmmOrphanCheck = poliza.getPolizaGmm();
             if (polizaGmmOrphanCheck != null) {
-                DependienteJpaController dependienteJpaController = new DependienteJpaController();
+//                DependienteJpaController dependienteJpaController = new DependienteJpaController();
                 for (Cliente cliente : polizaGmmOrphanCheck.getClienteList()) {
-                    dependienteJpaController.remove(new Dependiente(cliente, polizaGmmOrphanCheck));
+                    Query query = em.createNativeQuery("DELETE FROM APP.Dependiente WHERE idcliente = :idcliente AND idpoliza = :idpoliza");
+                    query.setParameter("idcliente", cliente.getIdcliente());
+                    query.setParameter("idpoliza", poliza.getIdpoliza());
+                    query.executeUpdate();
+//                    dependienteJpaController.remove(new Dependiente(cliente, polizaGmmOrphanCheck));
                 }
                 polizaGmmOrphanCheck.setPoliza(null);
+//                em.remove(polizaGmmOrphanCheck);
                 polizaGmmOrphanCheck = em.merge(polizaGmmOrphanCheck);
             }
             List<Recibo> reciboListOrphanCheck = poliza.getReciboList();
             for (Recibo reciboListOrphanCheckRecibo : reciboListOrphanCheck) {
                 reciboListOrphanCheckRecibo.setIdpoliza(null);
-                reciboListOrphanCheckRecibo = em.merge(reciboListOrphanCheckRecibo);
+                em.remove(reciboListOrphanCheckRecibo);
+//                reciboListOrphanCheckRecibo = em.merge(reciboListOrphanCheckRecibo);
             }
+            reciboListOrphanCheck.clear();
+
             Asegurado contratante = poliza.getContratante();
             if (contratante != null) {
                 contratante.getPolizaList().remove(poliza);
@@ -147,6 +161,7 @@ public class PolizaJpaController implements Serializable, JpaController {
                 ramo.getPolizaList().remove(poliza);
                 ramo = em.merge(ramo);
             }
+
             em.remove(poliza);
             if (!isSubTransaction) {
                 em.getTransaction().commit();
@@ -159,6 +174,12 @@ public class PolizaJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @param start
+     * @param end
+     * @return
+     */
     public List<Poliza> getRenovacionesEntre(LocalDate start, LocalDate end) {
         EntityManager em = null;
         try {
@@ -178,6 +199,11 @@ public class PolizaJpaController implements Serializable, JpaController {
         return new ArrayList<>();
     }
 
+    /**
+     * Cambia el titular de la poliza
+     * @param poliza poliza a modificar
+     * @throws Exception - si falla la operacion
+     */
     public void editarTitular(Poliza poliza) throws Exception {
         boolean isSubTransaction = false;
         EntityManager em = null;
@@ -212,6 +238,11 @@ public class PolizaJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     * Inserta la poliza junto con todos sus atributos.
+     * @param object poliza a insertar
+     * @throws Exception - si falla la operacion. Se hace un rollback
+     */
     @Override
     public void create(Object object) throws Exception {
         Poliza poliza = (Poliza) object;
@@ -244,6 +275,9 @@ public class PolizaJpaController implements Serializable, JpaController {
             }
 
             for (Recibo recibo : poliza.getReciboList()) {
+//                recibo.setIdpoliza(poliza);
+//                em.persist(recibo);
+
                 NotificacionRecibo notificacion = new NotificacionRecibo(recibo, Globals.NOTIFICACION_ESTADO_PENDIENTE);
                 notificacion.setIdrecibo(recibo.getIdrecibo());
                 em.persist(notificacion);
@@ -297,6 +331,14 @@ public class PolizaJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     * Busca las polizas que coincidan con los parametros especificados.
+     * Busca las polizas que contengan parcialmente los parametros especificados, por ejemplo, si el numeroPoliza es "456", puede regresar las polizas con numero de poliza "123456", "456789", etc.
+     * @param numeroPoliza numero de poliza
+     * @param aseguradora aseguradora
+     * @param ramo ramo
+     * @return todas las poliza que contengan los parametros especificados
+     */
     public List<Poliza> getBy(String numeroPoliza, String aseguradora, String ramo) {
 //        boolean isSubTransaction = false;
         EntityManager em = null;
@@ -341,6 +383,12 @@ public class PolizaJpaController implements Serializable, JpaController {
         return new ArrayList<>();
     }
 
+    /**
+     * Inserta la poliza nueva y cambia el estado de la poliza vieja a "Renovada"
+     * @param vieja poliza a renovar
+     * @param nueva poliza a insertar
+     * @throws Exception - si falla la operacion
+     */
     public void renovar(Poliza vieja, Poliza nueva) throws Exception {
         Poliza polizaVieja = (Poliza) vieja;
         Poliza polizaNueva = (Poliza) nueva;
@@ -373,16 +421,28 @@ public class PolizaJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return Poliza.class.getSimpleName();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "findByIdpoliza";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "idpoliza";

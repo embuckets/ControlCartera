@@ -18,31 +18,60 @@ public class ObservableArchivo {
     private StringProperty archivoProperty;
     private StringProperty tipoProperty;
 
+    /**
+     *
+     * @param archivoProperty
+     * @param tipoProperty
+     */
     public ObservableArchivo(String archivoProperty, String tipoProperty) {
         this.archivoProperty = new SimpleStringProperty(archivoProperty);
         this.tipoProperty = new SimpleStringProperty(tipoProperty);
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty archivoProperty() {
         return archivoProperty;
     }
 
+    /**
+     *
+     * @param archivoProperty
+     */
     public void setArchivoProperty(StringProperty archivoProperty) {
         this.archivoProperty = archivoProperty;
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty tipoProperty() {
         return tipoProperty;
     }
 
+    /**
+     *
+     * @param tipoProperty
+     */
     public void setTipoProperty(StringProperty tipoProperty) {
         this.tipoProperty = tipoProperty;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getIdCliente() {
         return idCliente;
     }
 
+    /**
+     *
+     * @param idCliente
+     */
     public void setIdCliente(int idCliente) {
         this.idCliente = idCliente;
     }

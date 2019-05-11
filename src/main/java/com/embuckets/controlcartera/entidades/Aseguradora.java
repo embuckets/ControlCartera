@@ -40,26 +40,49 @@ public class Aseguradora implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "aseguradora", fetch = FetchType.LAZY)
     private List<Poliza> polizaList;
 
+    /**
+     *
+     */
     public Aseguradora() {
     }
 
+    /**
+     *
+     * @param aseguradora
+     */
     public Aseguradora(String aseguradora) {
         this.aseguradora = aseguradora;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getAseguradora() {
         return aseguradora;
     }
 
+    /**
+     *
+     * @param aseguradora
+     */
     public void setAseguradora(String aseguradora) {
         this.aseguradora = aseguradora;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Poliza> getPolizaList() {
         return polizaList;
     }
 
+    /**
+     *
+     * @param polizaList
+     */
     public void setPolizaList(List<Poliza> polizaList) {
         this.polizaList = polizaList;
     }

@@ -20,6 +20,11 @@ import javax.persistence.Query;
  */
 public class BeneficiarioJpaController implements Serializable, JpaController {
 
+    /**
+     * Crea el enlace de beneficiario con la poliza. Crea el registro en caso de no existir previamente.
+     * @param object
+     * @throws Exception
+     */
     @Override
     public void create(Object object) throws Exception {
         EntityManager em = null;
@@ -43,6 +48,13 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @param <T>
+     * @param object
+     * @return
+     * @throws Exception
+     */
     @Override
     public <T> T edit(Object object) throws Exception {
         EntityManager em = null;
@@ -61,6 +73,11 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     * Elimina el enlace del beneficiario con la poliza.
+     * @param object
+     * @throws Exception
+     */
     @Override
     public void remove(Object object) throws Exception {
         EntityManager em = null;
@@ -85,7 +102,7 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
                 Cliente cliente = beneficiario.getCliente();
                 boolean removed = pVidaClientes.remove(cliente);
                 logger.info("Remove [" + beneficiario.getCliente() + "] = " + removed);
-                em.merge(pVida);
+                pVida = em.merge(pVida);
 
             }
 
@@ -119,16 +136,28 @@ public class BeneficiarioJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return "";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "";

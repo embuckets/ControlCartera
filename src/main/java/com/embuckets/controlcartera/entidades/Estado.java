@@ -39,26 +39,49 @@ public class Estado implements Serializable {
     @OneToMany(mappedBy = "estado", fetch = FetchType.LAZY)
     private List<Domicilio> domicilioList;
 
+    /**
+     *
+     */
     public Estado() {
     }
 
+    /**
+     *
+     * @param estado
+     */
     public Estado(String estado) {
         this.estado = estado;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getEstado() {
         return estado;
     }
 
+    /**
+     *
+     * @param estado
+     */
     public void setEstado(String estado) {
         this.estado = estado;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Domicilio> getDomicilioList() {
         return domicilioList;
     }
 
+    /**
+     *
+     * @param domicilioList
+     */
     public void setDomicilioList(List<Domicilio> domicilioList) {
         this.domicilioList = domicilioList;
     }

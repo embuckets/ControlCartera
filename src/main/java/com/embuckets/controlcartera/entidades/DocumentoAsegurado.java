@@ -49,6 +49,10 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
     private static final Logger logger = LogManager.getLogger(DocumentoAsegurado.class);
     
     private static final long serialVersionUID = 1L;
+
+    /**
+     *
+     */
     @EmbeddedId
     protected DocumentoAseguradoPK documentoAseguradoPK;
     @Basic(optional = false)
@@ -68,11 +72,20 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private TipoDocumentoAsegurado tipoDocumentoAsegurado;
 
+    /**
+     *
+     */
     public DocumentoAsegurado() {
         this.documentoAseguradoPK = new DocumentoAseguradoPK();
         this.tipoDocumentoAsegurado = new TipoDocumentoAsegurado();
     }
 
+    /**
+     * 
+     * @param file arhivo a ser leido
+     * @param tipoDocumentoAsegurado El tipo de documento
+     * @throws IOException 
+     */
     public DocumentoAsegurado(File file, String tipoDocumentoAsegurado) throws IOException {
         this.documentoAseguradoPK = new DocumentoAseguradoPK();
         String[] tokens = file.getName().split("\\.");
@@ -89,50 +102,98 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public DocumentoAseguradoPK getDocumentoAseguradoPK() {
         return documentoAseguradoPK;
     }
 
+    /**
+     *
+     * @param documentoAseguradoPK
+     */
     public void setDocumentoAseguradoPK(DocumentoAseguradoPK documentoAseguradoPK) {
         this.documentoAseguradoPK = documentoAseguradoPK;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getExtension() {
         return extension;
     }
 
+    /**
+     *
+     * @param extension
+     */
     public void setExtension(String extension) {
         this.extension = extension;
     }
 
+    /**
+     *
+     * @return
+     */
     public byte[] getArchivo() {
         return archivo;
     }
 
+    /**
+     *
+     * @param archivo
+     */
     public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getActualizado() {
         return actualizado;
     }
 
+    /**
+     *
+     * @param actualizado
+     */
     public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 
+    /**
+     *
+     * @return
+     */
     public Asegurado getAsegurado() {
         return asegurado;
     }
 
+    /**
+     *
+     * @param asegurado
+     */
     public void setAsegurado(Asegurado asegurado) {
         this.asegurado = asegurado;
     }
 
+    /**
+     *
+     * @return
+     */
     public TipoDocumentoAsegurado getTipoDocumentoAsegurado() {
         return tipoDocumentoAsegurado;
     }
 
+    /**
+     *
+     * @param tipoDocumentoAsegurado
+     */
     public void setTipoDocumentoAsegurado(TipoDocumentoAsegurado tipoDocumentoAsegurado) {
         this.tipoDocumentoAsegurado = tipoDocumentoAsegurado;
     }
@@ -157,6 +218,10 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombreArchivo() {
         return documentoAseguradoPK.getNombre();
     }
@@ -166,11 +231,19 @@ public class DocumentoAsegurado implements Serializable, ObservableDocumento {
         return "com.embuckets.controlcartera.entidades.DocumentoAsegurado[ documentoAseguradoPK=" + documentoAseguradoPK + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty archivoProperty() {
         return new SimpleStringProperty(documentoAseguradoPK.getNombre() + extension);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty tipoProperty() {
         return new SimpleStringProperty(tipoDocumentoAsegurado.getTipodocumento());

@@ -13,12 +13,28 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableNotificacionCumple {
 
+    /**
+     *
+     * @return
+     */
     StringProperty nombreCompletoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty nacimientoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty faltanProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty estadoProperty();
 
 }

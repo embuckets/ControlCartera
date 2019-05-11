@@ -24,6 +24,14 @@ public class DependienteJpaController implements Serializable, JpaController {
 
     private static final Logger logger = LogManager.getLogger(DependienteJpaController.class);
 
+    /**
+     * Crea el enlace del dependiente con la poliza. Crea el registro en caso de
+     * no existir previamente
+     *
+     * @param object
+     * @throws EntityExistsException
+     * @throws Exception
+     */
     @Override
     public void create(Object object) throws EntityExistsException, Exception {
         EntityManager em = null;
@@ -47,6 +55,13 @@ public class DependienteJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @param <T>
+     * @param object
+     * @return
+     * @throws Exception
+     */
     @Override
     public <T> T edit(Object object) throws Exception {
         EntityManager em = null;
@@ -65,8 +80,14 @@ public class DependienteJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     * Eliimina el enlace del dependiente con la poliza
+     *
+     * @param object
+     * @throws Exception
+     */
     @Override
-    public void remove(Object object) {
+    public void remove(Object object) throws Exception {
         EntityManager em = null;
         Dependiente beneficiario = (Dependiente) object;
         boolean isSubTransaction = false;
@@ -100,16 +121,28 @@ public class DependienteJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return "";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "";

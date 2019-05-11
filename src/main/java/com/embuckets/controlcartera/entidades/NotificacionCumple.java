@@ -59,6 +59,9 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private EstadoNotificacion estadonotificacion;
 
+    /**
+     *
+     */
     public NotificacionCumple() {
     }
 //
@@ -66,57 +69,106 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
 //        this.idcliente = idcliente;
 //    }
 
+    /**
+     *
+     * @param cliente
+     * @param estadonotificacion
+     */
     public NotificacionCumple(Cliente cliente, String estadonotificacion) {
         this.idcliente = cliente.getIdcliente();
         this.cliente = cliente;
         this.estadonotificacion = new EstadoNotificacion(estadonotificacion);
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdcliente() {
         return idcliente;
     }
 
+    /**
+     *
+     * @param idcliente
+     */
     public void setIdcliente(Integer idcliente) {
         this.idcliente = idcliente;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public LocalDateTime getEnviado() {
         return enviado;
     }
 
+    /**
+     *
+     * @param enviado
+     */
     @Override
     public void setEnviado(LocalDateTime enviado) {
         this.enviado = enviado;
     }
 
+    /**
+     *
+     * @return
+     */
     public Cliente getCliente() {
         return cliente;
     }
 
+    /**
+     *
+     * @param cliente
+     */
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public EstadoNotificacion getEstadonotificacion() {
         return estadonotificacion;
     }
 
+    /**
+     *
+     * @param estadonotificacion
+     */
     @Override
     public void setEstadonotificacion(EstadoNotificacion estadonotificacion) {
         this.estadonotificacion = estadonotificacion;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombreAsegurado() {
         return cliente.nombreProperty().get();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean tieneEmail() {
         return !cliente.getAsegurado().getEmailList().isEmpty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<String> getEmailsDeNotificacion() {
         List<Email> emails = cliente.getAsegurado().getEmailList();
@@ -155,16 +207,28 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
         return "com.embuckets.controlcartera.entidades.NotificacionCumple[ idcliente=" + idcliente + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty nombreCompletoProperty() {
         return cliente.nombreProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty nacimientoProperty() {
         return cliente.nacimientoProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty faltanProperty() {
         LocalDate nacimiento = this.cliente.getNacimiento().withYear(Year.now().getValue());
@@ -174,6 +238,10 @@ public class NotificacionCumple implements Serializable, ObservableNotificacionC
         return new SimpleStringProperty(faltan);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty estadoProperty() {
         return new SimpleStringProperty(this.estadonotificacion.getEstadonotificacion());

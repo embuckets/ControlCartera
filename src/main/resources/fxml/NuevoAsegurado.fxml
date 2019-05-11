@@ -50,7 +50,7 @@
                               <Label text="Tipo de persona" GridPane.rowIndex="1" />
                               <HBox alignment="CENTER_LEFT" spacing="30.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                                  <children>
-                                    <RadioButton fx:id="personaFisicaRadioButton" mnemonicParsing="false" onAction="#tipoPersonaHandler" text="Fisica" />
+                                    <RadioButton fx:id="personaFisicaRadioButton" mnemonicParsing="false" onAction="#tipoPersonaHandler" text="Física" />
                                     <RadioButton fx:id="personaMoralRadionButton" mnemonicParsing="false" onAction="#tipoPersonaHandler" text="Moral" />
                                  </children>
                               </HBox>
@@ -68,7 +68,7 @@
                         </GridPane>
                         <HBox>
                            <children>
-                              <Label text="Informacion Personal" />
+                              <Label text="Información Personal" />
                            </children>
                         </HBox>
                         <HBox prefHeight="150.0" spacing="20.0">
@@ -77,8 +77,8 @@
                                  <children>
                                     <TableView fx:id="telefonoTableView">
                                       <columns>
-                                        <TableColumn fx:id="telefonoTableColumn" prefWidth="75.0" text="Telefono" />
-                                        <TableColumn fx:id="extensionTableColumn" prefWidth="75.0" text="Extension" />
+                                        <TableColumn fx:id="telefonoTableColumn" prefWidth="75.0" text="Teléfono" />
+                                        <TableColumn fx:id="extensionTableColumn" prefWidth="75.0" text="Extensión" />
                                           <TableColumn fx:id="tipoTelefonoTableColumn" prefWidth="75.0" text="Tipo" />
                                       </columns>
                                        <columnResizePolicy>
@@ -87,8 +87,8 @@
                                     </TableView>
                                     <HBox spacing="10.0" VBox.vgrow="NEVER">
                                        <children>
-                                          <TextField fx:id="telefonoTextField" promptText="Telefono" />
-                                          <TextField fx:id="extensionTextField" promptText="Extension" />
+                                          <TextField fx:id="telefonoTextField" promptText="Teléfono" />
+                                          <TextField fx:id="extensionTextField" promptText="Extensión" />
                                           <ComboBox fx:id="tipoTelefonoComboBox" prefWidth="150.0" promptText="Tipo" />
                                           <Button fx:id="agregarTelefonoButton" mnemonicParsing="false" onAction="#agregarTelefono" text="Agregar" />
                                        </children>
@@ -142,12 +142,12 @@
                               <TextField fx:id="interiorTextField" GridPane.columnIndex="5" GridPane.rowIndex="1" />
                               <TextField fx:id="codigoPostaTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <TextField fx:id="coloniaTextField" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                              <Label text="Codigo Postal" GridPane.rowIndex="2" />
+                              <Label text="Código Postal" GridPane.rowIndex="2" />
                               <Label text="Colonia" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <Label text="Delegacion" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                              <Label text="Delegación" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                               <Label text="Estado" GridPane.rowIndex="3" />
                               <ComboBox fx:id="estadoComboBox" promptText="Estado" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <ComboBox fx:id="delegacionComboBox" promptText="Delegacion" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                              <ComboBox fx:id="delegacionComboBox" promptText="Delegación" GridPane.columnIndex="5" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
                         <HBox VBox.vgrow="NEVER">

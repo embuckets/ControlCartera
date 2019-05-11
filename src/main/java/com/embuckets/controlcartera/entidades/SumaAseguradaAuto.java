@@ -40,26 +40,49 @@ public class SumaAseguradaAuto implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sumaaseguradaauto", fetch = FetchType.LAZY)
     private List<PolizaAuto> polizaAutoList;
 
+    /**
+     *
+     */
     public SumaAseguradaAuto() {
     }
 
+    /**
+     *
+     * @param sumaaseguradaauto
+     */
     public SumaAseguradaAuto(String sumaaseguradaauto) {
         this.sumaaseguradaauto = sumaaseguradaauto;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getSumaaseguradaauto() {
         return sumaaseguradaauto;
     }
 
+    /**
+     *
+     * @param sumaaseguradaauto
+     */
     public void setSumaaseguradaauto(String sumaaseguradaauto) {
         this.sumaaseguradaauto = sumaaseguradaauto;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<PolizaAuto> getPolizaAutoList() {
         return polizaAutoList;
     }
 
+    /**
+     *
+     * @param polizaAutoList
+     */
     public void setPolizaAutoList(List<PolizaAuto> polizaAutoList) {
         this.polizaAutoList = polizaAutoList;
     }

@@ -40,26 +40,49 @@ public class Cobranza implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cobranza", fetch = FetchType.LAZY)
     private List<Recibo> reciboList;
 
+    /**
+     *
+     */
     public Cobranza() {
     }
 
+    /**
+     *
+     * @param cobranza
+     */
     public Cobranza(String cobranza) {
         this.cobranza = cobranza;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getCobranza() {
         return cobranza;
     }
 
+    /**
+     *
+     * @param cobranza
+     */
     public void setCobranza(String cobranza) {
         this.cobranza = cobranza;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Recibo> getReciboList() {
         return reciboList;
     }
 
+    /**
+     *
+     * @param reciboList
+     */
     public void setReciboList(List<Recibo> reciboList) {
         this.reciboList = reciboList;
     }

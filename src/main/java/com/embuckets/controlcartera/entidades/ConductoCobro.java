@@ -40,26 +40,49 @@ public class ConductoCobro implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "conductocobro", fetch = FetchType.LAZY)
     private List<Poliza> polizaList;
 
+    /**
+     *
+     */
     public ConductoCobro() {
     }
 
+    /**
+     *
+     * @param conductocobro
+     */
     public ConductoCobro(String conductocobro) {
         this.conductocobro = conductocobro;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getConductocobro() {
         return conductocobro;
     }
 
+    /**
+     *
+     * @param conductocobro
+     */
     public void setConductocobro(String conductocobro) {
         this.conductocobro = conductocobro;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Poliza> getPolizaList() {
         return polizaList;
     }
 
+    /**
+     *
+     * @param polizaList
+     */
     public void setPolizaList(List<Poliza> polizaList) {
         this.polizaList = polizaList;
     }

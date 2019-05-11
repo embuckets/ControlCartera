@@ -18,11 +18,19 @@ import javax.persistence.EntityManager;
  */
 public class EmailJpaController implements Serializable, JpaController {
 
+    /**
+     *
+     */
     public EmailJpaController() {
     }
 
+    /**
+     *
+     * @param object
+     * @throws Exception
+     */
     @Override
-    public void remove(Object object) {
+    public void remove(Object object) throws Exception {
         EntityManager em = null;
         Email email = (Email) object;
         try {
@@ -41,16 +49,28 @@ public class EmailJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return Email.class.getSimpleName();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "findByIdcliente";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "idcliente";

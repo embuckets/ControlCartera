@@ -13,12 +13,28 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableRenovacion {
 
+    /**
+     *
+     * @return
+     */
     StringProperty aseguradoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty polizaProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty finVigenciaProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty faltanProperty();
 
 }

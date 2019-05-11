@@ -50,46 +50,85 @@ public class PolizaAuto implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "idpoliza", fetch = FetchType.LAZY)
     private List<Auto> autoList;
 
+    /**
+     *
+     */
     public PolizaAuto() {
         this.sumaaseguradaauto = new SumaAseguradaAuto();
         this.autoList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public PolizaAuto(Integer idpoliza) {
         this.idpoliza = idpoliza;
         this.sumaaseguradaauto = new SumaAseguradaAuto();
         this.autoList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdpoliza() {
         return idpoliza;
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public void setIdpoliza(Integer idpoliza) {
         this.idpoliza = idpoliza;
     }
 
+    /**
+     *
+     * @return
+     */
     public Poliza getPoliza() {
         return poliza;
     }
 
+    /**
+     *
+     * @param poliza
+     */
     public void setPoliza(Poliza poliza) {
         this.poliza = poliza;
     }
 
+    /**
+     *
+     * @return
+     */
     public SumaAseguradaAuto getSumaaseguradaauto() {
         return sumaaseguradaauto;
     }
 
+    /**
+     *
+     * @param sumaaseguradaauto
+     */
     public void setSumaaseguradaauto(SumaAseguradaAuto sumaaseguradaauto) {
         this.sumaaseguradaauto = sumaaseguradaauto;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Auto> getAutoList() {
         return autoList;
     }
 
+    /**
+     *
+     * @param autoList
+     */
     public void setAutoList(List<Auto> autoList) {
         this.autoList = autoList;
     }

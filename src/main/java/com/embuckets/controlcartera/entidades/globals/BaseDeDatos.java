@@ -72,12 +72,23 @@ import com.embuckets.controlcartera.entidades.controladores.TipoDocumentoAsegura
 import com.embuckets.controlcartera.entidades.controladores.TipoEmailJpaController;
 import com.embuckets.controlcartera.entidades.controladores.TipoPersonaJpaController;
 import com.embuckets.controlcartera.entidades.controladores.TipoTelefonoJpaController;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -85,6 +96,7 @@ import javax.persistence.Persistence;
 import javax.persistence.RollbackException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.derby.tools.ij;
 
 /**
  *
@@ -99,19 +111,31 @@ public class BaseDeDatos {
     private EntityManager em;
     private Map<Class, JpaController> controllers;
 
-    private BaseDeDatos() {
+    private BaseDeDatos() throws SQLException, Exception {
+        if (Files.notExists(Paths.get("./cartera"))) {
+            createDB();
+        }
         this.emf = Persistence.createEntityManagerFactory("cartera");
         this.em = this.emf.createEntityManager();
         controllers = createControllers();
     }
 
-    public static BaseDeDatos getInstance() {
+    /**
+     * Obtiene la unica instancia de la base de datos
+     * @return la base de datos
+     * @throws Exception - si no se puede conectar a la base de datos
+     */
+    public static BaseDeDatos getInstance() throws Exception {
         if (bd == null) {
             bd = new BaseDeDatos();
         }
         return bd;
     }
 
+    /**
+     * Obtiene el EntityManager. 
+     * @return el entity manager
+     */
     public EntityManager getEntityManager() {
         if (em != null) {
             em = emf.createEntityManager();
@@ -126,6 +150,11 @@ public class BaseDeDatos {
         }
     }
 
+    /**
+     * Inserta el objeto especificado. Delega la operacion al controlador de la entidad
+     * @param object la entidad a insertar
+     * @throws Exception - si falla la operacion. Se hace un rollback
+     */
     public void create(Object object) throws Exception {
         try {
             controllers.get(object.getClass()).create(object);
@@ -139,14 +168,34 @@ public class BaseDeDatos {
         }
     }
 
+    /**
+     * Busca todos los registros de la clase especificada
+     * @param <T> el tipo de la clase especificada
+     * @param clazz la clase especificada
+     * @return todos los registros de la clase especificada
+     */
     public <T> List<T> getAll(Class clazz) {
         return controllers.get(clazz).getAll();
     }
 
+    /**
+     * Busca el registro de la entidad especificada con el identificador especificado.
+     * @param <T> el tipo del registro
+     * @param clazz la clase del registro
+     * @param id el identificador del registro
+     * @return El registro con el identificador especificado. <code>null</code> si no lo encuentra.
+     */
     public <T> T getById(Class clazz, int id) {
         return controllers.get(clazz).getById(id);
     }
 
+    /**
+     * Actualiza el registro especificado. Delega la operacion al controlador de la entidad.
+     * @param <T> el tipo de la entidad
+     * @param object la entidad a actualizar
+     * @return la entidad actualizada
+     * @throws Exception - si falla la operacion. Se hace un rollback
+     */
     public <T> T edit(Object object) throws Exception {
         try {
             return controllers.get(object.getClass()).edit(object);
@@ -156,6 +205,11 @@ public class BaseDeDatos {
         }
     }
 
+    /**
+     * Cambia el titular de la poliza.
+     * @param poliza poliza a cambiar el titular
+     * @throws Exception - si falla la operacion. Se hace un rollback
+     */
     public void cambiarTitular(Poliza poliza) throws Exception {
         try {
             ((PolizaJpaController) controllers.get(Poliza.class)).editarTitular(poliza);
@@ -165,6 +219,11 @@ public class BaseDeDatos {
         }
     }
 
+    /**
+     * Elimina la entidad especificada junto con sus dependencias. Delega la operacion al controlador de la entidad.
+     * @param object entidad a eliminar
+     * @throws Exception - si falla la operacion. Se hace un rollback
+     */
     public void remove(Object object) throws Exception {
         try {
             controllers.get(object.getClass()).remove(object);
@@ -178,6 +237,9 @@ public class BaseDeDatos {
         }
     }
 
+    /**
+     * Cierra la conexion a la base de datos.
+     */
     public void close() {
         if (em != null) {
             if (em.getTransaction().isActive()) {
@@ -212,6 +274,12 @@ public class BaseDeDatos {
         }
     }
 
+    /**
+     * Inserta la poliza nueva y cambia el estado de la poliza vieja a "Renovada"
+     * @param vieja poliza a renovar
+     * @param nueva poliza a insertar
+     * @throws Exception - si falla la operacion
+     */
     public void renovarPoliza(Poliza vieja, Poliza nueva) throws Exception {
         try {
             ((PolizaJpaController) controllers.get(Poliza.class)).renovar(vieja, nueva);
@@ -221,6 +289,12 @@ public class BaseDeDatos {
         }
     }
 
+    /**
+     * Busca las notificaciones de cumpleaños que se encuentren dentro de las fechas especificadas sin importar el estado de notificacion.
+     * @param start fecha de inicio
+     * @param end fecha de fin
+     * @return las notificaciones de los asegurados que cumplan dentro del rango especificado
+     */
     public List<NotificacionCumple> getCumplesEntre(LocalDate start, LocalDate end) {
         try {
             return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesEntre(start, end);
@@ -230,22 +304,51 @@ public class BaseDeDatos {
         }
     }
 
+    /**
+     * Busca las notificaciones de cumpleaños pendientes de enviar dentro del rango especificado.
+     * @param start fecha de inicio
+     * @param end fecha de fin
+     * @return las notificaciones pendientes de enviar de los asegurados que cumplen dentro del rango especificado
+     */
     public List<NotificacionCumple> getCumplesPendientesEntre(LocalDate start, LocalDate end) {
         return ((NotificacionCumpleJpaController) controllers.get(NotificacionCumple.class)).getNotificacionesPendientesEntre(start, end);
     }
 
+    /**
+     * Busca las notificaciones de recibos pendientes de enviar dentro del rango especificado.
+     * @param start fecha de inicio
+     * @param end fecha de fin
+     * @return las notificaciones pendientes de enviar de los recibos pendientes de pago
+     */
     public List<NotificacionRecibo> getRecibosPendientesEntre(LocalDate start, LocalDate end) {
         return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesPendientesEntre(start, end);
     }
 
+    /**
+     * Busca las notificaciones de recibos dentro del rango especificado sin importar el estado de cobranza.
+     * @param start fecha de inicio
+     * @param end fecha de fin
+     * @return las notificaciones pendientes de enviar de los recibos dentro del rango
+     */
     public List<NotificacionRecibo> getRecibosEntre(LocalDate start, LocalDate end) {
         return ((NotificacionReciboJpaController) controllers.get(NotificacionRecibo.class)).getNotificacionesEntre(start, end);
     }
 
+    /**
+     * Busca las polizas cuya fecha de fin de vigencia se encuentre dentro del rango especificado
+     * @param start fecha de inicio
+     * @param end fecha de fin
+     * @return todas las polizas con fin de vigencia dentro del rango
+     */
     public List<Poliza> getRenovacionesEntre(LocalDate start, LocalDate end) {
         return ((PolizaJpaController) controllers.get(Poliza.class)).getRenovacionesEntre(start, end);
     }
 
+    /**
+     * Inserta los asegurados especificados. Delega la operacion al controlador de la entidad
+     * @param asegurados asegurados a insertar
+     * @throws Exception - si falla la operacion
+     */
     public void importarAsegurados(List<Asegurado> asegurados) throws Exception {
         try {
             ((AseguradoJpaController) controllers.get(Asegurado.class)).importarAsegurados(asegurados);
@@ -256,14 +359,89 @@ public class BaseDeDatos {
 
     }
 
+    
+    private static void createDB() throws FileNotFoundException, IOException, SQLException, Exception {
+        Connection conn = null;
+        try (InputStream in = new FileInputStream("bd/crear-cartera.sql");
+                OutputStream out = new FileOutputStream("logs/logfile.log")) {
+            conn = createConnection();
+            Statement s = conn.createStatement();
+            s.executeUpdate("set schema APP");
+
+            int errores = ij.runScript(conn, in, "utf-8", out, "utf-8");
+
+            if (errores != 0) {
+                throw new Exception("Error al crear base de datos");
+            }
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+//            try {
+//                DriverManager.getConnection("jdbc:derby:;shutdown=true");
+//            } catch (SQLException ex) {
+//                if (((ex.getErrorCode() == 50000)
+//                        && ("XJ015".equals(ex.getSQLState())))) {
+//                    // we got the expected exception
+////                System.out.println("Derby shut down normally");
+//                    // Note that for single database shutdown, the expected
+//                    // SQL state is "08006", and the error code is 45000.
+//                } else {
+//                    logger.error("Error al apagar Base de datos", ex);
+//                    // if the error code or SQLState is different, we have
+//                    // an unexpected exception (shutdown failed)
+//                    //                System.err.println("Derby did not shut down normally");
+//                }
+//            }
+        }
+    }
+
+    private static Connection createConnection() throws SQLException, ClassNotFoundException {
+        Properties props = new Properties();
+        props.put("create", "true");
+        props.put("user", "emilio");
+        props.put("password", "emilio");
+        props.put("collation", "TERRITORY_BASED:PRIMARY");
+        props.put("territory", "es_MX");
+        Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+        
+        return DriverManager.getConnection("jdbc:derby:cartera", props);
+    }
+
+    /**
+     * Busca los asegurados por nombre y apellidos.
+     * En caso de que algun parametro sea <code>null</code> o vacio se omite del query. 
+     * Busca asegurado que contengan parcialmente los parametros especificados, por ejemplo, si solo se especifica el nombre "em", regresera los asegurados con nombre "Emilio", "Emiliano", "Emma" etc.
+     * @param nombre nombre de pila
+     * @param paterno apellido paterno
+     * @param materno apellido matenro
+     * @return asegurados que tengan el nombre y apellidos especificados
+     */
     public List<Asegurado> buscarAseguradosPorNombre(String nombre, String paterno, String materno) {
         return ((AseguradoJpaController) controllers.get(Asegurado.class)).getByName(nombre, paterno, materno);
     }
 
+    /**
+     * Busca a los clientes por nombre y apellidos.
+     * En caso de que algun parametro sea <code>null</code> o vacio se omite del query. 
+     * Busca cliente que contengan parcialmente los parametros especificados, por ejemplo, si solo se especifica el nombre "em", regresera los clientes con nombre "Emilio", "Emiliano", "Emma" etc.
+     * @param nombre nombre de pila
+     * @param paterno apellido paterno
+     * @param materno apellido materno
+     * @return todos los clientes con nombre y apellidos especificados
+     */
     public List<Cliente> buscarClientesPor(String nombre, String paterno, String materno) {
         return ((ClienteJpaController) controllers.get(Cliente.class)).getByName(nombre, paterno, materno);
     }
 
+    /**
+     * Busca las polizas que coincidan con los parametros especificados.
+     * Busca las polizas que contengan parcialmente los parametros especificados, por ejemplo, si el numeroPoliza es "456", puede regresar las polizas con numero de poliza "123456", "456789", etc.
+     * @param numeroPoliza numero de poliza
+     * @param aseguradora aseguradora
+     * @param ramo ramo
+     * @return todas las poliza que contengan los parametros especificados
+     */
     public List<Poliza> buscarPolizasPor(String numeroPoliza, String aseguradora, String ramo) {
         return ((PolizaJpaController) controllers.get(Poliza.class)).getBy(numeroPoliza, aseguradora, ramo);
     }

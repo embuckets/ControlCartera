@@ -11,7 +11,6 @@ import com.embuckets.controlcartera.entidades.Beneficiario;
 import com.embuckets.controlcartera.entidades.Caratula;
 import java.io.Serializable;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import com.embuckets.controlcartera.entidades.Cliente;
 import com.embuckets.controlcartera.entidades.ConductoCobro;
 import com.embuckets.controlcartera.entidades.Dependiente;
@@ -31,7 +30,6 @@ import com.embuckets.controlcartera.entidades.PolizaVida;
 import com.embuckets.controlcartera.entidades.Ramo;
 import com.embuckets.controlcartera.entidades.Recibo;
 import com.embuckets.controlcartera.entidades.Telefono;
-import com.embuckets.controlcartera.exceptions.NonexistentEntityException;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import com.embuckets.controlcartera.entidades.globals.Globals;
 import com.embuckets.controlcartera.entidades.globals.Logging;
@@ -48,9 +46,17 @@ public class AseguradoJpaController implements Serializable, JpaController {
 
     private static final Logger logger = LogManager.getLogger(AseguradoJpaController.class);
 
+    /**
+     *
+     */
     public AseguradoJpaController() {
     }
 
+    /**
+     * Inserta al asegurado junto con todos sus atributos
+     * @param object
+     * @throws Exception - si falla la operacion. Se hace un rollback a la transaccion
+     */
     @Override
     public void create(Object object) throws Exception {
         Asegurado asegurado = (Asegurado) object;
@@ -112,6 +118,11 @@ public class AseguradoJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     * Inserta los asegurados especificados. Si algun asegurado ya existe inserta las polizas al asegurado ya existente.
+     * @param asegurados aseguarado a insertar
+     * @throws Exception - si falla la operacion
+     */
     public void importarAsegurados(List<Asegurado> asegurados) throws Exception {
         boolean isSubTransaction = false;
         EntityManager em = null;
@@ -147,6 +158,13 @@ public class AseguradoJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     * Se hace un merge del asegurado especificado
+     * @param <T> tipo del objeto
+     * @param object asegurado a actualizar
+     * @return el asegurado actualizado
+     * @throws Exception si falla la operacion. Se hace un rollback a la transaccion
+     */
     @Override
     public <T> T edit(Object object) throws Exception {
         Asegurado asegurado = (Asegurado) object;
@@ -182,6 +200,11 @@ public class AseguradoJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @param object
+     * @throws Exception
+     */
     @Override
     public void remove(Object object) throws Exception {
         EntityManager em = null;
@@ -196,15 +219,6 @@ public class AseguradoJpaController implements Serializable, JpaController {
             }
 
             Asegurado asegurado = (Asegurado) object;
-            int id = asegurado.getIdcliente();
-            try {
-                asegurado = em.getReference(Asegurado.class, id);
-                asegurado.getIdcliente();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The asegurado with id " + id + " no longer exists.", enfe);
-            }
-
-            List<String> illegalOrphanMessages = null;
             List<Email> emailListOrphanCheck = asegurado.getEmailList();
 //            for (Email emailListOrphanCheckEmail : emailListOrphanCheck) {
 //                emailListOrphanCheckEmail.setAsegurado(null);
@@ -265,6 +279,7 @@ public class AseguradoJpaController implements Serializable, JpaController {
                 tipopersona = em.merge(tipopersona);
             }
             em.remove(asegurado);
+            em.remove(asegurado.getCliente());//si no es dependiente o beneficiario
             if (!isSubTransaction) {
                 em.getTransaction().commit();
             }
@@ -276,94 +291,103 @@ public class AseguradoJpaController implements Serializable, JpaController {
         }
     }
 
-    private void removePoliza(Poliza poliza) throws Exception {
-        EntityManager em = null;
-        try {
-            em = BaseDeDatos.getInstance().getEntityManager();
-//            em.getTransaction().begin();//if active throws exception
-            Caratula caratulaOrphanCheck = poliza.getCaratula();
-            if (caratulaOrphanCheck != null) {
-                caratulaOrphanCheck.setPoliza(null);
-                caratulaOrphanCheck = em.merge(caratulaOrphanCheck);
-            }
-            PolizaAuto polizaAutoOrphanCheck = poliza.getPolizaAuto();
-            if (polizaAutoOrphanCheck != null) {
-                polizaAutoOrphanCheck.setPoliza(null);
-                polizaAutoOrphanCheck = em.merge(polizaAutoOrphanCheck);
-            }
-            PolizaVida polizaVidaOrphanCheck = poliza.getPolizaVida();
-            if (polizaVidaOrphanCheck != null) {
-                BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
-                for (Cliente cliente : polizaVidaOrphanCheck.getClienteList()) {
-                    beneficiarioJpaController.remove(new Beneficiario(cliente, polizaVidaOrphanCheck));
-                }
-                polizaVidaOrphanCheck.setPoliza(null);
-                polizaVidaOrphanCheck = em.merge(polizaVidaOrphanCheck);
-            }
-            PolizaGmm polizaGmmOrphanCheck = poliza.getPolizaGmm();
-            if (polizaGmmOrphanCheck != null) {
-                DependienteJpaController dependienteJpaController = new DependienteJpaController();
-                for (Cliente cliente : polizaGmmOrphanCheck.getClienteList()) {
-                    dependienteJpaController.remove(new Dependiente(cliente, polizaGmmOrphanCheck));
-                }
-                polizaGmmOrphanCheck.setPoliza(null);
-                polizaGmmOrphanCheck = em.merge(polizaGmmOrphanCheck);
-            }
-            List<Recibo> reciboListOrphanCheck = poliza.getReciboList();
-            for (Recibo reciboListOrphanCheckRecibo : reciboListOrphanCheck) {
-                reciboListOrphanCheckRecibo.setIdpoliza(null);
-                reciboListOrphanCheckRecibo = em.merge(reciboListOrphanCheckRecibo);
-            }
-            Asegurado contratante = poliza.getContratante();
-            if (contratante != null) {
-//                contratante.getPolizaList().remove(poliza);
-                contratante = em.merge(contratante);
-            }
-            Aseguradora aseguradora = poliza.getAseguradora();
-            if (aseguradora != null) {
-                aseguradora.getPolizaList().remove(poliza);
-                aseguradora = em.merge(aseguradora);
-            }
-            Cliente titular = poliza.getTitular();
-            if (titular != null) {
-                titular.getPolizaList().remove(poliza);
-                titular = em.merge(titular);
-            }
-            ConductoCobro conductocobro = poliza.getConductocobro();
-            if (conductocobro != null) {
-                conductocobro.getPolizaList().remove(poliza);
-                conductocobro = em.merge(conductocobro);
-            }
-            EstadoPoliza estado = poliza.getEstado();
-            if (estado != null) {
-                estado.getPolizaList().remove(poliza);
-                estado = em.merge(estado);
-            }
-            FormaPago formapago = poliza.getFormapago();
-            if (formapago != null) {
-                formapago.getPolizaList().remove(poliza);
-                formapago = em.merge(formapago);
-            }
-            Moneda primamoneda = poliza.getPrimamoneda();
-            if (primamoneda != null) {
-                primamoneda.getPolizaList().remove(poliza);
-                primamoneda = em.merge(primamoneda);
-            }
-            Ramo ramo = poliza.getRamo();
-            if (ramo != null) {
-                ramo.getPolizaList().remove(poliza);
-                ramo = em.merge(ramo);
-            }
-            em.remove(poliza);
-            //TODO: Aparentemente si elimina todos los recibos
-        } catch (Exception ex) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw ex;
-        }
-    }
+//    private void removePoliza(Poliza poliza) throws Exception {
+//        EntityManager em = null;
+//        try {
+//            em = BaseDeDatos.getInstance().getEntityManager();
+////            em.getTransaction().begin();//if active throws exception
+//            Caratula caratulaOrphanCheck = poliza.getCaratula();
+//            if (caratulaOrphanCheck != null) {
+//                caratulaOrphanCheck.setPoliza(null);
+//                caratulaOrphanCheck = em.merge(caratulaOrphanCheck);
+//            }
+//            PolizaAuto polizaAutoOrphanCheck = poliza.getPolizaAuto();
+//            if (polizaAutoOrphanCheck != null) {
+//                polizaAutoOrphanCheck.setPoliza(null);
+//                polizaAutoOrphanCheck = em.merge(polizaAutoOrphanCheck);
+//            }
+//            PolizaVida polizaVidaOrphanCheck = poliza.getPolizaVida();
+//            if (polizaVidaOrphanCheck != null) {
+//                BeneficiarioJpaController beneficiarioJpaController = new BeneficiarioJpaController();
+//                for (Cliente cliente : polizaVidaOrphanCheck.getClienteList()) {
+//                    beneficiarioJpaController.remove(new Beneficiario(cliente, polizaVidaOrphanCheck));
+//                }
+//                polizaVidaOrphanCheck.setPoliza(null);
+//                polizaVidaOrphanCheck = em.merge(polizaVidaOrphanCheck);
+//            }
+//            PolizaGmm polizaGmmOrphanCheck = poliza.getPolizaGmm();
+//            if (polizaGmmOrphanCheck != null) {
+//                DependienteJpaController dependienteJpaController = new DependienteJpaController();
+//                for (Cliente cliente : polizaGmmOrphanCheck.getClienteList()) {
+//                    dependienteJpaController.remove(new Dependiente(cliente, polizaGmmOrphanCheck));
+//                }
+//                polizaGmmOrphanCheck.setPoliza(null);
+//                polizaGmmOrphanCheck = em.merge(polizaGmmOrphanCheck);
+//            }
+//            List<Recibo> reciboListOrphanCheck = poliza.getReciboList();
+//            for (Recibo reciboListOrphanCheckRecibo : reciboListOrphanCheck) {
+//                reciboListOrphanCheckRecibo.setIdpoliza(null);
+//                reciboListOrphanCheckRecibo = em.merge(reciboListOrphanCheckRecibo);
+//            }
+//            Asegurado contratante = poliza.getContratante();
+//            if (contratante != null) {
+////                contratante.getPolizaList().remove(poliza);
+//                contratante = em.merge(contratante);
+//            }
+//            Aseguradora aseguradora = poliza.getAseguradora();
+//            if (aseguradora != null) {
+//                aseguradora.getPolizaList().remove(poliza);
+//                aseguradora = em.merge(aseguradora);
+//            }
+//            Cliente titular = poliza.getTitular();
+//            if (titular != null) {
+//                titular.getPolizaList().remove(poliza);
+//                titular = em.merge(titular);
+//            }
+//            ConductoCobro conductocobro = poliza.getConductocobro();
+//            if (conductocobro != null) {
+//                conductocobro.getPolizaList().remove(poliza);
+//                conductocobro = em.merge(conductocobro);
+//            }
+//            EstadoPoliza estado = poliza.getEstado();
+//            if (estado != null) {
+//                estado.getPolizaList().remove(poliza);
+//                estado = em.merge(estado);
+//            }
+//            FormaPago formapago = poliza.getFormapago();
+//            if (formapago != null) {
+//                formapago.getPolizaList().remove(poliza);
+//                formapago = em.merge(formapago);
+//            }
+//            Moneda primamoneda = poliza.getPrimamoneda();
+//            if (primamoneda != null) {
+//                primamoneda.getPolizaList().remove(poliza);
+//                primamoneda = em.merge(primamoneda);
+//            }
+//            Ramo ramo = poliza.getRamo();
+//            if (ramo != null) {
+//                ramo.getPolizaList().remove(poliza);
+//                ramo = em.merge(ramo);
+//            }
+//            em.remove(poliza);
+//            //TODO: Aparentemente si elimina todos los recibos
+//        } catch (Exception ex) {
+//            if (em != null && em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            throw ex;
+//        }
+//    }
 
+    /**
+     * Busca los asegurados por nombre y apellidos.
+     * En caso de que algun parametro sea <code>null</code> o vacio se omite del query. 
+     * Busca asegurado que contengan parcialmente los parametros especificados, por ejemplo, si solo se especifica el nombre "em", regresera los asegurados con nombre "Emilio", "Emiliano", "Emma" etc.
+     * @param nombre nombre de pila
+     * @param paterno apellido paterno
+     * @param materno apellido matenro
+     * @return asegurados que tengan el nombre y apellidos especificados
+     */
     public List<Asegurado> getByName(String nombre, String paterno, String materno) {
         EntityManager em = null;
         try {
@@ -406,16 +430,28 @@ public class AseguradoJpaController implements Serializable, JpaController {
         return new ArrayList<>();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return Asegurado.class.getSimpleName();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "findByIdcliente";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "idcliente";

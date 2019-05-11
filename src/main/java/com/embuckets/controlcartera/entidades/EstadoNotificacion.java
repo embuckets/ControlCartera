@@ -42,35 +42,66 @@ public class EstadoNotificacion implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "estadonotificacion", fetch = FetchType.LAZY)
     private List<NotificacionRecibo> notificacionReciboList;
 
+    /**
+     *
+     */
     public EstadoNotificacion() {
     }
 
+    /**
+     *
+     * @param estadonotificacion
+     */
     public EstadoNotificacion(String estadonotificacion) {
         this.estadonotificacion = estadonotificacion;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getEstadonotificacion() {
         return estadonotificacion;
     }
 
+    /**
+     *
+     * @param estadonotificacion
+     */
     public void setEstadonotificacion(String estadonotificacion) {
         this.estadonotificacion = estadonotificacion;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<NotificacionCumple> getNotificacionCumpleList() {
         return notificacionCumpleList;
     }
 
+    /**
+     *
+     * @param notificacionCumpleList
+     */
     public void setNotificacionCumpleList(List<NotificacionCumple> notificacionCumpleList) {
         this.notificacionCumpleList = notificacionCumpleList;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<NotificacionRecibo> getNotificacionReciboList() {
         return notificacionReciboList;
     }
 
+    /**
+     *
+     * @param notificacionReciboList
+     */
     public void setNotificacionReciboList(List<NotificacionRecibo> notificacionReciboList) {
         this.notificacionReciboList = notificacionReciboList;
     }

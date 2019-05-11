@@ -20,9 +20,21 @@ import javax.persistence.EntityManager;
  */
 public class ClienteJpaController implements Serializable, JpaController {
 
+    /**
+     *
+     */
     public ClienteJpaController() {
     }
 
+    /**
+     * Busca a los clientes por nombre y apellidos.
+     * En caso de que algun parametro sea <code>null</code> o vacio se omite del query. 
+     * Busca cliente que contengan parcialmente los parametros especificados, por ejemplo, si solo se especifica el nombre "em", regresera los clientes con nombre "Emilio", "Emiliano", "Emma" etc.
+     * @param nombre nombre de pila
+     * @param paterno apellido paterno
+     * @param materno apellido materno
+     * @return todos los clientes con nombre y apellidos especificados
+     */
     public List<Cliente> getByName(String nombre, String paterno, String materno) {
         boolean isSubTransaction = false;
         EntityManager em = null;
@@ -67,16 +79,28 @@ public class ClienteJpaController implements Serializable, JpaController {
         return new ArrayList<>();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return Cliente.class.getSimpleName();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "findByIdcliente";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "idcliente";

@@ -39,26 +39,49 @@ public class TipoPersona implements Serializable {
     @OneToMany(mappedBy = "tipopersona", fetch = FetchType.LAZY)
     private List<Asegurado> aseguradoList;
 
+    /**
+     *
+     */
     public TipoPersona() {
     }
 
+    /**
+     *
+     * @param tipopersona
+     */
     public TipoPersona(String tipopersona) {
         this.tipopersona = tipopersona;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTipopersona() {
         return tipopersona;
     }
 
+    /**
+     *
+     * @param tipopersona
+     */
     public void setTipopersona(String tipopersona) {
         this.tipopersona = tipopersona;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Asegurado> getAseguradoList() {
         return aseguradoList;
     }
 
+    /**
+     *
+     * @param aseguradoList
+     */
     public void setAseguradoList(List<Asegurado> aseguradoList) {
         this.aseguradoList = aseguradoList;
     }

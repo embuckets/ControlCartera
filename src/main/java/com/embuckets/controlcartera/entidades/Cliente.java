@@ -81,103 +81,201 @@ public class Cliente implements Serializable, ObservableCliente {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "titular", fetch = FetchType.LAZY)
     private List<Poliza> polizaList;
 
+    /**
+     *
+     */
     public Cliente() {
     }
 
+    /**
+     *
+     * @param idcliente
+     */
     public Cliente(Integer idcliente) {
         this.idcliente = idcliente;
     }
 
+    /**
+     *
+     * @param idcliente
+     * @param nombre
+     */
     public Cliente(Integer idcliente, String nombre) {
         this.idcliente = idcliente;
         this.nombre = nombre;
     }
 
+    /**
+     *
+     * @param nombre
+     * @param paterno
+     * @param materno
+     */
     public Cliente(String nombre, String paterno, String materno) {
         this.nombre = nombre;
         this.apellidopaterno = paterno;
         this.apellidomaterno = materno;
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdcliente() {
         return idcliente;
     }
 
+    /**
+     *
+     * @param idcliente
+     */
     public void setIdcliente(Integer idcliente) {
         this.idcliente = idcliente;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     *
+     * @param nombre
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getApellidopaterno() {
         return apellidopaterno;
     }
 
+    /**
+     *
+     * @param apellidopaterno
+     */
     public void setApellidopaterno(String apellidopaterno) {
         this.apellidopaterno = apellidopaterno;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getApellidomaterno() {
         return apellidomaterno;
     }
 
+    /**
+     *
+     * @param apellidomaterno
+     */
     public void setApellidomaterno(String apellidomaterno) {
         this.apellidomaterno = apellidomaterno;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getNacimiento() {
         return nacimiento;
     }
 
+    /**
+     *
+     * @param nacimiento
+     */
     public void setNacimiento(LocalDate nacimiento) {
         this.nacimiento = nacimiento;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<PolizaGmm> getPolizaGmmList() {
         return polizaGmmList;
     }
 
+    /**
+     *
+     * @param polizaGmmList
+     */
     public void setPolizaGmmList(List<PolizaGmm> polizaGmmList) {
         this.polizaGmmList = polizaGmmList;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<PolizaVida> getPolizaVidaList() {
         return polizaVidaList;
     }
 
+    /**
+     *
+     * @param polizaVidaList
+     */
     public void setPolizaVidaList(List<PolizaVida> polizaVidaList) {
         this.polizaVidaList = polizaVidaList;
     }
 
+    /**
+     *
+     * @return
+     */
     public Asegurado getAsegurado() {
         return asegurado;
     }
 
+    /**
+     *
+     * @param asegurado
+     */
     public void setAsegurado(Asegurado asegurado) {
         this.asegurado = asegurado;
     }
 
+    /**
+     *
+     * @return
+     */
     public NotificacionCumple getNotificacionCumple() {
         return notificacionCumple;
     }
 
+    /**
+     *
+     * @param notificacionCumple
+     */
     public void setNotificacionCumple(NotificacionCumple notificacionCumple) {
         this.notificacionCumple = notificacionCumple;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Poliza> getPolizaList() {
         return polizaList;
     }
 
+    /**
+     *
+     * @param polizaList
+     */
     public void setPolizaList(List<Poliza> polizaList) {
         this.polizaList = polizaList;
     }
@@ -227,26 +325,46 @@ public class Cliente implements Serializable, ObservableCliente {
         return "com.embuckets.controlcartera.entidades.Cliente[ idcliente=" + idcliente + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty nombreProperty() {
         return new SimpleStringProperty(nombre + " " + apellidopaterno + " " + apellidomaterno);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty primerNombreProperty() {
         return new SimpleStringProperty(nombre);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty paternoProperty() {
         return new SimpleStringProperty(apellidopaterno);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty maternoProperty() {
         return new SimpleStringProperty(apellidomaterno);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty nacimientoProperty() {
         return new SimpleStringProperty(nacimiento == null ? "" : nacimiento.toString());

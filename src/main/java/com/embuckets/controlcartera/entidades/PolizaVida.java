@@ -55,58 +55,110 @@ public class PolizaVida implements Serializable {
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Poliza poliza;
 
+    /**
+     *
+     */
     public PolizaVida() {
         this.clienteList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public PolizaVida(Integer idpoliza) {
         this.idpoliza = idpoliza;
         this.clienteList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param idpoliza
+     * @param sumaasegurada
+     */
     public PolizaVida(Integer idpoliza, BigDecimal sumaasegurada) {
         this.idpoliza = idpoliza;
         this.sumaasegurada = sumaasegurada;
         this.clienteList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdpoliza() {
         return idpoliza;
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public void setIdpoliza(Integer idpoliza) {
         this.idpoliza = idpoliza;
     }
 
+    /**
+     *
+     * @return
+     */
     public BigDecimal getSumaasegurada() {
         return sumaasegurada;
     }
 
+    /**
+     *
+     * @param sumaasegurada
+     */
     public void setSumaasegurada(BigDecimal sumaasegurada) {
         this.sumaasegurada = sumaasegurada;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Cliente> getClienteList() {
         return clienteList;
     }
 
+    /**
+     *
+     * @param clienteList
+     */
     public void setClienteList(List<Cliente> clienteList) {
         this.clienteList = clienteList;
     }
 
+    /**
+     *
+     * @return
+     */
     public Moneda getSumaaseguradamoneda() {
         return sumaaseguradamoneda;
     }
 
+    /**
+     *
+     * @param sumaaseguradamoneda
+     */
     public void setSumaaseguradamoneda(Moneda sumaaseguradamoneda) {
         this.sumaaseguradamoneda = sumaaseguradamoneda;
     }
 
+    /**
+     *
+     * @return
+     */
     public Poliza getPoliza() {
         return poliza;
     }
 
+    /**
+     *
+     * @param poliza
+     */
     public void setPoliza(Poliza poliza) {
         this.poliza = poliza;
     }

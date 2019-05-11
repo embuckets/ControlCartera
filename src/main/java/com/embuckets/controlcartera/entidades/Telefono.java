@@ -35,6 +35,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Telefono implements Serializable, ObservableTelefono {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     *
+     */
     @EmbeddedId
     protected TelefonoPK telefonoPK;
     @Column(name = "EXTENSION")
@@ -46,50 +50,98 @@ public class Telefono implements Serializable, ObservableTelefono {
     @ManyToOne(fetch = FetchType.EAGER)
     private TipoTelefono tipotelefono;
 
+    /**
+     *
+     */
     public Telefono() {
     }
 
+    /**
+     *
+     * @param telefonoPK
+     */
     public Telefono(TelefonoPK telefonoPK) {
         this.telefonoPK = telefonoPK;
     }
 
+    /**
+     *
+     * @param idcliente
+     * @param telefono
+     */
     public Telefono(int idcliente, String telefono) {
         this.telefonoPK = new TelefonoPK(idcliente, telefono);
     }
 
+    /**
+     *
+     * @param telefono
+     */
     public Telefono(String telefono) {
         this.telefonoPK = new TelefonoPK();
         this.telefonoPK.setTelefono(telefono);
     }
 
+    /**
+     *
+     * @return
+     */
     public TelefonoPK getTelefonoPK() {
         return telefonoPK;
     }
 
+    /**
+     *
+     * @param telefonoPK
+     */
     public void setTelefonoPK(TelefonoPK telefonoPK) {
         this.telefonoPK = telefonoPK;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getExtension() {
         return extension;
     }
 
+    /**
+     *
+     * @param extension
+     */
     public void setExtension(String extension) {
         this.extension = extension;
     }
 
+    /**
+     *
+     * @return
+     */
     public Asegurado getAsegurado() {
         return asegurado;
     }
 
+    /**
+     *
+     * @param asegurado
+     */
     public void setAsegurado(Asegurado asegurado) {
         this.asegurado = asegurado;
     }
 
+    /**
+     *
+     * @return
+     */
     public TipoTelefono getTipotelefono() {
         return tipotelefono;
     }
 
+    /**
+     *
+     * @param tipotelefono
+     */
     public void setTipotelefono(TipoTelefono tipotelefono) {
         this.tipotelefono = tipotelefono;
     }
@@ -119,16 +171,28 @@ public class Telefono implements Serializable, ObservableTelefono {
         return "com.embuckets.controlcartera.entidades.Telefono[ telefonoPK=" + telefonoPK + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty telefonoProperty() {
         return new SimpleStringProperty(telefonoPK.getTelefono());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty extensionProperty() {
         return new SimpleStringProperty(extension);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty tipoProperty() {
         return new SimpleStringProperty(tipotelefono.getTipotelefono());

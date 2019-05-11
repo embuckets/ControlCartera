@@ -11,6 +11,10 @@ import javax.mail.internet.MimeMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ *
+ * @author emilio
+ */
 public class EmailSender implements TransportListener, Runnable {
 
     private static final Logger logger = LogManager.getLogger(EmailSender.class);
@@ -20,17 +24,18 @@ public class EmailSender implements TransportListener, Runnable {
     private Address[] addresses;
     private EnviarNotificacionesTask task;
 
+    /**
+     *
+     * @param transport
+     * @param message
+     * @param addresses
+     * @param task
+     */
     public EmailSender(Transport transport, MimeMessage message, Address[] addresses, EnviarNotificacionesTask task) {
         this.transport = transport;
         this.message = message;
         this.addresses = addresses;
         this.task = task;
-    }
-
-    public EmailSender(Transport transport, MimeMessage message, Address[] addresses) {
-        this.transport = transport;
-        this.message = message;
-        this.addresses = addresses;
     }
 
     @Override
@@ -43,17 +48,29 @@ public class EmailSender implements TransportListener, Runnable {
         }
     }
 
+    /**
+     *
+     * @param e
+     */
     @Override
     public void messageDelivered(TransportEvent e) {
         task.getSentMessages().add(e.getMessage());
         task.updateWorkDone();
     }
 
+    /**
+     *
+     * @param e
+     */
     @Override
     public void messageNotDelivered(TransportEvent e) {
         logger.info("Message Not Delivered", e);
     }
 
+    /**
+     *
+     * @param e
+     */
     @Override
     public void messagePartiallyDelivered(TransportEvent e) {
         task.getSentMessages().add(e.getMessage());

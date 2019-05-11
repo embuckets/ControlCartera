@@ -116,15 +116,30 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 //    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, mappedBy = "idpoliza", fetch = FetchType.LAZY)
     private List<Recibo> reciboList;
 
+    /**
+     *
+     */
     public Poliza() {
         this.reciboList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public Poliza(Integer idpoliza) {
         this.idpoliza = idpoliza;
         this.reciboList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param idpoliza
+     * @param numero
+     * @param iniciovigencia
+     * @param finvigencia
+     * @param prima
+     */
     public Poliza(Integer idpoliza, String numero, LocalDate iniciovigencia, LocalDate finvigencia, BigDecimal prima) {
         this.idpoliza = idpoliza;
         this.numero = numero;
@@ -134,42 +149,82 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         this.reciboList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdpoliza() {
         return idpoliza;
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public void setIdpoliza(Integer idpoliza) {
         this.idpoliza = idpoliza;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNumero() {
         return numero;
     }
 
+    /**
+     *
+     * @param numero
+     */
     public void setNumero(String numero) {
         this.numero = numero;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getProducto() {
         return producto;
     }
 
+    /**
+     *
+     * @param producto
+     */
     public void setProducto(String producto) {
         this.producto = producto;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPlan() {
         return plan;
     }
 
+    /**
+     *
+     * @param plan
+     */
     public void setPlan(String plan) {
         this.plan = plan;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getIniciovigencia() {
         return iniciovigencia;
     }
 
+    /**
+     *
+     * @param iniciovigencia
+     */
     public void setIniciovigencia(LocalDate iniciovigencia) {
         this.iniciovigencia = iniciovigencia;
         this.finvigencia = iniciovigencia.plusMonths(12);
@@ -178,10 +233,19 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 //    public void setIniciovigencia(LocalDate iniciovigencia) {
 //        this.iniciovigencia = iniciovigencia;
 //    }
+
+    /**
+     *
+     * @return
+     */
     public LocalDate getFinvigencia() {
         return finvigencia;
     }
 
+    /**
+     *
+     * @param finvigencia
+     */
     public void setFinvigencia(LocalDate finvigencia) {
         this.finvigencia = finvigencia;
         this.iniciovigencia = finvigencia.minusMonths(12);
@@ -190,98 +254,195 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
 //    public void setFinvigencia(LocalDate finvigencia) {
 //        this.finvigencia = Date.from(finvigencia.atStartOfDay(ZoneId.systemDefault()).toInstant());
 //    }
+
+    /**
+     *
+     * @return
+     */
     public BigDecimal getPrima() {
         return prima;
     }
 
+    /**
+     *
+     * @param prima
+     */
     public void setPrima(BigDecimal prima) {
         this.prima = prima;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNota() {
         return nota;
     }
 
+    /**
+     *
+     * @param nota
+     */
     public void setNota(String nota) {
         this.nota = nota;
     }
 
+    /**
+     *
+     * @return
+     */
     public Caratula getCaratula() {
         return caratula;
     }
 
+    /**
+     *
+     * @param caratula
+     */
     public void setCaratula(Caratula caratula) {
         this.caratula = caratula;
     }
 
+    /**
+     *
+     * @return
+     */
     public PolizaAuto getPolizaAuto() {
         return polizaAuto;
     }
 
+    /**
+     *
+     * @param polizaAuto
+     */
     public void setPolizaAuto(PolizaAuto polizaAuto) {
         this.polizaAuto = polizaAuto;
     }
 
+    /**
+     *
+     * @return
+     */
     public Asegurado getContratante() {
         return contratante;
     }
 
+    /**
+     *
+     * @param contratante
+     */
     public void setContratante(Asegurado contratante) {
         this.contratante = contratante;
     }
 
+    /**
+     *
+     * @return
+     */
     public Aseguradora getAseguradora() {
         return aseguradora;
     }
 
+    /**
+     *
+     * @param aseguradora
+     */
     public void setAseguradora(Aseguradora aseguradora) {
         this.aseguradora = aseguradora;
     }
 
+    /**
+     *
+     * @return
+     */
     public Cliente getTitular() {
         return titular;
     }
 
+    /**
+     *
+     * @param titular
+     */
     public void setTitular(Cliente titular) {
         this.titular = titular;
     }
 
+    /**
+     *
+     * @return
+     */
     public ConductoCobro getConductocobro() {
         return conductocobro;
     }
 
+    /**
+     *
+     * @param conductocobro
+     */
     public void setConductocobro(ConductoCobro conductocobro) {
         this.conductocobro = conductocobro;
     }
 
+    /**
+     *
+     * @return
+     */
     public EstadoPoliza getEstado() {
         return estado;
     }
 
+    /**
+     *
+     * @param estado
+     */
     public void setEstado(EstadoPoliza estado) {
         this.estado = estado;
     }
 
+    /**
+     *
+     * @return
+     */
     public FormaPago getFormapago() {
         return formapago;
     }
 
+    /**
+     *
+     * @param formapago
+     */
     public void setFormapago(FormaPago formapago) {
         this.formapago = formapago;
     }
 
+    /**
+     *
+     * @return
+     */
     public Moneda getPrimamoneda() {
         return primamoneda;
     }
 
+    /**
+     *
+     * @param primamoneda
+     */
     public void setPrimamoneda(Moneda primamoneda) {
         this.primamoneda = primamoneda;
     }
 
+    /**
+     *
+     * @return
+     */
     public Ramo getRamo() {
         return ramo;
     }
 
+    /**
+     *
+     * @param ramo
+     */
     public void setRamo(Ramo ramo) {
         this.ramo = ramo;
         crearSubPoliza();
@@ -311,27 +472,51 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public PolizaVida getPolizaVida() {
         return polizaVida;
     }
 
+    /**
+     *
+     * @param polizaVida
+     */
     public void setPolizaVida(PolizaVida polizaVida) {
         this.polizaVida = polizaVida;
     }
 
+    /**
+     *
+     * @return
+     */
     public PolizaGmm getPolizaGmm() {
         return polizaGmm;
     }
 
+    /**
+     *
+     * @param polizaGmm
+     */
     public void setPolizaGmm(PolizaGmm polizaGmm) {
         this.polizaGmm = polizaGmm;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Recibo> getReciboList() {
         return reciboList;
     }
 
+    /**
+     *
+     * @param reciboList
+     */
     public void setReciboList(List<Recibo> reciboList) {
         this.reciboList = reciboList;
     }
@@ -361,80 +546,146 @@ public class Poliza implements Serializable, ObservableTreeItem, ObservableRenov
         return "com.embuckets.controlcartera.entidades.Poliza[ idpoliza=" + idpoliza + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getId() {
         return getIdpoliza();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty nombreProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty numeroProperty() {
         return new SimpleStringProperty(numero);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty aseguradoraProperty() {
         return new SimpleStringProperty(aseguradora.getAseguradora());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty ramoProperty() {
         return new SimpleStringProperty(ramo.getRamo());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty productoProperty() {
         return new SimpleStringProperty(producto);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty planProperty() {
         return new SimpleStringProperty(plan);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty primaProperty() {
         return new SimpleStringProperty(Globals.formatCantidad(prima) + " " + primamoneda.getMoneda());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<? extends ObservableTreeItem> getPolizaListProperty() {
         return null;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty aseguradoProperty() {
         return new SimpleStringProperty(this.contratante.getCliente().nombreProperty().get());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty polizaProperty() {
         return numeroProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty finVigenciaProperty() {
         return new SimpleStringProperty(this.finvigencia.toString());
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty inicioVigenciaProperty() {
         return new SimpleStringProperty(this.iniciovigencia.toString());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty faltanProperty() {
         return new SimpleStringProperty("" + (finvigencia.getDayOfYear() - LocalDate.now().getDayOfYear()) + " días");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty estadoProperty() {
         return new SimpleStringProperty(estado.getEstado());
     }
 
+    /**
+     *
+     * @param recibosPagados
+     * @param importeConDerechoDePoliza
+     * @param importeSubsecuente
+     */
     public void generarRecibos(int recibosPagados, BigDecimal importeConDerechoDePoliza, BigDecimal importeSubsecuente) {
         int recibos = cuantosRecibos();
         int siguienteMes = siguienteMes();

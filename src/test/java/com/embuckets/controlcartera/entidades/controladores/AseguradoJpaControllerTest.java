@@ -35,7 +35,7 @@ public class AseguradoJpaControllerTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         bd = BaseDeDatos.getInstance();
 //        entityManagerFactory = Persistence.createEntityManagerFactory("cartera");
     }

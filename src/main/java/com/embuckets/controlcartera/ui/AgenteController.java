@@ -52,6 +52,8 @@ public class AgenteController implements Initializable {
 
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -105,6 +107,10 @@ public class AgenteController implements Initializable {
         return ptr.matcher(emailField.getText()).matches() || emailField.getText().isEmpty();
     }
 
+    /**
+     *
+     * @return
+     */
     public Dialog<Agente> getDialog() {
         return dialog;
     }

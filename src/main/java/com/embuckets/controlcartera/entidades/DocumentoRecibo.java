@@ -65,9 +65,18 @@ public class DocumentoRecibo implements Serializable {
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Recibo recibo;
 
+    /**
+     *
+     */
     public DocumentoRecibo() {
     }
 
+    /**
+     * Constructor
+     * @param file Archivo a ser leido
+     * @param recibo recibo a cual pertence este documento
+     * @throws IOException cuando hay error al leer el archivo
+     */
     public DocumentoRecibo(File file, Recibo recibo) throws IOException {
         this.recibo = recibo;
         this.idrecibo = recibo.getIdrecibo();
@@ -83,50 +92,98 @@ public class DocumentoRecibo implements Serializable {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdrecibo() {
         return idrecibo;
     }
 
+    /**
+     *
+     * @param idrecibo
+     */
     public void setIdrecibo(Integer idrecibo) {
         this.idrecibo = idrecibo;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     *
+     * @param nombre
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getExtension() {
         return extension;
     }
 
+    /**
+     *
+     * @param extension
+     */
     public void setExtension(String extension) {
         this.extension = extension;
     }
 
+    /**
+     *
+     * @return
+     */
     public byte[] getArchivo() {
         return archivo;
     }
 
+    /**
+     *
+     * @param archivo
+     */
     public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getActualizado() {
         return actualizado;
     }
 
+    /**
+     *
+     * @param actualizado
+     */
     public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 
+    /**
+     *
+     * @return
+     */
     public Recibo getRecibo() {
         return recibo;
     }
 
+    /**
+     *
+     * @param recibo
+     */
     public void setRecibo(Recibo recibo) {
         this.recibo = recibo;
     }

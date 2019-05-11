@@ -68,9 +68,18 @@ public class Caratula implements Serializable, ObservableDocumento {
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Poliza poliza;
 
+    /**
+     *
+     */
     public Caratula() {
     }
 
+    /**
+     *
+     * @param file
+     * @param poliza
+     * @throws IOException
+     */
     public Caratula(File file, Poliza poliza) throws IOException {
         this.poliza = poliza;
         this.idpoliza = poliza.getIdpoliza();
@@ -86,50 +95,98 @@ public class Caratula implements Serializable, ObservableDocumento {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdpoliza() {
         return idpoliza;
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public void setIdpoliza(Integer idpoliza) {
         this.idpoliza = idpoliza;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     *
+     * @param nombre
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getExtension() {
         return extension;
     }
 
+    /**
+     *
+     * @param extension
+     */
     public void setExtension(String extension) {
         this.extension = extension;
     }
 
+    /**
+     *
+     * @return
+     */
     public byte[] getArchivo() {
         return archivo;
     }
 
+    /**
+     *
+     * @param archivo
+     */
     public void setArchivo(byte[] archivo) {
         this.archivo = archivo;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getActualizado() {
         return actualizado;
     }
 
+    /**
+     *
+     * @param actualizado
+     */
     public void setActualizado(LocalDateTime actualizado) {
         this.actualizado = actualizado;
     }
 
+    /**
+     *
+     * @return
+     */
     public Poliza getPoliza() {
         return poliza;
     }
 
+    /**
+     *
+     * @param poliza
+     */
     public void setPoliza(Poliza poliza) {
         this.poliza = poliza;
     }
@@ -159,11 +216,19 @@ public class Caratula implements Serializable, ObservableDocumento {
         return "com.embuckets.controlcartera.entidades.Caratula[ idpoliza=" + idpoliza + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty archivoProperty() {
         return new SimpleStringProperty(nombre + extension);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty tipoProperty() {
         return new SimpleStringProperty("");
