@@ -67,88 +67,173 @@ public class Domicilio implements Serializable {
     @OneToMany(mappedBy = "iddomicilio", fetch = FetchType.LAZY)
     private List<Asegurado> aseguradoList;
 
+    /**
+     *
+     */
     public Domicilio() {
     }
 
+    /**
+     *
+     * @param iddomicilio
+     */
     public Domicilio(Integer iddomicilio) {
         this.iddomicilio = iddomicilio;
     }
 
+    /**
+     *
+     * @param iddomicilio
+     * @param calle
+     * @param exterior
+     */
     public Domicilio(Integer iddomicilio, String calle, String exterior) {
         this.iddomicilio = iddomicilio;
         this.calle = calle;
         this.exterior = exterior;
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIddomicilio() {
         return iddomicilio;
     }
 
+    /**
+     *
+     * @param iddomicilio
+     */
     public void setIddomicilio(Integer iddomicilio) {
         this.iddomicilio = iddomicilio;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getCalle() {
         return calle;
     }
 
+    /**
+     *
+     * @param calle
+     */
     public void setCalle(String calle) {
         this.calle = calle;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getExterior() {
         return exterior;
     }
 
+    /**
+     *
+     * @param exterior
+     */
     public void setExterior(String exterior) {
         this.exterior = exterior;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getInterior() {
         return interior;
     }
 
+    /**
+     *
+     * @param interior
+     */
     public void setInterior(String interior) {
         this.interior = interior;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getCodigopostal() {
         return codigopostal;
     }
 
+    /**
+     *
+     * @param codigopostal
+     */
     public void setCodigopostal(String codigopostal) {
         this.codigopostal = codigopostal;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getColonia() {
         return colonia;
     }
 
+    /**
+     *
+     * @param colonia
+     */
     public void setColonia(String colonia) {
         this.colonia = colonia;
     }
 
+    /**
+     *
+     * @return
+     */
     public Delegacion getDelegacion() {
         return delegacion;
     }
 
+    /**
+     *
+     * @param delegacion
+     */
     public void setDelegacion(Delegacion delegacion) {
         this.delegacion = delegacion;
     }
 
+    /**
+     *
+     * @return
+     */
     public Estado getEstado() {
         return estado;
     }
 
+    /**
+     *
+     * @param estado
+     */
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Asegurado> getAseguradoList() {
         return aseguradoList;
     }
 
+    /**
+     *
+     * @param aseguradoList
+     */
     public void setAseguradoList(List<Asegurado> aseguradoList) {
         this.aseguradoList = aseguradoList;
     }

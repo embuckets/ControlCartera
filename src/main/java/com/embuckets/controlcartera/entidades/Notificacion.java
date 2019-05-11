@@ -14,15 +14,39 @@ import java.util.List;
  */
 public interface Notificacion {
 
+    /**
+     *
+     * @param dateTime
+     */
     void setEnviado(LocalDateTime dateTime);
 
+    /**
+     *
+     * @param estadoNotificacion
+     */
     void setEstadonotificacion(EstadoNotificacion estadoNotificacion);
 
+    /**
+     *
+     * @return
+     */
     LocalDateTime getEnviado();
 
+    /**
+     *
+     * @return
+     */
     EstadoNotificacion getEstadonotificacion();
 
+    /**
+     *
+     * @return
+     */
     boolean tieneEmail();
 
+    /**
+     *
+     * @return
+     */
     List<String> getEmailsDeNotificacion();
 }

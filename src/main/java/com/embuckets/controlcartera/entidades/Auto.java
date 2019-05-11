@@ -65,13 +65,28 @@ public class Auto implements Serializable, ObservableAuto {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PolizaAuto idpoliza;
 
+    /**
+     *
+     */
     public Auto() {
     }
 
+    /**
+     *
+     * @param idauto
+     */
     public Auto(Integer idauto) {
         this.idauto = idauto;
     }
 
+    /**
+     *
+     * @param idauto
+     * @param descripcion
+     * @param marca
+     * @param submarca
+     * @param modelo
+     */
     public Auto(Integer idauto, String descripcion, String marca, String submarca, Year modelo) {
         this.idauto = idauto;
         this.descripcion = descripcion;
@@ -80,50 +95,98 @@ public class Auto implements Serializable, ObservableAuto {
         this.modelo = LocalDate.of(modelo.getValue(), Month.JANUARY, 1);
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdauto() {
         return idauto;
     }
 
+    /**
+     *
+     * @param idauto
+     */
     public void setIdauto(Integer idauto) {
         this.idauto = idauto;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDescripcion() {
         return descripcion;
     }
 
+    /**
+     *
+     * @param descripcion
+     */
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getMarca() {
         return marca;
     }
 
+    /**
+     *
+     * @param marca
+     */
     public void setMarca(String marca) {
         this.marca = marca;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getSubmarca() {
         return submarca;
     }
 
+    /**
+     *
+     * @param submarca
+     */
     public void setSubmarca(String submarca) {
         this.submarca = submarca;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getModelo() {
         return modelo;
     }
 
+    /**
+     *
+     * @param modelo
+     */
     public void setModelo(Year modelo) {
         this.modelo = LocalDate.of(modelo.getValue(), Month.JANUARY, 1);
     }
 
+    /**
+     *
+     * @return
+     */
     public PolizaAuto getIdpoliza() {
         return idpoliza;
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public void setIdpoliza(PolizaAuto idpoliza) {
         this.idpoliza = idpoliza;
     }
@@ -153,21 +216,37 @@ public class Auto implements Serializable, ObservableAuto {
         return "com.embuckets.controlcartera.entidades.Auto[ idauto=" + idauto + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty descripcionProperty() {
         return new SimpleStringProperty(descripcion);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty marcaProperty() {
         return new SimpleStringProperty(marca);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty submarcaProperty() {
         return new SimpleStringProperty(submarca);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty modeloProperty() {
         return new SimpleStringProperty("" + modelo.getYear());

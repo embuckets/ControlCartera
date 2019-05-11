@@ -17,23 +17,44 @@ public class Dependiente {
     private Cliente cliente;
     private PolizaGmm polizaGmm;
 
+    /**
+     *
+     * @param cliente
+     * @param polizaGmm
+     */
     public Dependiente(Cliente cliente, PolizaGmm polizaGmm) {
         this.cliente = cliente;
         this.polizaGmm = polizaGmm;
     }
 
+    /**
+     *
+     * @return
+     */
     public Cliente getCliente() {
         return cliente;
     }
 
+    /**
+     *
+     * @param cliente
+     */
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
 
+    /**
+     *
+     * @return
+     */
     public PolizaGmm getPolizaGmm() {
         return polizaGmm;
     }
 
+    /**
+     *
+     * @param polizaGmm
+     */
     public void setPolizaGmm(PolizaGmm polizaGmm) {
         this.polizaGmm = polizaGmm;
     }

@@ -25,7 +25,13 @@ public class TemplateGenerator {
 
     private static final Logger logger = LogManager.getLogger(TemplateGenerator.class);
 
-    public static String getCobranzaMessage(NotificacionRecibo notificacionRecibo) throws IOException {
+    /**
+     * crea texto html de cobranza con los datos de la notificacion especificada a partir de la plantilla.
+     * @param notificacionRecibo de la cual tomar los datos para llenar la plantilla
+     * @return texto html
+     * @throws IOException - si no se puede leer la plantilla
+     */
+    public static String crearMensajeHTMLDeNotificacionDeCobranza(NotificacionRecibo notificacionRecibo) throws IOException {
         try {
             byte[] encoded = Files.readAllBytes(Paths.get(Globals.TEMPLATE_COBRANZA_PATH));
             String template = new String(encoded, Charset.forName("utf-8"));
@@ -45,7 +51,13 @@ public class TemplateGenerator {
         }
     }
 
-    public static String getCumpleMessage(NotificacionCumple notificacionCumple) throws IOException {
+    /**
+     * crea texto html de felicitacion de cumpleaños con los datos de la notificacion especificada a partir de la plantilla.
+     * @param notificacionCumple notificacion para llenar la plantilla
+     * @return texto html
+     * @throws IOException - si no se puede leer la plantilla
+     */
+    public static String crearMensajeHTMLDeNotificacionDeCumple(NotificacionCumple notificacionCumple) throws IOException {
         try {
             byte[] encoded = Files.readAllBytes(Paths.get(Globals.TEMPLATE_CUMPLE_PATH));
             String template = new String(encoded, Charset.forName("utf-8"));

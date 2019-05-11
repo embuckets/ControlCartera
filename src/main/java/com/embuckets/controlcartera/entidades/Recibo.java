@@ -72,13 +72,27 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Poliza idpoliza;
 
+    /**
+     *
+     */
     public Recibo() {
     }
 
+    /**
+     *
+     * @param idrecibo
+     */
     public Recibo(Integer idrecibo) {
         this.idrecibo = idrecibo;
     }
 
+    /**
+     *
+     * @param idrecibo
+     * @param cubredesde
+     * @param cubrehasta
+     * @param importe
+     */
     public Recibo(Integer idrecibo, LocalDate cubredesde, LocalDate cubrehasta, BigDecimal importe) {
         this.idrecibo = idrecibo;
         this.cubredesde = cubredesde;
@@ -86,18 +100,34 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
         this.importe = importe;
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdrecibo() {
         return idrecibo;
     }
 
+    /**
+     *
+     * @param idrecibo
+     */
     public void setIdrecibo(Integer idrecibo) {
         this.idrecibo = idrecibo;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getCubredesde() {
         return cubredesde;
     }
 
+    /**
+     *
+     * @param cubredesde
+     */
     public void setCubredesde(LocalDate cubredesde) {
         this.cubredesde = cubredesde;
     }
@@ -105,10 +135,19 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
 //    public void setCubredesde(LocalDate cubredesde) {
 //        this.cubredesde = Date.from(cubredesde.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 //    }
+
+    /**
+     *
+     * @return
+     */
     public LocalDate getCubrehasta() {
         return cubrehasta;
     }
 
+    /**
+     *
+     * @param cubrehasta
+     */
     public void setCubrehasta(LocalDate cubrehasta) {
         this.cubrehasta = cubrehasta;
     }
@@ -116,42 +155,83 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
 //    public void setCubrehasta(LocalDate cubrehasta) {
 //        this.cubrehasta = Date.from(cubrehasta.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 //    }
+
+    /**
+     *
+     * @return
+     */
     public BigDecimal getImporte() {
         return importe;
     }
 
+    /**
+     *
+     * @param importe
+     */
     public void setImporte(BigDecimal importe) {
         this.importe = importe;
     }
 
+    /**
+     *
+     * @return
+     */
     public DocumentoRecibo getDocumentoRecibo() {
         return documentoRecibo;
     }
 
+    /**
+     *
+     * @param documentoRecibo
+     */
     public void setDocumentoRecibo(DocumentoRecibo documentoRecibo) {
         this.documentoRecibo = documentoRecibo;
     }
 
+    /**
+     *
+     * @return
+     */
     public NotificacionRecibo getNotificacionRecibo() {
         return notificacionRecibo;
     }
 
+    /**
+     *
+     * @param notificacionRecibo
+     */
     public void setNotificacionRecibo(NotificacionRecibo notificacionRecibo) {
         this.notificacionRecibo = notificacionRecibo;
     }
 
+    /**
+     *
+     * @return
+     */
     public Cobranza getCobranza() {
         return cobranza;
     }
 
+    /**
+     *
+     * @param cobranza
+     */
     public void setCobranza(Cobranza cobranza) {
         this.cobranza = cobranza;
     }
 
+    /**
+     *
+     * @return
+     */
     public Poliza getIdpoliza() {
         return idpoliza;
     }
 
+    /**
+     *
+     * @param idpoliza
+     */
     public void setIdpoliza(Poliza idpoliza) {
         this.idpoliza = idpoliza;
     }
@@ -181,31 +261,55 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
         return "com.embuckets.controlcartera.entidades.Recibo[ idrecibo=" + idrecibo + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty polizaProperty() {
         return getIdpoliza().numeroProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty aseguradoProperty() {
         return getIdpoliza().getContratante().nombreProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty cubreDesdeProperty() {
         return new SimpleStringProperty(cubredesde.toString());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty cubreHastaProperty() {
         return new SimpleStringProperty(cubrehasta.toString());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty importeProperty() {
         return new SimpleStringProperty(Globals.formatCantidad(importe));
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty enviadoProperty() {
         //puede ser null
@@ -216,11 +320,19 @@ public class Recibo implements Serializable, ObservableNotificacionRecibo {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty cobranzaProperty() {
         return new SimpleStringProperty(cobranza.getCobranza());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty documentoProperty() {
         return documentoRecibo == null ? new SimpleStringProperty("NO") : new SimpleStringProperty("SI");

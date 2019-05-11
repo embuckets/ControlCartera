@@ -13,20 +13,52 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableNotificacionRecibo {
 
+    /**
+     *
+     * @return
+     */
     StringProperty polizaProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty aseguradoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty cubreDesdeProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty cubreHastaProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty importeProperty();
     
+    /**
+     *
+     * @return
+     */
     StringProperty cobranzaProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty enviadoProperty();
     
+    /**
+     *
+     * @return
+     */
     StringProperty documentoProperty();
     
 }

@@ -40,26 +40,49 @@ public class TipoDocumentoAsegurado implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tipoDocumentoAsegurado", fetch = FetchType.LAZY)
     private List<DocumentoAsegurado> documentoAseguradoList;
 
+    /**
+     *
+     */
     public TipoDocumentoAsegurado() {
     }
 
+    /**
+     *
+     * @param tipodocumento
+     */
     public TipoDocumentoAsegurado(String tipodocumento) {
         this.tipodocumento = tipodocumento;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTipodocumento() {
         return tipodocumento;
     }
 
+    /**
+     *
+     * @param tipodocumento
+     */
     public void setTipodocumento(String tipodocumento) {
         this.tipodocumento = tipodocumento;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<DocumentoAsegurado> getDocumentoAseguradoList() {
         return documentoAseguradoList;
     }
 
+    /**
+     *
+     * @param documentoAseguradoList
+     */
     public void setDocumentoAseguradoList(List<DocumentoAsegurado> documentoAseguradoList) {
         this.documentoAseguradoList = documentoAseguradoList;
     }

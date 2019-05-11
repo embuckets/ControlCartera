@@ -35,6 +35,7 @@ package com.embuckets.controlcartera.ui;
 import com.embuckets.controlcartera.entidades.Agente;
 import com.embuckets.controlcartera.entidades.globals.BaseDeDatos;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -50,6 +51,10 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ *
+ * @author emilio
+ */
 public final class MainApp extends Application {
 
     private static final Logger logger = LogManager.getLogger(MainApp.class);
@@ -61,18 +66,34 @@ public final class MainApp extends Application {
     private Agente agente;
 //    private ControlCartera controlCartera;
 
+    /**
+     *
+     */
     public MainApp() {
         instance = this;
         windowStack = new ArrayDeque<>();
-        this.bd = BaseDeDatos.getInstance();
         try {
+            this.bd = BaseDeDatos.getInstance();
             this.agente = Agente.getInstance();
         } catch (IOException ex) {
             logger.fatal("Error al cargar al cliente", ex);
-            this.stop();
+            LogManager.shutdown();
+            System.exit(1);
+        } catch (SQLException ex) {
+            logger.fatal("Error al cargar base de datos", ex);
+            LogManager.shutdown();
+            System.exit(1);
+        } catch (Exception ex) {
+            logger.fatal("Error al iniciar el programa", ex);
+            LogManager.shutdown();
+            System.exit(1);
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public static MainApp getInstance() {
         return instance;
     }
@@ -101,6 +122,13 @@ public final class MainApp extends Application {
         }
     }
 
+    /**
+     *
+     * @param previousController
+     * @param previousFxml
+     * @param nextFxml
+     * @throws IOException
+     */
     public void changeSceneContent(Object previousController, String previousFxml, String nextFxml) throws IOException {
         Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource(nextFxml), null, new JavaFXBuilderFactory());
         if (!(previousFxml.equals("/fxml/RenovarPoliza.fxml") && nextFxml.equals("/fxml/PolizaHome.fxml"))) {
@@ -117,6 +145,13 @@ public final class MainApp extends Application {
 //        mainStage.setMaximized(true);
     }
 
+    /**
+     *
+     * @param previousController
+     * @param previousFxml
+     * @param page
+     * @param loader
+     */
     public void changeSceneContent(Object previousController, String previousFxml, Parent page, FXMLLoader loader) {
         if (!(previousFxml.equals("/fxml/RenovarPoliza.fxml") && loader.getLocation().getFile().endsWith("/fxml/PolizaHome.fxml"))) {
             windowStack.addLast(new Pair(previousController, previousFxml));
@@ -133,6 +168,10 @@ public final class MainApp extends Application {
         }
     }
 
+    /**
+     *
+     * @throws IOException
+     */
     public void goBack() throws IOException {
         Pair pair = windowStack.pollLast();
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource((String) pair.getValue()));
@@ -149,6 +188,10 @@ public final class MainApp extends Application {
         }
     }
 
+    /**
+     *
+     * @throws IOException
+     */
     public void goHome() throws IOException {
         Parent page = (Parent) FXMLLoader.load(MainApp.class.getResource("/fxml/Home.fxml"), null, new JavaFXBuilderFactory());
         windowStack.clear();
@@ -169,14 +212,26 @@ public final class MainApp extends Application {
         LogManager.shutdown();
     }
 
+    /**
+     *
+     * @return
+     */
     public Stage getStage() {
         return mainStage;
     }
 
+    /**
+     *
+     * @return
+     */
     public BaseDeDatos getBaseDeDatos() {
         return this.bd;
     }
 
+    /**
+     *
+     * @return
+     */
     public Agente getAgente() {
         return this.agente;
     }

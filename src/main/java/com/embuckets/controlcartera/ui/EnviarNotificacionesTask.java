@@ -40,10 +40,19 @@ public class EnviarNotificacionesTask extends Task<Void> {
     private List<? extends Notificacion> notificaciones;
     private Map<Message, Notificacion> scheduledNotificaciones;
     private Set<Message> sentMessages;
+
+    /**
+     *
+     */
     public static AtomicInteger workDone;
     private double goal;
 //    private Task<Void> task;
 
+    /**
+     *
+     * @param notificaciones
+     * @throws Exception
+     */
     public EnviarNotificacionesTask(List<? extends Notificacion> notificaciones) throws Exception {
         this.mailService = MailService.getInstance();
         this.notificaciones = notificaciones;
@@ -96,14 +105,25 @@ public class EnviarNotificacionesTask extends Task<Void> {
         return null;
     }
 
+    /**
+     *
+     * @return
+     */
     public Set<Message> getSentMessages() {
         return sentMessages;
     }
 
+    /**
+     *
+     * @param sentMessages
+     */
     public void setSentMessages(Set<Message> sentMessages) {
         this.sentMessages = sentMessages;
     }
 
+    /**
+     *
+     */
     public void updateWorkDone() {
         workDone.addAndGet(1);
     }

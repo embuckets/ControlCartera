@@ -147,6 +147,8 @@ public class NuevaPolizaController implements Initializable, Controller {
 
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -626,16 +628,28 @@ public class NuevaPolizaController implements Initializable, Controller {
         finVigenciaPicker.setValue(inicioVigenciaPicker.getValue().plusMonths(12));
     }
 
+    /**
+     *
+     * @param obj
+     */
     @Override
     public void setData(Object obj) {
         //NO NOTHING
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Object getData() {
         return null;
     }
 
+    /**
+     *
+     * @param contratante
+     */
     public void setContratante(Asegurado contratante) {
         this.contratante = contratante;
     }

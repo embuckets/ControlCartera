@@ -239,6 +239,10 @@ public class NuevoAseguradoController implements Initializable {
         tipoArchivoComboBox.getSelectionModel().select(0);
     }
 
+    /**
+     *
+     * @param event
+     */
     public void tipoPersonaHandler(ActionEvent event) {
         if (personaFisicaRadioButton.isSelected()) {
             paternoTextField.setText("");
@@ -334,6 +338,10 @@ public class NuevoAseguradoController implements Initializable {
         return FXCollections.observableArrayList(list);
     }
 
+    /**
+     *
+     * @param event
+     */
     public void agregarTelefono(ActionEvent event) {
         //si los textfield no estan vacios
         if (!telefonoTextField.getText().isEmpty()) {
@@ -347,6 +355,10 @@ public class NuevoAseguradoController implements Initializable {
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     public void agregarEmail(ActionEvent event) {
         //si los textfield no estan vacios
         if (!emailTextField.getText().isEmpty() && validarEmail(emailTextField.getText())) {
@@ -363,6 +375,10 @@ public class NuevoAseguradoController implements Initializable {
         return ptr.matcher(email).matches();
     }
 
+    /**
+     *
+     * @param event
+     */
     public void seleccionarArchivo(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Elige un Documento");
@@ -373,6 +389,10 @@ public class NuevoAseguradoController implements Initializable {
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     public void agregarDocumento(ActionEvent event) {
         if (!archivoTextField.getText().isEmpty()) {
             ObservableArchivo obs = new ObservableArchivo(archivoTextField.getText(), tipoArchivoComboBox.getValue().toString());
@@ -381,6 +401,10 @@ public class NuevoAseguradoController implements Initializable {
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     public void homePage(ActionEvent event) {
         try {
             MainApp.getInstance().goHome();
@@ -390,6 +414,11 @@ public class NuevoAseguradoController implements Initializable {
         }
     }
 
+    /**
+     *
+     * @param event
+     * @throws IOException
+     */
     public void guardar(ActionEvent event) throws IOException {
         List<String> errores = new ArrayList<>();
         if (validarForm(errores)) {

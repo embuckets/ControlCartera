@@ -13,7 +13,15 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableDocumento {
 
+    /**
+     *
+     * @return
+     */
     StringProperty archivoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty tipoProperty();
 }

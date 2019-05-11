@@ -39,26 +39,49 @@ public class Delegacion implements Serializable {
     @OneToMany(mappedBy = "delegacion", fetch = FetchType.LAZY)
     private List<Domicilio> domicilioList;
 
+    /**
+     *
+     */
     public Delegacion() {
     }
 
+    /**
+     *
+     * @param delegacion
+     */
     public Delegacion(String delegacion) {
         this.delegacion = delegacion;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDelegacion() {
         return delegacion;
     }
 
+    /**
+     *
+     * @param delegacion
+     */
     public void setDelegacion(String delegacion) {
         this.delegacion = delegacion;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Domicilio> getDomicilioList() {
         return domicilioList;
     }
 
+    /**
+     *
+     * @param domicilioList
+     */
     public void setDomicilioList(List<Domicilio> domicilioList) {
         this.domicilioList = domicilioList;
     }

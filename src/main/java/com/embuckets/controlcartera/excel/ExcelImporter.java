@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,9 +79,19 @@ public class ExcelImporter {
     private final String ERROR_CELL_NUMBER = "Se espereba número";
     private final String ERROR_CELL_DATE = "Se espereba fecha";
 
+    /**
+     *
+     */
     public ExcelImporter() {
     }
 
+    /**
+     * crea una lista de asegurados con sus polizas a partir de los datos de un archivo de excel.
+     * @param file plantilla de excel
+     * @return asegurados con sus respectivas polizas
+     * @throws IOException - si no se puede leer el archivo.
+     * @throws Exception - si falla la imprtacion de los datos. Se pueden obtener los errores del mensaje de la excepcion
+     */
     public List<Asegurado> importar(File file) throws IOException, Exception {
         try (InputStream in = new FileInputStream(file)) {
             List<String> errores = new ArrayList<>();
@@ -303,25 +312,4 @@ public class ExcelImporter {
         return null;
     }
 
-    private boolean isDataValid(Object... data) {
-        for (Object obj : data) {
-            if (obj == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isDataValid(double... data) {
-        for (double obj : data) {
-            if (obj == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-//    public List<String> getErrores() {
-//        return errores;
-//    }
 }

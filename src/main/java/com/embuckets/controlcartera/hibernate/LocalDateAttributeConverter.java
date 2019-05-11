@@ -14,6 +14,10 @@ import java.time.LocalDate;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
+/**
+ * Convierte sql Date a time LocalDate
+ * @author emilio
+ */
 @Converter(autoApply = true)
 public class LocalDateAttributeConverter implements AttributeConverter<LocalDate, Date> {
 

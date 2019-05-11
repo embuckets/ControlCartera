@@ -24,26 +24,50 @@ public class EmailPK implements Serializable {
     @Column(name = "EMAIL")
     private String email;
 
+    /**
+     *
+     */
     public EmailPK() {
     }
 
+    /**
+     *
+     * @param idcliente
+     * @param email
+     */
     public EmailPK(int idcliente, String email) {
         this.idcliente = idcliente;
         this.email = email;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getIdcliente() {
         return idcliente;
     }
 
+    /**
+     *
+     * @param idcliente
+     */
     public void setIdcliente(int idcliente) {
         this.idcliente = idcliente;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     *
+     * @param email
+     */
     public void setEmail(String email) {
         this.email = email;
     }

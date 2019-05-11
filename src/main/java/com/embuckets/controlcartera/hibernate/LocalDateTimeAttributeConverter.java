@@ -11,7 +11,7 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 /**
- *
+ * Convierte sql Timestamp a time LocalDateTime
  * @author emilio
  */
 @Converter(autoApply = true)

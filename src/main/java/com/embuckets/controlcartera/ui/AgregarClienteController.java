@@ -61,6 +61,8 @@ public class AgregarClienteController implements Initializable {
 
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -205,10 +207,18 @@ public class AgregarClienteController implements Initializable {
         //TODO: buscar asegurado con campos del nombre incomplentos
     }
 
+    /**
+     *
+     * @return
+     */
     public Dialog<Cliente> getDialog() {
         return dialog;
     }
 
+    /**
+     *
+     * @param cliente
+     */
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }

@@ -170,6 +170,8 @@ public class PolizaHomeController implements Initializable, Controller {
 
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -1097,6 +1099,10 @@ public class PolizaHomeController implements Initializable, Controller {
         }
     }
 
+    /**
+     *
+     * @param poliza
+     */
     public void setPoliza(Poliza poliza) {
         this.poliza = poliza;
     }
@@ -1349,11 +1355,19 @@ public class PolizaHomeController implements Initializable, Controller {
         }
     }
 
+    /**
+     *
+     * @param obj
+     */
     @Override
     public void setData(Object obj) {
         this.poliza = (Poliza) obj;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Object getData() {
         return this.poliza;

@@ -11,6 +11,15 @@ package com.embuckets.controlcartera.ui;
  */
 public interface Controller {
 
+    /**
+     *
+     * @param obj
+     */
     void setData(Object obj);
+
+    /**
+     *
+     * @return
+     */
     Object getData();
 }

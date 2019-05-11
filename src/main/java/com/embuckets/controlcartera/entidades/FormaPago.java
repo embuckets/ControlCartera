@@ -40,26 +40,49 @@ public class FormaPago implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "formapago", fetch = FetchType.LAZY)
     private List<Poliza> polizaList;
 
+    /**
+     *
+     */
     public FormaPago() {
     }
 
+    /**
+     *
+     * @param formapago
+     */
     public FormaPago(String formapago) {
         this.formapago = formapago;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFormapago() {
         return formapago;
     }
 
+    /**
+     *
+     * @param formapago
+     */
     public void setFormapago(String formapago) {
         this.formapago = formapago;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Poliza> getPolizaList() {
         return polizaList;
     }
 
+    /**
+     *
+     * @param polizaList
+     */
     public void setPolizaList(List<Poliza> polizaList) {
         this.polizaList = polizaList;
     }

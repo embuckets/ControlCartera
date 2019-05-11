@@ -39,26 +39,49 @@ public class TipoEmail implements Serializable {
     @OneToMany(mappedBy = "tipoemail", fetch = FetchType.LAZY)
     private List<Email> emailList;
 
+    /**
+     *
+     */
     public TipoEmail() {
     }
 
+    /**
+     *
+     * @param tipoemail
+     */
     public TipoEmail(String tipoemail) {
         this.tipoemail = tipoemail;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTipoemail() {
         return tipoemail;
     }
 
+    /**
+     *
+     * @param tipoemail
+     */
     public void setTipoemail(String tipoemail) {
         this.tipoemail = tipoemail;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Email> getEmailList() {
         return emailList;
     }
 
+    /**
+     *
+     * @param emailList
+     */
     public void setEmailList(List<Email> emailList) {
         this.emailList = emailList;
     }

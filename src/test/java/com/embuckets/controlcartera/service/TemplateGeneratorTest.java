@@ -31,7 +31,7 @@ public class TemplateGeneratorTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         bd = BaseDeDatos.getInstance();
     }
 

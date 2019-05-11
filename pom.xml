@@ -119,6 +119,11 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbytools</artifactId>
+            <version>10.14.2.0</version>
+        </dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -192,6 +197,21 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/config</directory>
+                                </resource>
+                            </resources>              
+                        </configuration>            
+                    </execution>
+                    <execution>
+                        <id>copy-resources-sql</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/bd</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/bd</directory>
                                 </resource>
                             </resources>              
                         </configuration>            

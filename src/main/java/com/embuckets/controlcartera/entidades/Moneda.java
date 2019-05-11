@@ -46,53 +46,100 @@ public class Moneda implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "deduciblemoneda", fetch = FetchType.LAZY)
     private List<PolizaGmm> polizaGmmList1;
 
+    /**
+     *
+     */
     public Moneda() {
     }
 
+    /**
+     *
+     * @param moneda
+     */
     public Moneda(String moneda) {
         this.moneda = moneda;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getMoneda() {
         return moneda;
     }
 
+    /**
+     *
+     * @param moneda
+     */
     public void setMoneda(String moneda) {
         this.moneda = moneda;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Poliza> getPolizaList() {
         return polizaList;
     }
 
+    /**
+     *
+     * @param polizaList
+     */
     public void setPolizaList(List<Poliza> polizaList) {
         this.polizaList = polizaList;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<PolizaVida> getPolizaVidaList() {
         return polizaVidaList;
     }
 
+    /**
+     *
+     * @param polizaVidaList
+     */
     public void setPolizaVidaList(List<PolizaVida> polizaVidaList) {
         this.polizaVidaList = polizaVidaList;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<PolizaGmm> getPolizaGmmList() {
         return polizaGmmList;
     }
 
+    /**
+     *
+     * @param polizaGmmList
+     */
     public void setPolizaGmmList(List<PolizaGmm> polizaGmmList) {
         this.polizaGmmList = polizaGmmList;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<PolizaGmm> getPolizaGmmList1() {
         return polizaGmmList1;
     }
 
+    /**
+     *
+     * @param polizaGmmList1
+     */
     public void setPolizaGmmList1(List<PolizaGmm> polizaGmmList1) {
         this.polizaGmmList1 = polizaGmmList1;
     }

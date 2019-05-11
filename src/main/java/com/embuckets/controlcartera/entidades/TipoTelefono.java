@@ -39,26 +39,49 @@ public class TipoTelefono implements Serializable {
     @OneToMany(mappedBy = "tipotelefono", fetch = FetchType.LAZY)
     private List<Telefono> telefonoList;
 
+    /**
+     *
+     */
     public TipoTelefono() {
     }
 
+    /**
+     *
+     * @param tipotelefono
+     */
     public TipoTelefono(String tipotelefono) {
         this.tipotelefono = tipotelefono;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTipotelefono() {
         return tipotelefono;
     }
 
+    /**
+     *
+     * @param tipotelefono
+     */
     public void setTipotelefono(String tipotelefono) {
         this.tipotelefono = tipotelefono;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Telefono> getTelefonoList() {
         return telefonoList;
     }
 
+    /**
+     *
+     * @param telefonoList
+     */
     public void setTelefonoList(List<Telefono> telefonoList) {
         this.telefonoList = telefonoList;
     }

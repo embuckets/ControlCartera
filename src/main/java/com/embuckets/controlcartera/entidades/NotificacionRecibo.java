@@ -84,6 +84,9 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Recibo recibo;
 
+    /**
+     *
+     */
     public NotificacionRecibo() {
     }
 //
@@ -91,64 +94,122 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
 //        this.idrecibo = idrecibo;
 //    }
 
+    /**
+     *
+     * @param recibo
+     * @param estadonotificacion
+     */
     public NotificacionRecibo(Recibo recibo, String estadonotificacion) {
         this.idrecibo = recibo.getIdrecibo();
         this.estadonotificacion = new EstadoNotificacion(estadonotificacion);
         this.recibo = recibo;
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdrecibo() {
         return idrecibo;
     }
 
+    /**
+     *
+     * @param idrecibo
+     */
     public void setIdrecibo(Integer idrecibo) {
         this.idrecibo = idrecibo;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public LocalDateTime getEnviado() {
         return enviado;
     }
 
+    /**
+     *
+     * @param enviado
+     */
     @Override
     public void setEnviado(LocalDateTime enviado) {
         this.enviado = enviado;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public EstadoNotificacion getEstadonotificacion() {
         return estadonotificacion;
     }
 
+    /**
+     *
+     * @param estadonotificacion
+     */
     @Override
     public void setEstadonotificacion(EstadoNotificacion estadonotificacion) {
         this.estadonotificacion = estadonotificacion;
     }
 
+    /**
+     *
+     * @return
+     */
     public Recibo getRecibo() {
         return recibo;
     }
 
+    /**
+     *
+     * @param recibo
+     */
     public void setRecibo(Recibo recibo) {
         this.recibo = recibo;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombreArchivo() {
         return recibo.getDocumentoRecibo() != null ? recibo.getDocumentoRecibo().getNombre() : "";
     }
 
+    /**
+     *
+     * @return
+     */
     public String getExtensionArchivo() {
         return recibo.getDocumentoRecibo() != null ? recibo.getDocumentoRecibo().getExtension() : "";
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean tieneArchivo() {
         return recibo.getDocumentoRecibo() != null;
     }
 
+    /**
+     *
+     * @return
+     */
     public byte[] getArchivoBytes() {
         return recibo.getDocumentoRecibo() != null ? recibo.getDocumentoRecibo().getArchivo() : null;
     }
 
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
     public File getArchivo() throws IOException {
         if (tieneArchivo()) {
             try {
@@ -163,11 +224,19 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         return null;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean tieneEmail() {
         return !recibo.getIdpoliza().getContratante().getEmailList().isEmpty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<String> getEmailsDeNotificacion() {
         List<Email> emails = recibo.getIdpoliza().getContratante().getEmailList();
@@ -201,10 +270,18 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombreContratante() {
         return recibo.getIdpoliza().getContratante().getCliente().nombreProperty().get();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNumeroPoliza() {
         return recibo.getIdpoliza().getNumero();
     }
@@ -214,32 +291,56 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         return "com.embuckets.controlcartera.entidades.NotificacionRecibo[ idrecibo=" + idrecibo + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty polizaProperty() {
         return new SimpleStringProperty(this.recibo.getIdpoliza().getNumero());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty aseguradoProperty() {
         return new SimpleStringProperty(this.recibo.getIdpoliza().getContratante().getCliente().nombreProperty().get());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty cubreDesdeProperty() {
         return new SimpleStringProperty(this.recibo.getCubredesde().toString());
 
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty cubreHastaProperty() {
         return new SimpleStringProperty(this.recibo.getCubrehasta().toString());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty importeProperty() {
         return new SimpleStringProperty(Globals.formatCantidad(this.recibo.getImporte()));
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty enviadoProperty() {
         if (enviado != null) {
@@ -251,20 +352,36 @@ public class NotificacionRecibo implements Serializable, ObservableNotificacionR
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty conductoProperty() {
         return new SimpleStringProperty(recibo.getIdpoliza().getConductocobro().getConductocobro());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty cobranzaProperty() {
         return recibo.cobranzaProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty documentoProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty diasDesdeProperty() {
         long dias = DAYS.between(recibo.getCubredesde(), LocalDate.now());
         String faltan = dias > 0 ? "" + dias : "faltan " + Math.abs(dias);

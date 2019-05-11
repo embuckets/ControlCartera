@@ -13,10 +13,22 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableTelefono {
 
+    /**
+     *
+     * @return
+     */
     StringProperty telefonoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty extensionProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty tipoProperty();
 
 }

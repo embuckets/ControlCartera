@@ -20,8 +20,16 @@ import org.apache.logging.log4j.Logger;
  */
 public interface JpaController {
 
+    /**
+     *
+     */
     static final Logger logger = LogManager.getLogger(JpaController.class);
 
+    /**
+     * Inserta el objeto especificado a la base de datos
+     * @param object
+     * @throws Exception - si falla la operacion. Se hace un rollback a la transaccion
+     */
     default void create(Object object) throws Exception {
         boolean isSubTransaction = false;
         EntityManager em = null;
@@ -45,6 +53,11 @@ public interface JpaController {
         }
     }
 
+    /**
+     * Busca todas las entidades
+     * @param <T> el tipo de entidades a buscar
+     * @return lista de todas las entidades
+     */
     default <T> List<T> getAll() {
         EntityManager em = null;
         try {
@@ -59,6 +72,12 @@ public interface JpaController {
         return new ArrayList<>();
     }
 
+    /**
+     * Busca la entidad por identificador
+     * @param <T> tipo de la entidad
+     * @param id el identificador
+     * @return la entidad del tipo especificado con el identificador especificado. Si no existe <code>null</code>
+     */
     default <T> T getById(int id) {
         EntityManager em = null;
         try {
@@ -75,6 +94,12 @@ public interface JpaController {
         return null;
     }
 
+    /**
+     * Busca todos las entidades que tengan el identificador especificado
+     * @param <T> el tipo de la entidad
+     * @param id el identificador
+     * @return lista de todas las entidades del tipo especificado con el identificador especificado
+     */
     default <T> List<T> getAllById(int id) {
         EntityManager em = null;
         try {
@@ -91,6 +116,13 @@ public interface JpaController {
         return new ArrayList<>();
     }
 
+    /**
+     * Hace un merge del objeto especificado
+     * @param <T> el tipo del objeto
+     * @param object el objeto a actualizar
+     * @return el objeto actualizado
+     * @throws Exception - si falla la operacion. Se hace un rollback a la transaccion
+     */
     default <T> T edit(Object object) throws Exception {
         boolean isSubTransaction = false;
         EntityManager em = null;
@@ -115,6 +147,11 @@ public interface JpaController {
         }
     }
 
+    /**
+     * elimina el objeto con todas sus dependencias
+     * @param object el objeto a eliminar
+     * @throws Exception - si falla la operacion. Se hace un rollback a la transaccion
+     */
     default void remove(Object object) throws Exception {
         boolean isSubTransaction = false;
         EntityManager em = null;
@@ -138,10 +175,22 @@ public interface JpaController {
         }
     }
 
+    /**
+     * 
+     * @return nombre de la clase de la entidad que representa el controlador
+     */
     String getControlledClassName();
 
+    /**
+     *
+     * @return nombre del named query que busca a todas las entidades que representa el controlador
+     */
     String getFindByIdNamedQuery();
 
+    /**
+     *
+     * @return nombre de la columna identificadora de la entidad que representa el controlador
+     */
     String getFindByIdParameter();
 
 }

@@ -40,26 +40,49 @@ public class EstadoPoliza implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "estado", fetch = FetchType.LAZY)
     private List<Poliza> polizaList;
 
+    /**
+     *
+     */
     public EstadoPoliza() {
     }
 
+    /**
+     *
+     * @param estado
+     */
     public EstadoPoliza(String estado) {
         this.estado = estado;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getEstado() {
         return estado;
     }
 
+    /**
+     *
+     * @param estado
+     */
     public void setEstado(String estado) {
         this.estado = estado;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Poliza> getPolizaList() {
         return polizaList;
     }
 
+    /**
+     *
+     * @param polizaList
+     */
     public void setPolizaList(List<Poliza> polizaList) {
         this.polizaList = polizaList;
     }

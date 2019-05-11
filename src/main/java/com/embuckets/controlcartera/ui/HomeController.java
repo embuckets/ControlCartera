@@ -151,6 +151,8 @@ public class HomeController implements Initializable, Controller {
 
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -259,16 +261,31 @@ public class HomeController implements Initializable, Controller {
         renovacionesFaltanTableColumn.setCellValueFactory(new PropertyValueFactory("faltan"));
     }
 
+    /**
+     *
+     * @param event
+     * @throws IOException
+     */
     @FXML
     public void abrirSceneNuevoAsegurado(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevoAsegurado.fxml");
     }
 
+    /**
+     *
+     * @param event
+     * @throws IOException
+     */
     @FXML
     public void abrirSceneNuevaPoliza(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NuevaPoliza.fxml");
     }
 
+    /**
+     *
+     * @param event
+     * @throws IOException
+     */
     @FXML
     public void goToNotificaciones(ActionEvent event) throws IOException {
         MainApp.getInstance().changeSceneContent(this, location, "/fxml/NotificacionHome.fxml");
@@ -295,6 +312,10 @@ public class HomeController implements Initializable, Controller {
 
     }
 
+    /**
+     *
+     * @param event
+     */
     @FXML
     public void editarAgente(ActionEvent event) {
         try {
@@ -319,6 +340,10 @@ public class HomeController implements Initializable, Controller {
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     @FXML
     public void importarCartera(ActionEvent event) {
         FileChooser chooser = new FileChooser();
@@ -330,6 +355,7 @@ public class HomeController implements Initializable, Controller {
             try {
                 List<Asegurado> asegurados = new ExcelImporter().importar(file);
                 MainApp.getInstance().getBaseDeDatos().importarAsegurados(asegurados);
+                Utilities.makeAlert(AlertType.INFORMATION, "Importar cartera", "Los datos se importaron exitosamente").showAndWait();
                 fillTablaAsegurados();
             } catch (Exception e) {
                 TextArea textArea = new TextArea(e.getMessage());
@@ -345,6 +371,10 @@ public class HomeController implements Initializable, Controller {
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     @FXML
     public void exportarPlantilla(ActionEvent event) {
         final DirectoryChooser chooser = new DirectoryChooser();
@@ -380,11 +410,19 @@ public class HomeController implements Initializable, Controller {
         return MainApp.getInstance().getBaseDeDatos().getRecibosEntre(Globals.RECIBO_CUBRE_DESDE_INICIO_DEFAULT, Globals.RECIBO_CUBRE_DESDE_FIN_DEFAULT);
     }
 
+    /**
+     *
+     * @param obj
+     */
     @Override
     public void setData(Object obj) {
         //do nothing
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Object getData() {
         return null;

@@ -39,7 +39,7 @@
                   </HBox>
                   <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                     <tabs>
-                      <Tab text="Informacion">
+                      <Tab text="Información">
                            <content>
                               <VBox spacing="20.0">
                                  <children>
@@ -139,8 +139,8 @@
                                              <children>
                                                 <TableView fx:id="telefonoTableView">
                                                    <columns>
-                                                      <TableColumn fx:id="telefonoTableColumn" minWidth="100.0" prefWidth="-1.0" text="Telefono" />
-                                                      <TableColumn fx:id="extensionTableColumn" minWidth="100.0" prefWidth="-1.0" text="Extension" />
+                                                      <TableColumn fx:id="telefonoTableColumn" minWidth="100.0" prefWidth="-1.0" text="Teléfono" />
+                                                      <TableColumn fx:id="extensionTableColumn" minWidth="100.0" prefWidth="-1.0" text="Extensión" />
                                                       <TableColumn fx:id="tipoTelefonoTableColumn" minWidth="100.0" prefWidth="-1.0" text="Tipo" />
                                                    </columns>
                                                    <columnResizePolicy>
@@ -149,8 +149,8 @@
                                                 </TableView>
                                                 <HBox spacing="10.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <TextField fx:id="telefonoTextField" promptText="Telefono" />
-                                                      <TextField fx:id="extensionTextField" promptText="Extension" />
+                                                      <TextField fx:id="telefonoTextField" promptText="Teléfono" />
+                                                      <TextField fx:id="extensionTextField" promptText="Extensión" />
                                                       <ComboBox fx:id="tipoTelefonoComboBox" prefWidth="150.0" promptText="Tipo" />
                                                       <Button fx:id="agregarTelefonoButton" mnemonicParsing="false" onAction="#agregarTelefono" text="Agregar" />
                                                    </children>
@@ -240,20 +240,20 @@
                               </VBox>
                            </content>
                         </Tab>
-                      <Tab text="Polizas">
+                      <Tab text="Pólizas">
                            <content>
                               <VBox prefHeight="150.0">
                                  <children>
                                     <HBox alignment="CENTER_RIGHT">
                                        <children>
-                                          <Button mnemonicParsing="false" onAction="#nuevaPolizaScene" text="Nueva Poliza" />
+                                          <Button mnemonicParsing="false" onAction="#nuevaPolizaScene" text="Nueva Póliza" />
                                        </children>
                                     </HBox>
                                     <HBox>
                                        <children>
                                           <TableView fx:id="polizasTableView" HBox.hgrow="ALWAYS">
                                             <columns>
-                                              <TableColumn fx:id="polizaTableColumn" minWidth="100.0" prefWidth="-1.0" text="Poliza" />
+                                              <TableColumn fx:id="polizaTableColumn" minWidth="100.0" prefWidth="-1.0" text="Póliza" />
                                               <TableColumn fx:id="aseguradoraTableColumn" minWidth="100.0" prefWidth="-1.0" text="Aseguradora" />
                                                 <TableColumn fx:id="ramoTableColumn" minWidth="100.0" prefWidth="-1.0" text="Ramo" />
                                                 <TableColumn fx:id="productoTableColumn" minWidth="100.0" prefWidth="-1.0" text="Producto" />

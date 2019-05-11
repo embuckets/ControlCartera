@@ -17,9 +17,17 @@ import javax.persistence.EntityManager;
  */
 public class CaratulaJpaController implements Serializable, JpaController {
 
+    /**
+     *
+     */
     public CaratulaJpaController() {
     }
 
+    /**
+     *
+     * @param object
+     * @throws Exception
+     */
     @Override
     public void remove(Object object) throws Exception {
         Caratula caratula = (Caratula) object;
@@ -47,16 +55,28 @@ public class CaratulaJpaController implements Serializable, JpaController {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return Caratula.class.getSimpleName();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "findByIdpoliza";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "idpoliza";

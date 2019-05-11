@@ -34,6 +34,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Email implements Serializable, ObservableEmail {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     *
+     */
     @EmbeddedId
     protected EmailPK emailPK;
     @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDCLIENTE", insertable = false, updatable = false)
@@ -45,50 +49,98 @@ public class Email implements Serializable, ObservableEmail {
     @Column(name = "NOTIFICAR")
     private boolean notificar;
 
+    /**
+     *
+     */
     public Email() {
     }
 
+    /**
+     *
+     * @param emailPK
+     */
     public Email(EmailPK emailPK) {
         this.emailPK = emailPK;
     }
 
+    /**
+     *
+     * @param idcliente
+     * @param email
+     */
     public Email(int idcliente, String email) {
         this.emailPK = new EmailPK(idcliente, email);
     }
 
+    /**
+     *
+     * @param email
+     */
     public Email(String email) {
         this.emailPK = new EmailPK();
         this.emailPK.setEmail(email);
     }
 
+    /**
+     *
+     * @return
+     */
     public EmailPK getEmailPK() {
         return emailPK;
     }
 
+    /**
+     *
+     * @param emailPK
+     */
     public void setEmailPK(EmailPK emailPK) {
         this.emailPK = emailPK;
     }
 
+    /**
+     *
+     * @return
+     */
     public Asegurado getAsegurado() {
         return asegurado;
     }
 
+    /**
+     *
+     * @param asegurado
+     */
     public void setAsegurado(Asegurado asegurado) {
         this.asegurado = asegurado;
     }
 
+    /**
+     *
+     * @return
+     */
     public TipoEmail getTipoemail() {
         return tipoemail;
     }
 
+    /**
+     *
+     * @param tipoemail
+     */
     public void setTipoemail(TipoEmail tipoemail) {
         this.tipoemail = tipoemail;
     }
 
+    /**
+     * 
+     * @return si se debe usar este email para notficaciones
+     */
     public boolean isNotificar() {
         return notificar;
     }
 
+    /**
+     * Establece este email para notificaciones por correo
+     * @param notificar 
+     */
     public void setNotificar(boolean notificar) {
         this.notificar = notificar;
     }
@@ -118,16 +170,28 @@ public class Email implements Serializable, ObservableEmail {
         return "com.embuckets.controlcartera.entidades.Email[ emailPK=" + emailPK + " ]";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty emailProperty() {
         return new SimpleStringProperty(this.emailPK.getEmail());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty tipoProperty() {
         return new SimpleStringProperty(this.tipoemail.getTipoemail());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty notificarProperty() {
         return notificar ? new SimpleStringProperty("SI") : new SimpleStringProperty("NO");

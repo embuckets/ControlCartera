@@ -40,26 +40,49 @@ public class Ramo implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ramo", fetch = FetchType.LAZY)
     private List<Poliza> polizaList;
 
+    /**
+     *
+     */
     public Ramo() {
     }
 
+    /**
+     *
+     * @param ramo
+     */
     public Ramo(String ramo) {
         this.ramo = ramo;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getRamo() {
         return ramo;
     }
 
+    /**
+     *
+     * @param ramo
+     */
     public void setRamo(String ramo) {
         this.ramo = ramo;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Poliza> getPolizaList() {
         return polizaList;
     }
 
+    /**
+     *
+     * @param polizaList
+     */
     public void setPolizaList(List<Poliza> polizaList) {
         this.polizaList = polizaList;
     }

@@ -14,24 +14,64 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableTreeItem {
 
+    /**
+     *
+     * @return
+     */
     int getId();
 
+    /**
+     *
+     * @return
+     */
     StringProperty nombreProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty numeroProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty aseguradoraProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty ramoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty productoProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty planProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty primaProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty estadoProperty();
 
+    /**
+     *
+     * @return
+     */
     List<? extends ObservableTreeItem> getPolizaListProperty();
 
 }

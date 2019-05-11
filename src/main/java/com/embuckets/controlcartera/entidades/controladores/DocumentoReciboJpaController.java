@@ -17,9 +17,17 @@ import javax.persistence.EntityManager;
  */
 public class DocumentoReciboJpaController implements Serializable, JpaController {
 
+    /**
+     *
+     */
     public DocumentoReciboJpaController() {
     }
 
+    /**
+     *
+     * @param object
+     * @throws Exception
+     */
     @Override
     public void remove(Object object) throws Exception {
         DocumentoRecibo documentoRecibo = (DocumentoRecibo) object;
@@ -48,16 +56,28 @@ public class DocumentoReciboJpaController implements Serializable, JpaController
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getControlledClassName() {
         return DocumentoRecibo.class.getSimpleName();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdNamedQuery() {
         return "findByIdrecibo";
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFindByIdParameter() {
         return "idrecibo";

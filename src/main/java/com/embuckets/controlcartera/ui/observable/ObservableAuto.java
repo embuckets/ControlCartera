@@ -13,11 +13,27 @@ import javafx.beans.property.StringProperty;
  */
 public interface ObservableAuto {
 
+    /**
+     *
+     * @return
+     */
     StringProperty descripcionProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty marcaProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty submarcaProperty();
 
+    /**
+     *
+     * @return
+     */
     StringProperty modeloProperty();
 }

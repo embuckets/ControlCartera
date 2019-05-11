@@ -12,7 +12,22 @@ import javafx.beans.property.StringProperty;
  * @author emilio
  */
 public interface ObservableEmail {
+
+    /**
+     *
+     * @return
+     */
     StringProperty emailProperty();
+
+    /**
+     *
+     * @return
+     */
     StringProperty tipoProperty();
+
+    /**
+     *
+     * @return
+     */
     StringProperty notificarProperty();
 }

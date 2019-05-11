@@ -19,43 +19,84 @@ public class NotificacionCumpleWrapper {
     private NotificacionCumple notificacion;
     private BooleanProperty selectedProperty;
 
+    /**
+     *
+     * @param notificacion
+     * @param selected
+     */
     public NotificacionCumpleWrapper(NotificacionCumple notificacion, Boolean selected) {
         this.notificacion = notificacion;
         this.selectedProperty = new SimpleBooleanProperty(selected);
     }
 
+    /**
+     *
+     * @return notificacion de cumple
+     */
     public NotificacionCumple getNotificacionCumple() {
         return notificacion;
     }
 
-    public void setNotificacionCumple(NotificacionCumple asegurado) {
-        this.notificacion = asegurado;
+    /**
+     *
+     * @param notificacion notificacion que envuelve este wrapper
+     */
+    public void setNotificacionCumple(NotificacionCumple notificacion) {
+        this.notificacion = notificacion;
     }
 
+    /**
+     *
+     * @return si este wrapper esta selecciondo
+     */
     public BooleanProperty getSelectedProperty() {
         return selectedProperty;
     }
 
+    /**
+     *
+     * @param selectedProperty
+     */
     public void setSelectedProperty(BooleanProperty selectedProperty) {
         this.selectedProperty = selectedProperty;
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty nombreProperty() {
         return notificacion.getCliente().nombreProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty nacimientoProperty() {
         return notificacion.getCliente().nacimientoProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty faltanProperty() {
         return notificacion.faltanProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     public StringProperty estadoProperty() {
         return notificacion.estadoProperty();
     }
 
+    /**
+     *
+     * @return
+     */
     public BooleanProperty selectedProperty() {
         return selectedProperty;
     }

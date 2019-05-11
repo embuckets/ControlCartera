@@ -108,6 +108,9 @@ public class Asegurado implements Serializable, ObservableTreeItem, ObservableCl
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "asegurado", fetch = FetchType.LAZY)
     private List<Telefono> telefonoList;
 
+    /**
+     *
+     */
     public Asegurado() {
         emailList = new ArrayList<>();
         cliente = new Cliente();
@@ -116,6 +119,10 @@ public class Asegurado implements Serializable, ObservableTreeItem, ObservableCl
         telefonoList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param idcliente
+     */
     public Asegurado(Integer idcliente) {
         this.idcliente = idcliente;
         emailList = new ArrayList<>();
@@ -126,6 +133,12 @@ public class Asegurado implements Serializable, ObservableTreeItem, ObservableCl
 
     }
 
+    /**
+     *
+     * @param nombre
+     * @param apellidoPaterno
+     * @param apellidoMaterno
+     */
     public Asegurado(String nombre, String apellidoPaterno, String apellidoMaterno) {
         this.cliente = new Cliente();
         cliente.setNombre(nombre);
@@ -137,59 +150,115 @@ public class Asegurado implements Serializable, ObservableTreeItem, ObservableCl
         telefonoList = new ArrayList<>();
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getIdcliente() {
         return idcliente;
     }
 
+    /**
+     *
+     * @param idcliente
+     */
     public void setIdcliente(Integer idcliente) {
         this.idcliente = idcliente;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getRfc() {
         return rfc;
     }
 
+    /**
+     *
+     * @param rfc
+     */
     public void setRfc(String rfc) {
         this.rfc = rfc;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNota() {
         return nota;
     }
 
+    /**
+     *
+     * @param nota
+     */
     public void setNota(String nota) {
         this.nota = nota;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Email> getEmailList() {
         return emailList;
     }
 
+    /**
+     *
+     * @param emailList
+     */
     public void setEmailList(List<Email> emailList) {
         this.emailList = emailList;
     }
 
+    /**
+     *
+     * @return
+     */
     public Cliente getCliente() {
         return cliente;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombreCompleto() {
         return cliente.nombreProperty().get();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNombre() {
         return cliente.getNombre();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getApellidoPaterno() {
         return cliente.getApellidopaterno();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getApellidoMaterno() {
         return cliente.getApellidomaterno();
     }
 
+    /**
+     *
+     * @param cliente
+     */
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
         if (cliente.getIdcliente() != null) {
@@ -197,45 +266,85 @@ public class Asegurado implements Serializable, ObservableTreeItem, ObservableCl
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Domicilio getIddomicilio() {
         return iddomicilio;
     }
 
+    /**
+     *
+     * @param iddomicilio
+     */
     public void setIddomicilio(Domicilio iddomicilio) {
         this.iddomicilio = iddomicilio;
     }
 
+    /**
+     *
+     * @return
+     */
     public TipoPersona getTipopersona() {
         return tipopersona;
     }
 
+    /**
+     *
+     * @param tipopersona
+     */
     public void setTipopersona(TipoPersona tipopersona) {
         this.tipopersona = tipopersona;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Poliza> getPolizaList() {
         return polizaList;
     }
 
+    /**
+     *
+     * @param polizaList
+     */
     public void setPolizaList(List<Poliza> polizaList) {
         this.polizaList = polizaList;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<DocumentoAsegurado> getDocumentoAseguradoList() {
         return documentoAseguradoList;
     }
 
+    /**
+     *
+     * @param documentoAseguradoList
+     */
     public void setDocumentoAseguradoList(List<DocumentoAsegurado> documentoAseguradoList) {
         this.documentoAseguradoList = documentoAseguradoList;
     }
 
+    /**
+     *
+     * @return
+     */
     @XmlTransient
     public List<Telefono> getTelefonoList() {
         return telefonoList;
     }
 
+    /**
+     *
+     * @param telefonoList
+     */
     public void setTelefonoList(List<Telefono> telefonoList) {
         this.telefonoList = telefonoList;
     }
@@ -265,83 +374,151 @@ public class Asegurado implements Serializable, ObservableTreeItem, ObservableCl
         return "com.embuckets.controlcartera.entidades.Asegurado[ idcliente=" + idcliente + " ]";
     }
 
+    /**
+     *
+     * @param telefono
+     */
     public void agregarTelefono(Telefono telefono) {
         telefonoList.add(telefono);
     }
 
+    /**
+     *
+     * @param email
+     */
     public void agregarEmail(Email email) {
         emailList.add(email);
     }
 
+    /**
+     *
+     * @param documentoAsegurado
+     */
     public void agregarDocumento(DocumentoAsegurado documentoAsegurado) {
         documentoAseguradoList.add(documentoAsegurado);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getId() {
         return getIdcliente();
     }
 
+    /**
+     * 
+     * @return El nombre completo
+     */
     @Override
     public StringProperty nombreProperty() {
         return new SimpleStringProperty(cliente.getNombre() + " " + cliente.getApellidopaterno() + " " + cliente.getApellidomaterno());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty numeroProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty aseguradoraProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty ramoProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty productoProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty planProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty primaProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<? extends ObservableTreeItem> getPolizaListProperty() {
         return getPolizaList();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty estadoProperty() {
         return new SimpleStringProperty("");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty primerNombreProperty() {
         return new SimpleStringProperty(cliente.getNombre());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty paternoProperty() {
         return new SimpleStringProperty(cliente.getApellidopaterno());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty maternoProperty() {
         return new SimpleStringProperty(cliente.getApellidomaterno());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public StringProperty nacimientoProperty() {
         return new SimpleStringProperty(cliente.getNacimiento() == null ? "" : cliente.getNacimiento().toString());
